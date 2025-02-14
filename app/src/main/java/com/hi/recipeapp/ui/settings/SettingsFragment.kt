@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.hi.recipeapp.classes.APIObject
+import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.databinding.FragmentNotificationsBinding
 import com.hi.recipeapp.databinding.FragmentSettingsBinding
 import com.hi.recipeapp.ui.Networking.apiClient
@@ -44,17 +44,16 @@ class SettingsFragment : Fragment() {
 
         button.setOnClickListener {
             Log.d("SettingsFragment", "Button clicked")
-            val postId = 7 // Replace with the desired post ID
-            val call = apiClient.apiService.getPostById(postId)
+            val call = apiClient.apiService.getRoot()
 
-            call.enqueue(object : Callback<APIObject> {
-                override fun onResponse(call: Call<APIObject>, response: Response<APIObject>) {
+            call.enqueue(object : Callback<UserDTO> {
+                override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                     if (response.isSuccessful) {
                         Log.d("SettingsFragment", "API call successful")
-                        val post = response.body()
-                        if (post != null) {
-                            Log.d("SettingsFragment", "Received post name: ${post.name}")
-                            settingsViewModel.updateText(post.name)
+                        val user = response.body()
+                        if (user != null) {
+                            Log.d("SettingsFragment", "Received post name: ${user.email}")
+                            settingsViewModel.updateText(user.email)
                         } else {
                             Log.e("SettingsFragment", "Response body is null")
                             settingsViewModel.updateText("No data received")
@@ -65,7 +64,7 @@ class SettingsFragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(call: Call<APIObject>, t: Throwable) {
+                override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                     Log.e("SettingsFragment", "API call failed: ${t.localizedMessage}")
                     settingsViewModel.updateText("API call failed")
                 }
