@@ -6,15 +6,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsetsAnimation
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.hi.recipeapp.databinding.FragmentDashboardBinding
 import androidx.appcompat.widget.SearchView
 import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.ui.Networking.apiClient
+import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.ui.search.SearchViewModel
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,6 +27,7 @@ class DashboardFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private lateinit var searchViewModel: SearchViewModel
+    private lateinit var recipeService: RecipeService
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,20 +35,24 @@ class DashboardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
+            ViewModelProvider(this)[DashboardViewModel::class.java]
 
-        searchViewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
-
+        searchViewModel = ViewModelProvider(this)[SearchViewModel::class.java]
+        recipeService = RecipeService()
 
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        //This subscribes the UI (Fragment) to the LiveData (searchResults).
+        //Whenever searchResults changes, the observer will be notified automatically
+        //The viewLifecyclyOwner ensures that the observer is only active while the fragments lifecycle is alive.
+        //and also prevents memory leaks by automatically removing the observer when the fragment is destroyed.
         searchViewModel.searchResults.observe(viewLifecycleOwner, { results ->
             binding.textDashboard.text = results
         })
 
         val searchView: SearchView = binding.searchDashboard
-        searchView.setIconified(false)
+        searchView.isIconified = false
         searchView.setSuggestionsAdapter(null)
         searchView.clearFocus()
         searchView.setQueryHint("Search for recipes...")
@@ -58,7 +61,7 @@ class DashboardFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean{
                 query?.let {
-                    fetchRecipesByQuery(it)
+                    searchByQuery(it)
                 }
                 return true
             }
@@ -75,49 +78,16 @@ class DashboardFragment : Fragment() {
         return root
     }
 
-    private fun fetchRecipesByQuery(query: String) {
-        apiClient.apiService.getRecipesByQuery(query).enqueue(object : Callback<List<RecipeCard>>{
-            override fun onResponse(call: Call<List<RecipeCard>>, response: Response<List<RecipeCard>>) {
-                if (response.isSuccessful) {
-                    val recipes = response.body()
-                    if (recipes != null && recipes.isNotEmpty()) {
-                        recipes.forEach {
-                            Log.d("DashboardFragment", "Recipe found: ${it.title}, Rating: ${it.averageRating}")
-                        }
-                        displayRecipes(recipes)
-                    } else {
-                        displayNoResultsMessage(query)
-                    }
-                } else {
-                    Log.e("DashboardFragment", "API call unsuccessful: ${response.errorBody()?.string()}")
-                }
+    private fun searchByQuery(query: String) {
+        recipeService.searchRecipes(query) { recipes, error ->
+            if (!recipes.isNullOrEmpty()) {
+                val firstRecipe = recipes.first()
+                val resultText = "Found Recipe: ${firstRecipe.title}\nRating: ${firstRecipe.averageRating}\nDescription: ${firstRecipe.description}"
+                searchViewModel.updateSearchResults(resultText) // ✅ Use ViewModel to update UI
+            } else {
+                searchViewModel.updateSearchResults(error ?: "No recipes found for '$query'")
             }
-
-            override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
-            Log.e("DashboardFragment", "API call failed: ${t.localizedMessage}")
         }
-        })
-    }
-    @SuppressLint("SetTextI18n")
-    private fun displayRecipes(recipes: List<RecipeCard>) {
-        if (recipes.isEmpty()) {
-            Log.d("DashboardFragment", "No recipes to display.")
-            return
-        }
-        recipes.forEach {
-            Log.d("DashboardFragment", "Recipe found: ${it.title}, Rating: ${it.averageRating}, Description: ${it.description}")
-        }
-        binding.textDashboard.text = "Found Recipe: ${recipes.first().title}\nRating: ${recipes.first().averageRating}\nDescription: ${recipes.first().description}"
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun displayNoResultsMessage(query: String) {
-        Log.d("DashboardFragment", "No recipes found for '$query'")
-        binding.textDashboard.text = "No recipes found for '$query'"
-        binding.textDashboard.visibility = View.VISIBLE
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }
