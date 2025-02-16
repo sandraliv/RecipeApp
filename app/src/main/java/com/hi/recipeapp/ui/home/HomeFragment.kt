@@ -4,39 +4,48 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var adapter: RecipeAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+    ): View? {
+        val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        // Initialize the ViewModel
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        // Set up RecyclerView and Adapter
+        adapter = RecipeAdapter()
+        binding.recipeRecyclerView.adapter = adapter
+
+        // Set the LayoutManager for RecyclerView
+        binding.recipeRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        // Observe the LiveData from ViewModel
+        homeViewModel.recipes.observe(viewLifecycleOwner) { recipeList ->
+            // Submit the new list to the adapter
+            adapter.submitList(recipeList)
         }
-        return root
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        homeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Trigger the recipe fetch
+        homeViewModel.fetchRecipes()
+
+        return binding.root
     }
 }

@@ -11,6 +11,12 @@ import retrofit2.http.Query
 interface ApiService {
     @GET("users/1")
     fun getRoot(): Call<UserDTO>
+
     @GET("recipes")
     fun getRecipesByQuery(@Query("query") query: String): Call<List<RecipeCard>>
+
+    @GET("recipes")
+    fun getAllRecipes(): Call<List<RecipeCard>>
+
+
 }

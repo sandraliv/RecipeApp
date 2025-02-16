@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:layout_margin="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Recipe image -->
+        <ImageView
+            android:id="@+id/recipe_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:contentDescription="Recipe image"
+            android:layout_marginBottom="8dp"
+            android:scaleType="centerCrop" />
+
+        <!-- Recipe name -->
+        <TextView
+            android:id="@+id/recipe_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recipe Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Recipe description -->
+        <TextView
+            android:id="@+id/recipe_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recipe Description"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Rating layout -->
+        <LinearLayout
+            android:id="@+id/recipe_rating_layout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_marginTop="8dp">
+
+            <!-- Rating stars -->
+            <TextView
+                android:id="@+id/recipe_rating_stars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐⭐⭐⭐"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Rating count -->
+            <TextView
+                android:id="@+id/recipe_rating_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(50)"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+
