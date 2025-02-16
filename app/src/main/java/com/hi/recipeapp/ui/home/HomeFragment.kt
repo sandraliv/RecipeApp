@@ -1,18 +1,19 @@
+package com.hi.recipeapp.ui.home
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentHomeBinding
-import com.hi.recipeapp.ui.home.HomeViewModel
-import com.hi.recipeapp.ui.home.RecipeAdapter
+
 
 class HomeFragment : Fragment() {
-
-    private lateinit var homeViewModel: HomeViewModel
-    private lateinit var adapter: RecipeAdapter
+    private val homeViewModel: HomeViewModel by viewModels() // Get ViewModel instance
+    private lateinit var recipeAdapter: RecipeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -20,30 +21,44 @@ class HomeFragment : Fragment() {
     ): View? {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        // Initialize the ViewModel
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        // Initialize the adapter and set it to RecyclerView
+        recipeAdapter = RecipeAdapter()
+        binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recipeRecyclerView.adapter = recipeAdapter
 
-        // Set up RecyclerView and Adapter
-        adapter = RecipeAdapter()
-        binding.recipeRecyclerView.adapter = adapter
-
-        // Observe the LiveData from ViewModel
-        homeViewModel.recipes.observe(viewLifecycleOwner) { recipeList ->
-            if (recipeList != null) {
-                // Submit the new list to the adapter
-                adapter.submitList(recipeList)
+        // Observe the recipes LiveData from HomeViewModel
+        homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
+            if (recipes.isEmpty()) {
+                binding.textHome.visibility = View.VISIBLE // Show message if no recipes
+                binding.recipeRecyclerView.visibility = View.GONE
+            } else {
+                binding.textHome.visibility = View.GONE // Hide message if recipes are found
+                binding.recipeRecyclerView.visibility = View.VISIBLE
+                recipeAdapter.submitList(recipes) // Update RecyclerView
             }
         }
 
+        // Observe the error message LiveData
         homeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Trigger the recipe fetch
+        // Observe progress bar visibility (assuming you want to use it while fetching data)
+        homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE // Show progress bar when loading
+            } else {
+                binding.progressBar.visibility = View.GONE // Hide progress bar when done
+            }
+        }
+
+        // Trigger the recipe fetch from ViewModel
         homeViewModel.fetchRecipes()
 
         return binding.root
     }
 }
+
+
