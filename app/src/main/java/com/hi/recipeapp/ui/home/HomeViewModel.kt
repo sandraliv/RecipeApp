@@ -5,12 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.ui.Networking.apiClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.hi.recipeapp.services.RecipeService
 
 class HomeViewModel : ViewModel() {
+
+
+    private val recipeService = RecipeService()  // Initialize the service
 
     // LiveData to hold the list of recipes
     private val _recipes = MutableLiveData<List<RecipeCard>>()
@@ -20,28 +20,17 @@ class HomeViewModel : ViewModel() {
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> get() = _errorMessage
 
-    // Fetch recipes from the API
+    // Fetch recipes using RecipeService
     fun fetchRecipes() {
-        apiClient.apiService.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
-            override fun onResponse(
-                call: Call<List<RecipeCard>>,
-                response: Response<List<RecipeCard>>
-            ) {
-                if (response.isSuccessful) {
-                    val recipes = response.body() ?: emptyList()
-                    recipes.forEach {
-                        Log.d("HomeViewModel", "Recipe image URL: ${it.imageUrl}")
-                    }
-                    _recipes.value = recipes
-                } else {
-                    _errorMessage.value = "Error: ${response.code()}"
-                }
+        recipeService.fetchRecipes { recipeList, error ->
+            if (recipeList != null) {
+                _recipes.value = recipeList  // Update LiveData with the fetched recipes
+            } else {
+                _errorMessage.value = error  // Update LiveData with the error message
             }
-
-            override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
-                // Handle failure
-                _errorMessage.value = t.message
-            }
-        })
+        }
     }
+
+
+
 }

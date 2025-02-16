@@ -22,5 +22,28 @@ class RecipeService {
         })
     }
 
+    fun fetchRecipes(callback: (List<RecipeCard>?, String?) -> Unit) {
+        NetworkClient.service.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
+            override fun onResponse(
+                call: Call<List<RecipeCard>>,
+                response: Response<List<RecipeCard>>
+            ) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
+                callback(null, "Network error: ${t.localizedMessage}")
+            }
+        })
+    }
+
+
+
+
+
 
 }

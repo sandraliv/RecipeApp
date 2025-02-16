@@ -1,5 +1,3 @@
-package com.hi.recipeapp.ui.home
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +5,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentHomeBinding
+import com.hi.recipeapp.ui.home.HomeViewModel
+import com.hi.recipeapp.ui.home.RecipeAdapter
 
 class HomeFragment : Fragment() {
 
@@ -28,13 +27,12 @@ class HomeFragment : Fragment() {
         adapter = RecipeAdapter()
         binding.recipeRecyclerView.adapter = adapter
 
-        // Set the LayoutManager for RecyclerView
-        binding.recipeRecyclerView.layoutManager = LinearLayoutManager(context)
-
         // Observe the LiveData from ViewModel
         homeViewModel.recipes.observe(viewLifecycleOwner) { recipeList ->
-            // Submit the new list to the adapter
-            adapter.submitList(recipeList)
+            if (recipeList != null) {
+                // Submit the new list to the adapter
+                adapter.submitList(recipeList)
+            }
         }
 
         homeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
