@@ -1,8 +1,6 @@
 package com.hi.recipeapp.ui.dashboard
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.hi.recipeapp.databinding.FragmentDashboardBinding
 import androidx.appcompat.widget.SearchView
-import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.ui.search.SearchViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
 
 class DashboardFragment : Fragment() {
 
