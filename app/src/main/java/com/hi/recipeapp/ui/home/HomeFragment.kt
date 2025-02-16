@@ -18,7 +18,7 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         // Initialize the adapter and set it to RecyclerView
@@ -28,13 +28,15 @@ class HomeFragment : Fragment() {
 
         // Observe the recipes LiveData from HomeViewModel
         homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
-            if (recipes.isEmpty()) {
-                binding.textHome.visibility = View.VISIBLE // Show message if no recipes
-                binding.recipeRecyclerView.visibility = View.GONE
-            } else {
-                binding.textHome.visibility = View.GONE // Hide message if recipes are found
-                binding.recipeRecyclerView.visibility = View.VISIBLE
-                recipeAdapter.submitList(recipes) // Update RecyclerView
+            if (recipes != null) {
+                if (recipes.isEmpty()) {
+                    binding.textHome.visibility = View.VISIBLE // Show message if no recipes
+                    binding.recipeRecyclerView.visibility = View.GONE
+                } else {
+                    binding.textHome.visibility = View.GONE // Hide message if recipes are found
+                    binding.recipeRecyclerView.visibility = View.VISIBLE
+                    recipeAdapter.submitList(recipes) // Update RecyclerView
+                }
             }
         }
 
@@ -53,10 +55,7 @@ class HomeFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE // Hide progress bar when done
             }
         }
-
-        // Trigger the recipe fetch from ViewModel
-        homeViewModel.fetchRecipes()
-
+         homeViewModel.fetchRecipes()
         return binding.root
     }
 }

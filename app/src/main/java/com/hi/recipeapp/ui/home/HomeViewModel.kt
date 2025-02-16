@@ -6,18 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.services.RecipeService
+import com.hi.recipeapp.ui.networking.NetworkClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HomeViewModel : ViewModel() {
-    private lateinit var recipeService:RecipeService
-    recipeService
-
     // LiveData to hold the list of recipes
-    private val _recipes = MutableLiveData<List<RecipeCard>>()
-    val recipes: LiveData<List<RecipeCard>> get() = _recipes
+    private val _recipes = MutableLiveData<List<RecipeCard>?>()
+    val recipes: MutableLiveData<List<RecipeCard>?> get() = _recipes
 
     // LiveData for error messages
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> get() = _errorMessage
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: MutableLiveData<String?> get() = _errorMessage
 
     // LiveData to track loading state
     private val _isLoading = MutableLiveData<Boolean>()
@@ -25,17 +26,26 @@ class HomeViewModel : ViewModel() {
 
     // Fetch recipes from the API using the RecipeService
     fun fetchRecipes() {
-        // Show the loading state (optional, if you have a progress bar)
-        _errorMessage.value = null // Clear previous error messages
-
-        recipeService.fetchRecipes { recipes, error ->
-            if (recipes != null) {
-                // Successful fetch: update LiveData
-                _recipes.value = recipes
-            } else {
-                // Error occurred: update error message
-                _errorMessage.value = error ?: "Unknown error occurred"
+        NetworkClient.service.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
+            override fun onResponse(
+                call: Call<List<RecipeCard>>,
+                response: Response<List<RecipeCard>>
+            ) {
+                if (response.isSuccessful) {
+                    val recipes = response.body() ?: emptyList()
+                    recipes.forEach {
+                        Log.d("HomeViewModel", "Recipe image URL: ${it.imageUrl}")
+                    }
+                    _recipes.value = recipes
+                } else {
+                    _errorMessage.value = "Error: ${response.code()}"
+                }
             }
-        }
+
+            override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
+                // Handle failure
+                _errorMessage.value = t.message
+            }
+        })
     }
 }

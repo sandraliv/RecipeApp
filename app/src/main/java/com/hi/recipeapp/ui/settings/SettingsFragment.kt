@@ -11,10 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.databinding.FragmentSettingsBinding
-import com.hi.recipeapp.ui.networking.NetworkClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 //This class extends Fragment(), meaning it represents a reusable UI component.
 class SettingsFragment : Fragment() {
