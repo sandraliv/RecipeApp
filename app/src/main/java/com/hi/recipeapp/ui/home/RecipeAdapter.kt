@@ -33,16 +33,15 @@ class RecipeAdapter : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(Re
 
             Glide.with(binding.root.context)
                 .load(recipe.imageUrl)
-                .placeholder(R.drawable.placeholder) // Optional placeholder
-                .error(R.drawable.error_image) // Optional error image
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error_image)
                 .into(binding.recipeImage)
         }
     }
-
     // DiffUtil callback to optimize list updates
     class RecipeDiffCallback : DiffUtil.ItemCallback<RecipeCard>() {
         override fun areItemsTheSame(oldItem: RecipeCard, newItem: RecipeCard): Boolean {
-            return oldItem.id == newItem.id // Assume 'id' is a unique identifier for RecipeCard
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: RecipeCard, newItem: RecipeCard): Boolean {
