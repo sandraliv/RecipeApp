@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
