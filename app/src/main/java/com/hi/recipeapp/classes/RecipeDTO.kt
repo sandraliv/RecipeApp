@@ -1,8 +1,9 @@
 package com.hi.recipeapp.classes
 
 data class RecipeCard(
-    val title: String,
-    val rating: Int,
     val imageUrl: String,
-    val description: String
+    val title: String,
+    val description: String,
+    val averageRating: Double,
+    val ratingCount: Int
 )

@@ -1,5 +1,6 @@
 package com.hi.recipeapp.ui.dashboard
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -44,7 +45,6 @@ class DashboardFragment : Fragment() {
         val root: View = binding.root
 
         searchViewModel.searchResults.observe(viewLifecycleOwner, { results ->
-            // Update the UI with the search results
             binding.textDashboard.text = results
         })
 
@@ -82,7 +82,7 @@ class DashboardFragment : Fragment() {
                     val recipes = response.body()
                     if (recipes != null && recipes.isNotEmpty()) {
                         recipes.forEach {
-                            Log.d("DashboardFragment", "Recipe found: ${it.title}, Rating: ${it.rating}")
+                            Log.d("DashboardFragment", "Recipe found: ${it.title}, Rating: ${it.averageRating}")
                         }
                         displayRecipes(recipes)
                     } else {
@@ -98,17 +98,19 @@ class DashboardFragment : Fragment() {
         }
         })
     }
+    @SuppressLint("SetTextI18n")
     private fun displayRecipes(recipes: List<RecipeCard>) {
         if (recipes.isEmpty()) {
             Log.d("DashboardFragment", "No recipes to display.")
             return
         }
         recipes.forEach {
-            Log.d("DashboardFragment", "Recipe found: ${it.title}, Rating: ${it.rating}")
+            Log.d("DashboardFragment", "Recipe found: ${it.title}, Rating: ${it.averageRating}, Description: ${it.description}")
         }
-        binding.textDashboard.text = "Found Recipe: ${recipes.first().title}"
+        binding.textDashboard.text = "Found Recipe: ${recipes.first().title}\nRating: ${recipes.first().averageRating}\nDescription: ${recipes.first().description}"
     }
 
+    @SuppressLint("SetTextI18n")
     private fun displayNoResultsMessage(query: String) {
         Log.d("DashboardFragment", "No recipes found for '$query'")
         binding.textDashboard.text = "No recipes found for '$query'"
