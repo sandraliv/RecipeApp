@@ -48,6 +48,5 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.e("MainActivity", "NavHostFragment not found!")
         }
-        val button = findViewById<Button>(R.id.home_button)
     }
 }
