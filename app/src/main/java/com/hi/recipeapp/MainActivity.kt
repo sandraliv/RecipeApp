@@ -92,8 +92,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivity", "NavHostFragment not found!")
         }
 
-        // Optional: If you have a button for custom actions like navigating home or something else
-        val button = findViewById<Button>(R.id.home_button)
+       
     }
 
 

@@ -11,8 +11,4 @@ class SettingsViewModel : ViewModel() {
     }
     val text: LiveData<String> = _text
 
-    // Add this method to allow updating the text from the fragment
-    fun updateText(newText: String) {
-        _text.value = newText
-    }
 }
