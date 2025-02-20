@@ -3,62 +3,61 @@ package com.hi.recipeapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.hi.recipeapp.services.UserService
+import com.hi.recipeapp.databinding.ActivityWelcomePageBinding
+import com.hi.recipeapp.ui.welcomepage.WelcomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class WelcomePageActivity : AppCompatActivity() {
 
-    private lateinit var usernameInput: EditText
-    private lateinit var passwordInput: EditText
-    private lateinit var loginBtn: Button
-    private val loginService = UserService()
+    private lateinit var binding: ActivityWelcomePageBinding
+    private val welcomeViewModel: WelcomeViewModel by viewModels() // ✅ Inject ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_welcome_page)
+        binding = ActivityWelcomePageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Bind UI elements
-        usernameInput = findViewById(R.id.username_input)
-        passwordInput = findViewById(R.id.password_input)
-        loginBtn = findViewById(R.id.login_btn)
+        setupObservers()
+        setupListeners()
+    }
 
-        // Handle login button click
-        loginBtn.setOnClickListener {
-            val username = usernameInput.text.toString().trim()
-            val password = passwordInput.text.toString().trim()
+    private fun setupObservers() {
+        welcomeViewModel.loginResult.observe(this) { user ->
+            if (user != null) {
+                showToast("Login successful! Welcome, ${user.username}")
+                Log.d("LoginSuccess", "User: ${user.username}")
 
-            if (username.isEmpty() || password.isEmpty()) {
-                showToast("Please enter both username and password")
-                return@setOnClickListener
+                // ✅ Navigate to MainActivity
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
             }
+        }
 
-            // Send login request
-            loginService.login(username, password) { user, error ->
-                if (user != null) {
-                    showToast("Login successful! Welcome, ${user.username}")
-                    Log.d("LoginSuccess", "User: ${user.username}")
-
-                    // Navigate to MainActivity
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                } else {
-                    showToast(error ?: "Unknown error, please try again")
-                    Log.e("LoginError", "Login failed: $error")
-                }
+        welcomeViewModel.errorMessage.observe(this) { error ->
+            error?.let {
+                showToast(it)
+                Log.e("LoginError", it)
             }
+        }
+
+        welcomeViewModel.isLoading.observe(this) { isLoading ->
+            binding.loginBtn.isEnabled = !isLoading
         }
     }
 
-    // Helper function to show toast messages
+    private fun setupListeners() {
+        binding.loginBtn.setOnClickListener {
+            val username = binding.usernameInput.text.toString().trim()
+            val password = binding.passwordInput.text.toString().trim()
+            welcomeViewModel.login(username, password) // ✅ Call ViewModel
+        }
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
-
-

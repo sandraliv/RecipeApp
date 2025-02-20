@@ -9,9 +9,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.databinding.FragmentSettingsBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 //This class extends Fragment(), meaning it represents a reusable UI component.
 class SettingsFragment : Fragment() {
 

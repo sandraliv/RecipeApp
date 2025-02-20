@@ -2,17 +2,20 @@ package com.hi.recipeapp.services
 
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.UserDTO
-import com.hi.recipeapp.ui.networking.NetworkClient
+import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class UserService {
+class UserService @Inject constructor(
+    private val networkService: NetworkService
+) {
 
     fun login(username: String, password: String, callback: (UserDTO?, String?) -> Unit) {
         val loginRequest = LoginRequest(username, password)
 
-        NetworkClient.service.login(loginRequest).enqueue(object : Callback<UserDTO> {
+        networkService.login(loginRequest).enqueue(object : Callback<UserDTO> {
             override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                 if (response.isSuccessful) {
                     response.body()?.let { user ->

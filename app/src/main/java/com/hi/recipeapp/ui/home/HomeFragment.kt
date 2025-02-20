@@ -9,8 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentHomeBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModels() // Get ViewModel instance
     private lateinit var recipeAdapter: RecipeAdapter
@@ -55,7 +56,8 @@ class HomeFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE // Hide progress bar when done
             }
         }
-         homeViewModel.fetchRecipes()
+
+        homeViewModel.fetchRecipes()
         return binding.root
     }
 }

@@ -24,9 +24,3 @@ interface NetworkService {
     fun login(@Body loginRequest: LoginRequest): Call<UserDTO>
 }
 
-// Provide a single instance of NetworkService
-object NetworkClient {
-    val service: NetworkService by lazy {
-        ApiClient.instance.create(NetworkService::class.java)
-    }
-}

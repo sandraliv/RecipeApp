@@ -1,15 +1,18 @@
 package com.hi.recipeapp.services
 
 import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.ui.networking.NetworkClient
+import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class RecipeService {
+class RecipeService @Inject constructor(
+    private val networkService: NetworkService
+) {
 
     fun searchRecipes(query: String, callback: (List<RecipeCard>?, String?) -> Unit) {
-        NetworkClient.service.getRecipesByQuery(query).enqueue(object : Callback<List<RecipeCard>> {
+        networkService.getRecipesByQuery(query).enqueue(object : Callback<List<RecipeCard>> {
             override fun onResponse(call: Call<List<RecipeCard>>, response: Response<List<RecipeCard>>) {
                 response.body()?.takeIf { it.isNotEmpty() }?.let { recipes ->
                     callback(recipes, null) // ✅ Return successful results
@@ -23,7 +26,7 @@ class RecipeService {
     }
 
     fun fetchRecipes(callback: (List<RecipeCard>?, String?) -> Unit) {
-        NetworkClient.service.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
+        networkService.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
             override fun onResponse(
                 call: Call<List<RecipeCard>>,
                 response: Response<List<RecipeCard>>
