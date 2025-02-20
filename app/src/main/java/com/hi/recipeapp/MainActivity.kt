@@ -2,6 +2,7 @@ package com.hi.recipeapp
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivity", "NavHostFragment not found!")
         }
 
-       
+
     }
 
 
