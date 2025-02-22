@@ -95,6 +95,22 @@ class DashboardFragment : Fragment() {
         binding.searchDashboard.clearFocus() // Remove focus from the search view
     }
 
+    // Method to reset search state
+    fun resetSearchState() {
+        binding.textDashboard.text = ""  // Clear any previous search results
+        binding.searchDashboard.setQuery("", false) // Clear the search view query
+        binding.searchDashboard.clearFocus() // Remove focus from the search view
+    }
+    // Reset the Dashboard UI when navigating back
+    override fun onResume() {
+        super.onResume()
+        // Clear any search results when returning to the Dashboard
+        binding.textDashboard.text = ""  // Clear any previous search results
+        binding.searchDashboard.setQuery("", false) // Clear the search view query
+        binding.searchDashboard.clearFocus() // Remove focus from the search view
+    }
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
