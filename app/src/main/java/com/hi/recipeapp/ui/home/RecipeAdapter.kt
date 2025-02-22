@@ -29,7 +29,18 @@ class RecipeAdapter(private val onClick: (Int) -> Unit) : ListAdapter<RecipeCard
         fun bind(recipe: RecipeCard) {
             binding.recipeName.text = recipe.title
             binding.recipeDescription.text = recipe.description
-            binding.recipeRatingStars.text = "⭐".repeat(recipe.averageRating.toInt())
+            // Handling fractional rating (e.g., showing full and half stars)
+            val fullStars = recipe.averageRating.toInt() // The integer part
+            val hasHalfStar = recipe.averageRating % 1 >= 0.5 // If there's a fractional part (>= 0.5, show half star)
+            val emptyStars = 5 - fullStars - if (hasHalfStar) 1 else 0 // Remaining empty stars
+
+            // Build the star rating string
+            val starRating = StringBuilder()
+            starRating.append("⭐".repeat(fullStars))  // Full stars
+            if (hasHalfStar) starRating.append("🌟")  // Half star
+            starRating.append("☆".repeat(emptyStars))  // Empty stars
+
+            binding.recipeRatingStars.text = starRating.toString()
             binding.recipeRatingCount.text = "(${recipe.ratingCount})"
 
             Glide.with(binding.root.context)

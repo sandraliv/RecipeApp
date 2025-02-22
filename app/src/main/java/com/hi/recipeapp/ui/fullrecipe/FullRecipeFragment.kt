@@ -3,10 +3,14 @@ package com.hi.recipeapp.ui.fullrecipe
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.TableRow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,6 +19,7 @@ import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.databinding.FragmentFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class FullRecipeFragment : Fragment() {
@@ -67,34 +72,79 @@ class FullRecipeFragment : Fragment() {
             .error(R.drawable.error_image)        // Error image
             .into(binding.imageView)
 
-
-        // Handle ingredients (now it's a Map<String, String>)
         recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
             val formattedIngredientName = ingredientName.replace("_", " ") // Replace underscores with spaces
+
+            // Create a TableRow to hold the components for each ingredient
+            val tableRow = TableRow(requireContext()).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, 8, 0, 8) // Optional padding for each row
+            }
+
+            // Create the measurement TextView (for displaying the quantity)
+            val measurementTextView = TextView(requireContext()).apply {
+                text = ingredientQuantity
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                gravity = Gravity.START  // Align text to the left for the measurements
+                setPadding(16, 0, 16, 0) // Adjust the padding between columns
+            }
+
+            // Create the ingredient name TextView (for displaying the ingredient name)
+            val ingredientNameTextView = TextView(requireContext()).apply {
+                text = formattedIngredientName
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                gravity = Gravity.START  // Align text to the left for the ingredient name
+                setPadding(16, 0, 16, 0) // Adjust the padding between columns
+            }
+
+            // Create the CheckBox for the ingredient
             val ingredientCheckBox = CheckBox(requireContext()).apply {
-                // Replace underscores with spaces in the ingredient name
-                text = "$ingredientQuantity: $formattedIngredientName"  // Show both ingredient name and quantity
                 setOnCheckedChangeListener { buttonView, isChecked ->
-                    if (isChecked) {
-                        buttonView.paintFlags = buttonView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    } else {
-                        buttonView.paintFlags = buttonView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                    }
+                    // Apply strike-through effect to the entire row (checkbox, measurement, and name)
+                    val strikeThroughFlag = if (isChecked) Paint.STRIKE_THRU_TEXT_FLAG else 0
+                    measurementTextView.paintFlags = strikeThroughFlag
+                    ingredientNameTextView.paintFlags = strikeThroughFlag
                 }
             }
-            binding.ingredientsLayout.addView(ingredientCheckBox) // Add checkbox to the layout
+
+            // Add the views to the TableRow
+            tableRow.addView(ingredientCheckBox) // First column (checkbox)
+            tableRow.addView(measurementTextView)  // Second column (measurement only)
+            tableRow.addView(ingredientNameTextView)  // Third column (ingredient name only)
+
+            // Add the TableRow to the TableLayout
+            binding.ingredientsLayout.addView(tableRow)  // Add the entire row
         }
 
-        // Set instructions
-        binding.instructionsTextView.text = recipe.instructions
 
-        // Set rating and count
-        binding.ratingBar.rating = recipe.averageRating.toFloat()
+
+        // Set instructions with numbering
+        val instructions = recipe.instructions.split(".") // Split by periods (.)
+
+        val formattedInstructions = StringBuilder()
+        instructions.forEachIndexed { index, instruction ->
+            // Ignore empty strings caused by trailing periods or extra spaces
+            if (instruction.trim().isNotEmpty()) {
+                // Add number and instruction step
+                formattedInstructions.append("${index + 1}. ${instruction.trim()}. \n\n")
+            }
+        }
+
+        binding.instructionsTextView.text = formattedInstructions.toString()
+
+
+        val rating = recipe.averageRating.toFloat() // Directly convert to float
+        binding.ratingBar.rating = rating
+
+
+        // Set the rating count (if 0, it will still display the text)
         binding.ratingCountTextView.text = "${recipe.ratingCount} ratings"
+
         // Display tags (if necessary)
-        binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.name } // Display tags as comma-separated
+        binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.name.replace("_", " ") }  // Display tags as comma-separated
         // Display categories (if necessary)
-        binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.name } // Display categories as comma-separated
+        binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.name.replace("_", " ").replaceFirstChar { it.uppercase(
+            Locale.ROOT) } } // Replace underscores and capitalize
     }
 
 }

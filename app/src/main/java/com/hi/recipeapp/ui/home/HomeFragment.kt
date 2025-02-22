@@ -22,7 +22,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
-
         // Initialize the adapter with the click listener
         recipeAdapter = RecipeAdapter { recipeId ->
             // This is where you handle the click event (navigate to FullRecipeFragment)
