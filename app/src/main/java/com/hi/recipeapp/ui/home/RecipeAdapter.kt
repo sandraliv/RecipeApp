@@ -10,7 +10,8 @@ import com.hi.recipeapp.R
 import com.hi.recipeapp.databinding.ItemRecipeCardBinding
 import com.hi.recipeapp.classes.RecipeCard
 
-class RecipeAdapter : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
+class RecipeAdapter(private val onClick: (Int) -> Unit) : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val binding = ItemRecipeCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -36,7 +37,12 @@ class RecipeAdapter : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(Re
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.error_image)
                 .into(binding.recipeImage)
+
+            binding.root.setOnClickListener {
+                onClick(recipe.id)
+            }
         }
+
     }
     // DiffUtil callback to optimize list updates
     class RecipeDiffCallback : DiffUtil.ItemCallback<RecipeCard>() {

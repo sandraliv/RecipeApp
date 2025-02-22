@@ -22,6 +22,7 @@ preference = "1.2.0"
 uiAndroid = "1.7.8"
 activity = "1.8.0"
 hilt = "2.55"
+navigationFragment = "2.8.7"
 
 [libraries]
 artifactid = { module = "groupId:artifactId", version.ref = "artifactid" }
@@ -49,6 +50,7 @@ androidx-annotation = { group = "androidx.annotation", name = "annotation", vers
 androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
