@@ -23,8 +23,8 @@ class HomeFragment : Fragment() {
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
         // Initialize the adapter with the click listener
-        recipeAdapter = RecipeAdapter { recipeId ->
-            // This is where you handle the click event (navigate to FullRecipeFragment)
+        recipeAdapter = RecipeAdapter { recipe ->  // recipe here is of type RecipeCard
+            val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
             val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
             findNavController().navigate(action)
         }

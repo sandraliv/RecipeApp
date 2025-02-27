@@ -11,7 +11,6 @@
         android:name="com.hi.recipeapp.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home">
-
         <!-- Action to navigate to FullRecipeFragment from HomeFragment -->
         <action
             android:id="@+id/action_homeFragment_to_fullRecipeFragment"
@@ -21,6 +20,22 @@
                 app:argType="integer" />
         </action>
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.hi.recipeapp.ui.dashboard.DashboardFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_dashboard" >
+
+    <action
+            android:id="@+id/action_dashboardFragment_to_fullRecipeFragment"
+            app:destination="@id/fullRecipeFragment">
+            <argument
+                android:name="recipeId"
+                app:argType="integer"/>
+        </action>
+    </fragment>
+
 
     <!-- Full Recipe Fragment -->
     <fragment
@@ -34,12 +49,6 @@
     </fragment>
 
     <!-- Other Fragments (Dashboard, Notifications, Settings) -->
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.hi.recipeapp.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.hi.recipeapp.ui.notifications.NotificationsFragment"

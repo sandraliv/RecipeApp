@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.FullRecipe
@@ -27,14 +28,18 @@ class FullRecipeFragment : Fragment() {
     private val fullRecipeViewModel: FullRecipeViewModel by viewModels() // Get ViewModel instance
     private lateinit var binding: FragmentFullRecipeBinding
 
+
+    // Safe Args: Retrieve arguments passed to the fragment
+    private val args: FullRecipeFragmentArgs by navArgs()
+    private val recipeId: Int get() = args.recipeId
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
 
-        // Get the recipe ID from arguments
-        val recipeId = arguments?.getInt("recipeId") ?: return null
+
 
         // Fetch full recipe data
         fullRecipeViewModel.fetchRecipeById(recipeId)

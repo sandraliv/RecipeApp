@@ -4,10 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.appcompat.widget.SearchView
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentDashboardBinding
+import com.hi.recipeapp.ui.home.HomeFragmentDirections
+import com.hi.recipeapp.ui.home.RecipeAdapter
 import com.hi.recipeapp.ui.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,22 +22,25 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
 
-    private val searchViewModel: SearchViewModel by viewModels() // ✅ Inject ViewModel via Hilt
+    private val searchViewModel: SearchViewModel by viewModels() // Inject ViewModel via Hilt
+    private lateinit var recipeAdapter: RecipeAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        // Initialize the adapter with the click listener
 
-        setupSearchView()  // ✅ Encapsulate setup logic for better readability
-        //Observe LiveData updates from ViewModel
-        observeViewModel()
+        setupSearchView()  // Setup SearchView functionality
+        observeViewModel() // Observe LiveData updates from ViewModel
+        setupRecyclerView() // Set up RecyclerView to show recipe cards
+
 
         return binding.root
     }
 
+    // Set up the SearchView and trigger search
     private fun setupSearchView() {
         val searchView: SearchView = binding.searchDashboard
         searchView.isIconified = false
@@ -54,28 +62,38 @@ class DashboardFragment : Fragment() {
         })
     }
 
-    private fun observeViewModel() {
-        searchViewModel.searchResults.observe(viewLifecycleOwner) { results ->
-            binding.textDashboard.text = results
+    private fun setupRecyclerView() {
+        // Initialize the adapter with the click listener
+        recipeAdapter = RecipeAdapter { recipe ->  // recipe here is of type RecipeCard
+            val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
+            val action = DashboardFragmentDirections.actionDashboardFragmentToFullRecipeFragment(recipeId)
+            findNavController().navigate(action)
         }
-
+        binding.recipeCardContainer.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = recipeAdapter
+        }
     }
 
-    // Method to reset search state
+
+    // Observe search results from the ViewModel and update RecyclerView
+    private fun observeViewModel() {
+        searchViewModel.searchResults.observe(viewLifecycleOwner) { results ->
+            if (results.isNullOrEmpty()) {
+                binding.textDashboard.text = "No recipes found."
+            } else {
+                binding.textDashboard.text = ""  // Clear any previous "No results" text
+                recipeAdapter.submitList(results) // Update the RecyclerView with the new data
+            }
+        }
+    }
+
+    // Reset the UI when navigating back to this fragment
     fun resetSearchState() {
         binding.textDashboard.text = ""  // Clear any previous search results
         binding.searchDashboard.setQuery("", false) // Clear the search view query
         binding.searchDashboard.clearFocus() // Remove focus from the search view
     }
-    // Reset the Dashboard UI when navigating back
-    override fun onResume() {
-        super.onResume()
-        // Clear any search results when returning to the Dashboard
-        binding.textDashboard.text = ""  // Clear any previous search results
-        binding.searchDashboard.setQuery("", false) // Clear the search view query
-        binding.searchDashboard.clearFocus() // Remove focus from the search view
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
