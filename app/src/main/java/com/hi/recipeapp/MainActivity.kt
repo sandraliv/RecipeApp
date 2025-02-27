@@ -65,8 +65,8 @@ class MainActivity : AppCompatActivity() {
                             // Pop all fragments from the back stack, ensuring we're at the initial state
                             navController.popBackStack(R.id.navigation_search, false)
                             // Optionally, reset any other states in the fragment
-                            val dashboardFragment = supportFragmentManager.findFragmentById(R.id.navigation_search)
-                            (dashboardFragment as? SearchFragment)?.resetSearchState()
+                            val searchFragment = supportFragmentManager.findFragmentById(R.id.navigation_search)
+                            (searchFragment as? SearchFragment)?.resetSearchState()
                         }
                         true
                     }
