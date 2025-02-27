@@ -2,7 +2,6 @@ package com.hi.recipeapp
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -11,7 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.hi.recipeapp.databinding.ActivityMainBinding
-import com.hi.recipeapp.ui.dashboard.DashboardFragment
+import com.hi.recipeapp.ui.search.SearchFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             val appBarConfiguration = AppBarConfiguration(
                 setOf(
                     R.id.navigation_home,
-                    R.id.navigation_dashboard,
+                    R.id.navigation_search,
                     R.id.navigation_notifications,
                     R.id.navigation_settings
                 )
@@ -57,17 +56,17 @@ class MainActivity : AppCompatActivity() {
                         }
                         true
                     }
-                    R.id.navigation_dashboard -> {
+                    R.id.navigation_search -> {
                         // If we are on a different fragment, navigate to Dashboard directly
-                        if (navController.currentDestination?.id != R.id.navigation_dashboard) {
-                            navController.navigate(R.id.navigation_dashboard)
+                        if (navController.currentDestination?.id != R.id.navigation_search) {
+                            navController.navigate(R.id.navigation_search)
                         } else {
                             // If we are already on the Dashboard, reset it manually
                             // Pop all fragments from the back stack, ensuring we're at the initial state
-                            navController.popBackStack(R.id.navigation_dashboard, false)
+                            navController.popBackStack(R.id.navigation_search, false)
                             // Optionally, reset any other states in the fragment
-                            val dashboardFragment = supportFragmentManager.findFragmentById(R.id.navigation_dashboard)
-                            (dashboardFragment as? DashboardFragment)?.resetSearchState()
+                            val dashboardFragment = supportFragmentManager.findFragmentById(R.id.navigation_search)
+                            (dashboardFragment as? SearchFragment)?.resetSearchState()
                         }
                         true
                     }

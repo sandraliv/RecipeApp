@@ -16,8 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:indeterminateDrawable="@color/rosybrown"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- RecyclerView for displaying recipes -->
     <androidx.recyclerview.widget.RecyclerView

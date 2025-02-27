@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.dashboard.DashboardFragment">
+    tools:context=".ui.search.SearchFragment">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_dashboard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:queryHint="Search here..."
+        android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

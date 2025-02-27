@@ -1,25 +1,23 @@
-package com.hi.recipeapp.ui.dashboard
+package com.hi.recipeapp.ui.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.hi.recipeapp.databinding.FragmentDashboardBinding
-import com.hi.recipeapp.ui.home.HomeFragmentDirections
+import com.hi.recipeapp.databinding.FragmentSearchBinding
+import com.hi.recipeapp.ui.search.SearchFragmentDirections
 import com.hi.recipeapp.ui.home.RecipeAdapter
-import com.hi.recipeapp.ui.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DashboardFragment : Fragment() {
+class SearchFragment : Fragment() {
 
-    private var _binding: FragmentDashboardBinding? = null
+    private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
     private val searchViewModel: SearchViewModel by viewModels() // Inject ViewModel via Hilt
@@ -29,7 +27,7 @@ class DashboardFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         // Initialize the adapter with the click listener
 
         setupSearchView()  // Setup SearchView functionality
@@ -66,7 +64,7 @@ class DashboardFragment : Fragment() {
         // Initialize the adapter with the click listener
         recipeAdapter = RecipeAdapter { recipe ->  // recipe here is of type RecipeCard
             val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
-            val action = DashboardFragmentDirections.actionDashboardFragmentToFullRecipeFragment(recipeId)
+            val action = SearchFragmentDirections.actionSearchFragmentToFullRecipeFragment(recipeId)
             findNavController().navigate(action)
         }
         binding.recipeCardContainer.apply {
