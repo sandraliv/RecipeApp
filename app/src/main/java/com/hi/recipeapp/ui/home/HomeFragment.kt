@@ -62,8 +62,7 @@ class HomeFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE // Hide progress bar when done
             }
         }
-
-
+        
         homeViewModel.fetchRecipes()
         return binding.root
     }
