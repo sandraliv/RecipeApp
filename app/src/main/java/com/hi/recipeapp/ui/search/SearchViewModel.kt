@@ -3,6 +3,7 @@ package com.hi.recipeapp.ui.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.services.RecipeService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -10,36 +11,34 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val recipeService: RecipeService
-) : ViewModel (){
+) : ViewModel() {
 
-    //Holds search results
-    private val _searchResults = MutableLiveData<String>()
-    //Allows only reading of the search results to prevent accidental modifications from UI
-    val searchResults: LiveData<String> get() = _searchResults
+    // LiveData to store the search results (nullable)
+    private val _searchResults = MutableLiveData<List<RecipeCard>?>()
+    val searchResults: LiveData<List<RecipeCard>?> get() = _searchResults
 
+    // LiveData to store error messages (nullable)
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> get() = _errorMessage
+
+    // LiveData to track loading state
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    //A function to update _searchResults, which will notify observers(UI) of the change.
-    //The underscore is used to indicate that is should only be modified within the ViewModel,
-    fun updateSearchResults(results: String) {
-        _searchResults.value = results  // Update the search results with the fetched data
-    }
+    // Function to trigger the search and update the LiveData
     fun searchByQuery(query: String) {
-        _isLoading.value = true // ✅ Show loading state
+        _errorMessage.value = null // Clear any previous error messages
+        _isLoading.value = true // Set loading state to true
 
         recipeService.searchRecipes(query) { recipes, error ->
-            _isLoading.postValue(false) // ✅ Hide loading state
+            _isLoading.value = false // Set loading state to false
 
-            if (!recipes.isNullOrEmpty()) {
-                val firstRecipe = recipes.first()
-                val resultText =
-                    "Found Recipe: ${firstRecipe.title}\nRating: ${firstRecipe.averageRating}\nDescription: ${firstRecipe.description}"
-                _searchResults.postValue(resultText) // ✅ Update LiveData
+            if (recipes != null && recipes.isNotEmpty()) {
+                _searchResults.value = recipes // Update search results in LiveData
             } else {
-                _searchResults.postValue(error ?: "No recipes found for '$query'") // ✅ Handle error
+                _searchResults.value = null // No recipes found, set the result to null
+                _errorMessage.value = error ?: "No results found" // Set error message if no recipes
             }
         }
     }
-
 }

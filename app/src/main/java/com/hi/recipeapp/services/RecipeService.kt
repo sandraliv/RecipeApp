@@ -1,5 +1,7 @@
 package com.hi.recipeapp.services
 
+import android.util.Log
+import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
@@ -44,6 +46,28 @@ class RecipeService @Inject constructor(
         })
     }
 
+    fun fetchRecipeById(id: Int, callback: (FullRecipe?, String?) -> Unit) {
+        networkService.getRecipeById(id).enqueue(object : Callback<FullRecipe> {
+            override fun onResponse(
+                call: Call<FullRecipe>,
+                response: Response<FullRecipe>
+            ) {
+                if (response.isSuccessful) {
+                    Log.d("RecipeService", "Recipe fetch successful, ID: $id") // Add logging here
+                    callback(response.body(), null)
+
+                } else {
+                    Log.d("RecipeService", "Error: ${response.code()}") // Add logging for error codes
+                    callback(null, "Error: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<FullRecipe>, t: Throwable) {
+                Log.d("RecipeService", "Network failure: ${t.localizedMessage}") // Log failure
+                callback(null, "Network error: ${t.localizedMessage}")
+            }
+        })
+    }
 
 
 

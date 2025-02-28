@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt.android)
+    id("androidx.navigation.safeargs")
+
+
     kotlin("kapt")
 }
 
@@ -54,6 +57,7 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.navigation.fragment)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,4 +73,6 @@ dependencies {
 
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
+    implementation ("androidx.core:core-ktx:1.9.0")
+
 }
