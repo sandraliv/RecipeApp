@@ -7,9 +7,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class WelcomeViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val userService: UserService
-) : ViewModel(){
+) : ViewModel() {
+
     private val _loginResult = MutableLiveData<UserDTO?>()
     val loginResult: LiveData<UserDTO?> get() = _loginResult
 
@@ -29,10 +30,11 @@ class WelcomeViewModel @Inject constructor(
         userService.login(username, password) { user, error ->
             _isLoading.postValue(false)
             if (user != null) {
-                _loginResult.postValue(user)
+                _loginResult.postValue(user) // Innskráning tókst
             } else {
-                _errorMessage.postValue(error ?: "Unknown error, please try again")
+                _errorMessage.postValue(error ?: "Unknown error, please try again") // ❌ Villa í innskráningu
             }
         }
     }
 }
+

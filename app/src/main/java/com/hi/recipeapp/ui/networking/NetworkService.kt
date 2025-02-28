@@ -3,6 +3,7 @@ package com.hi.recipeapp.ui.networking
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
+import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import retrofit2.Call
 import retrofit2.http.Body
@@ -27,5 +28,8 @@ interface NetworkService {
 
     @POST("users/Login")
     fun login(@Body loginRequest: LoginRequest): Call<UserDTO>
+
+    @POST("users/Register")
+    fun signup(@Body signupRequest: UserCreateDTO): Call<String>
 }
 
