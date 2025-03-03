@@ -70,6 +70,7 @@ dependencies {
     // Hilt testing dependencies
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
+    implementation(libs.converter.scalars)
 
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
