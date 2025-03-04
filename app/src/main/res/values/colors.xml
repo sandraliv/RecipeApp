@@ -12,4 +12,6 @@
     <color name="rosybrown_200">#ebdddd</color>
     <color name="rosybrown_50">#f8f4f4</color>
     <color name="rosybrown_400">#d7bcbc</color>
+    <color name="selectedChipBackground">#dbaaaa</color>
+    <color name="unselectedChipBackground">#808080</color>
 </resources>

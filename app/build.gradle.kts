@@ -70,9 +70,12 @@ dependencies {
     // Hilt testing dependencies
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
+    implementation ("com.google.android.material:material:1.9.0")
 
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
     implementation ("androidx.core:core-ktx:1.9.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.x.x")  // Replace with the latest version
+
 
 }

@@ -29,7 +29,6 @@ class HomeFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-
         binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recipeRecyclerView.adapter = recipeAdapter
 

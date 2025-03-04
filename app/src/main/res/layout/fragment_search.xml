@@ -6,31 +6,45 @@
     android:layout_height="match_parent"
     tools:context=".ui.search.SearchFragment">
 
+    <!-- ProgressBar (Visible while loading data) -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- SearchView for querying recipes -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_dashboard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:queryHint="Search here..."
-        android:elevation="4dp"
+        android:queryHint="Search for recipes..."
+        android:importantForAutofill="yes"
+        android:iconifiedByDefault="true"
+        android:imeOptions="actionSearch"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:iconifiedByDefault="false" />
+        android:layout_marginTop="16dp" />
 
-    <TextView
-        android:id="@+id/text_dashboard"
+    <!-- ChipGroup for selecting tags -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupTags"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/search_dashboard"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:singleSelection="false"
+        android:visibility="visible"> <!-- Initially visible, can be hidden or controlled programmatically -->
+    </com.google.android.material.chip.ChipGroup>
+
 
     <!-- RecyclerView for displaying recipe cards -->
     <androidx.recyclerview.widget.RecyclerView
@@ -38,9 +52,22 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/search_dashboard"
+        app:layout_constraintTop_toBottomOf="@id/chipGroupTags"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- TextView for showing "No results" message -->
+    <TextView
+        android:id="@+id/text_dashboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No recipes found."
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,8 +1,10 @@
 package com.hi.recipeapp.ui.networking
 
+import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
+import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import retrofit2.Call
@@ -14,8 +16,12 @@ import retrofit2.http.Query
 
 // Define API calls inside NetworkService (No ApiService.kt needed)
 interface NetworkService {
+
     @GET("recipes")
-    fun getRecipesByQuery(@Query("query") query: String): Call<List<RecipeCard>>
+    fun getRecipesByQueryAndTags(
+        @Query("query") query: String?,
+        @Query("tags") tags: Set<String>? // Expect Set<String> here, not Set<RecipeTag>
+    ): Call<List<RecipeCard>>
 
     @GET("recipes")
     fun getAllRecipes(): Call<List<RecipeCard>>

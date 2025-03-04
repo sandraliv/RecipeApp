@@ -3,6 +3,7 @@ package com.hi.recipeapp.services
 import android.util.Log
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
+import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
 import retrofit2.Callback
@@ -13,30 +14,46 @@ class RecipeService @Inject constructor(
     private val networkService: NetworkService
 ) {
 
-    fun searchRecipes(query: String, callback: (List<RecipeCard>?, String?) -> Unit) {
-        networkService.getRecipesByQuery(query).enqueue(object : Callback<List<RecipeCard>> {
+    fun searchRecipes(query: String, tags: Set<String>?, callback: (List<RecipeCard>?, String?) -> Unit) {
+        // Log the query and tags
+        Log.d("RECIPE_SERVICE", "Query: $query, Tags: $tags")
+
+        // Now pass the tags as Set<String> to the network service
+        networkService.getRecipesByQueryAndTags(
+            query.takeIf { it.isNotEmpty() },  // Only pass query if it's not empty
+            tags.takeIf { it.isNullOrEmpty().not() } // Only pass tags if they're not null or empty
+        ).enqueue(object : Callback<List<RecipeCard>> {
             override fun onResponse(call: Call<List<RecipeCard>>, response: Response<List<RecipeCard>>) {
-                response.body()?.takeIf { it.isNotEmpty() }?.let { recipes ->
-                    callback(recipes, null) // ✅ Return successful results
-                } ?: callback(null, "No recipes found for '$query'") // ✅ Handle empty list
+                if (response.isSuccessful) {
+                    val recipes = response.body()
+                    Log.d("NETWORK_RESPONSE", "Received recipes: $recipes")
+                    callback(recipes, null)
+                } else {
+                    Log.e("NETWORK_ERROR", "Error response: ${response.code()}")
+                    callback(null, "Error: ${response.code()}")
+                }
             }
 
             override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
-                callback(null, "Network error: ${t.localizedMessage}") // ✅ Handle network failure
+                callback(null, "Network error: ${t.localizedMessage}") // Handle network failure
             }
         })
     }
 
+
+
+    // Fetch all recipes (for initial display or fallback)
     fun fetchRecipes(callback: (List<RecipeCard>?, String?) -> Unit) {
         networkService.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
             override fun onResponse(
                 call: Call<List<RecipeCard>>,
                 response: Response<List<RecipeCard>>
             ) {
-                if (response.isSuccessful) {
-                    callback(response.body(), null)
+                val recipes = response.body()
+                if (response.isSuccessful && !recipes.isNullOrEmpty()) {
+                    callback(recipes, null)
                 } else {
-                    callback(null, "Error: ${response.code()}")
+                    callback(null, "No recipes found.")
                 }
             }
 
@@ -46,31 +63,29 @@ class RecipeService @Inject constructor(
         })
     }
 
+    // Fetch recipe by ID
     fun fetchRecipeById(id: Int, callback: (FullRecipe?, String?) -> Unit) {
         networkService.getRecipeById(id).enqueue(object : Callback<FullRecipe> {
-            override fun onResponse(
-                call: Call<FullRecipe>,
-                response: Response<FullRecipe>
-            ) {
+            override fun onResponse(call: Call<FullRecipe>, response: Response<FullRecipe>) {
                 if (response.isSuccessful) {
-                    Log.d("RecipeService", "Recipe fetch successful, ID: $id") // Add logging here
                     callback(response.body(), null)
-
                 } else {
-                    Log.d("RecipeService", "Error: ${response.code()}") // Add logging for error codes
                     callback(null, "Error: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<FullRecipe>, t: Throwable) {
-                Log.d("RecipeService", "Network failure: ${t.localizedMessage}") // Log failure
                 callback(null, "Network error: ${t.localizedMessage}")
             }
         })
     }
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
