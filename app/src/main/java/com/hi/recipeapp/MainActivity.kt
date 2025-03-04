@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 setOf(
                     R.id.navigation_home,
                     R.id.navigation_search,
-                    R.id.navigation_notifications,
+                    R.id.navigation_myrecipes,
                     R.id.navigation_settings
                 )
             )
@@ -71,10 +71,10 @@ class MainActivity : AppCompatActivity() {
                         }
                         true
                     }
-                    R.id.navigation_notifications -> {
+                    R.id.navigation_myrecipes -> {
                         // Check if already on NotificationsFragment to prevent unnecessary action
-                        if (navController.currentDestination?.id != R.id.navigation_notifications) {
-                            navController.navigate(R.id.navigation_notifications)
+                        if (navController.currentDestination?.id != R.id.navigation_myrecipes) {
+                            navController.navigate(R.id.navigation_myrecipes)
                         }
                         true
                     }

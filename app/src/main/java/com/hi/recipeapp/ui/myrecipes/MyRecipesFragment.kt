@@ -1,4 +1,4 @@
-package com.hi.recipeapp.ui.notifications
+package com.hi.recipeapp.ui.myrecipes
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,15 +7,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.hi.recipeapp.databinding.FragmentNotificationsBinding
+import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 //This class extends Fragment(), meaning it represents a reusable UI component.
-class NotificationsFragment : Fragment() {
+class MyRecipesFragment : Fragment() {
 
     // _binding holds the view binding reference for the fragment
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _binding: FragmentMyRecipesBinding? = null
 
     // binding is a non-nullable property, ensuring safe access to UI elements within the fragment's lifecycle
     // This property is only valid between onCreateView and
@@ -27,14 +27,14 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this)[NotificationsViewModel::class.java]
+        val myRecipesViewModel =
+            ViewModelProvider(this)[MyRecipesViewModel::class.java]
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
+        val textView: TextView = binding.textMyRecipes
+        myRecipesViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root

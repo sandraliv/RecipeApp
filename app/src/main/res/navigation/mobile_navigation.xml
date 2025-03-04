@@ -50,10 +50,10 @@
 
     <!-- Other Fragments (Dashboard, Notifications, Settings) -->
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.hi.recipeapp.ui.notifications.NotificationsFragment"
+        android:id="@+id/navigation_myrecipes"
+        android:name="com.hi.recipeapp.ui.myrecipes.MyRecipesFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_my_recipes" />
 
     <fragment
         android:id="@+id/navigation_settings"
