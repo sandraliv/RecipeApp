@@ -71,6 +71,7 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
     implementation ("com.google.android.material:material:1.9.0")
+    implementation(libs.converter.scalars)
 
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)

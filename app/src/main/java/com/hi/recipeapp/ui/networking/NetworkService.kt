@@ -10,6 +10,7 @@ import com.hi.recipeapp.classes.UserDTO
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -36,6 +37,7 @@ interface NetworkService {
     fun login(@Body loginRequest: LoginRequest): Call<UserDTO>
 
     @POST("users/Register")
-    fun signup(@Body signupRequest: UserCreateDTO): Call<String>
+    fun signup(@Body signupRequest: UserCreateDTO): Call<String> // ✅ Call<String> í stað Call<UserDTO>
+
 }
 

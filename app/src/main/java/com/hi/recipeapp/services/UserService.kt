@@ -34,19 +34,29 @@ class UserService @Inject constructor(
         })
     }
 
-    fun signup( role: String, name: String, email: String, password: String, username: String,
+    fun signup(
+        role: String,
+        name: String,
+        email: String,
+        password: String,
+        username: String,
         callback: (UserDTO?, String?) -> Unit
     ) {
         val request = UserCreateDTO(role, name, email, password, username)
 
         networkService.signup(request).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.isSuccessful) {
-                    val user = UserDTO("USER", name, email, password, username, 0, null)
-
-                    callback(user, null)  // Skilum UserDTO
-                } else {
-                    callback(null, "Signup failed: ${response.message()}")
+                when (response.code()) {
+                    201 -> {
+                        val user = UserDTO(role, name, email, password, username, 0, null)
+                        callback(user, null)  // Successfully registered
+                    }
+                    409 -> {
+                        callback(null, "Signup failed: User already registered with this email.")
+                    }
+                    else -> {
+                        callback(null, "Signup failed: ${response.message()}")
+                    }
                 }
             }
 

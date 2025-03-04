@@ -27,6 +27,7 @@ navigationFragment = "2.8.7"
 [libraries]
 artifactid = { module = "groupId:artifactId", version.ref = "artifactid" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
+converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
