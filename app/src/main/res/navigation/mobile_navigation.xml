@@ -52,7 +52,7 @@
     <fragment
         android:id="@+id/navigation_myrecipes"
         android:name="com.hi.recipeapp.ui.myrecipes.MyRecipesFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_my_recipes"
         tools:layout="@layout/fragment_my_recipes" />
 
     <fragment
