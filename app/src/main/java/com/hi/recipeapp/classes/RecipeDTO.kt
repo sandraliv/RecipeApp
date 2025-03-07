@@ -9,7 +9,9 @@ data class RecipeCard(
     val averageRating: Double,
     val ratingCount: Int,
     val id:Int,
-    val tags: List<String>
+    val tags: List<String>,
+    var isFavoritedByUser: Boolean = false
+
 )
 
 data class FullRecipe(
@@ -22,7 +24,8 @@ data class FullRecipe(
     val instructions: String,
     @SerializedName("ingredients") val ingredients: Map<String, String>, // Map for ingredient_name and ingredient_quantity
     @SerializedName("tags") val tags: Set<RecipeTag>,
-    @SerializedName("categories") val categories: Set<Category> // Set of Category enums
+    @SerializedName("categories") val categories: Set<Category>, // Set of Category enums
+    var isFavoritedByUser: Boolean = false
 )
 
 

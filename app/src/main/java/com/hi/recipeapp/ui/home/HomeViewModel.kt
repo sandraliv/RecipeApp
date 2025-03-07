@@ -1,16 +1,21 @@
 package com.hi.recipeapp.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.services.RecipeService
+import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val recipeService: RecipeService
+    private val recipeService: RecipeService,
+    private val userService: UserService
 ) : ViewModel() {
     // LiveData to hold the list of recipes
     private val _recipes = MutableLiveData<List<RecipeCard>?>()
@@ -26,6 +31,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         fetchRecipes();
+
     }
 
     fun fetchRecipes() {
@@ -39,4 +45,5 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
 }

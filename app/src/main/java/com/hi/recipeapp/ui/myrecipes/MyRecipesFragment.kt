@@ -4,46 +4,118 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
+import com.hi.recipeapp.ui.home.HomeViewModel
+import com.hi.recipeapp.ui.home.RecipeAdapter
+import com.hi.recipeapp.ui.search.SearchFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-//This class extends Fragment(), meaning it represents a reusable UI component.
 class MyRecipesFragment : Fragment() {
 
-    // _binding holds the view binding reference for the fragment
-    private var _binding: FragmentMyRecipesBinding? = null
-
-    // binding is a non-nullable property, ensuring safe access to UI elements within the fragment's lifecycle
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentMyRecipesBinding
+    private val myRecipesViewModel: MyRecipesViewModel by viewModels()
+    private lateinit var recipeAdapter: RecipeAdapter
+    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        val myRecipesViewModel =
-            ViewModelProvider(this)[MyRecipesViewModel::class.java]
+    ): View? {
+        binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
 
-        _binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textMyRecipes
-        myRecipesViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        // Initialize the adapter for both RecyclerViews
+        recipeAdapter = RecipeAdapter { recipe ->
+            val recipeId = recipe.id
+            val action = MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
+            findNavController().navigate(action)
         }
-        return root
+
+        // Set up the RecyclerViews with LayoutManager and Adapter
+        setupRecyclerView()
+
+        // Setup button listeners
+        setupButtonListeners()
+
+        // Observe live data from ViewModel
+        observeViewModel()
+
+        return binding.root
     }
 
-    // _binding is set to null in onDestroyView() to prevent memory leak
-    //If an Android Fragment, memory leaks can occur if the fragments holds references to UI elemnts (like TextView, Buttons, etc) AFTER the view is destroyed.
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setupButtonListeners() {
+        // Favorites Button Clicked
+        binding.favoritesButton.setOnClickListener {
+            // Display Favorites and hide My Recipes
+            binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
+            binding.myRecipesRecyclerView.visibility = View.GONE
+
+            // Fetch user's favorite recipes
+            myRecipesViewModel.fetchFavoriteRecipes()
+        }
+
+        // My Recipes Button Clicked
+        binding.myRecipesButton.setOnClickListener {
+            // Display My Recipes and hide Favorites
+            binding.favoriteRecipeRecyclerView.visibility = View.GONE
+            binding.myRecipesRecyclerView.visibility = View.VISIBLE
+
+            // Fetch user's own recipes
+            homeViewModel.fetchRecipes()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        // Set up LayoutManagers and adapters for both RecyclerViews
+        binding.favoriteRecipeRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context) // Ensure LayoutManager is set
+            adapter = recipeAdapter
+        }
+
+        binding.myRecipesRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context) // Ensure LayoutManager is set
+            adapter = recipeAdapter
+        }
+    }
+
+    private fun observeViewModel() {
+        // Observe the list of favorite recipes
+        myRecipesViewModel.favoriteRecipes.observe(viewLifecycleOwner) { recipes ->
+            if (recipes != null) {
+                recipeAdapter.submitList(recipes) // Update the RecyclerView
+            } else {
+                Toast.makeText(requireContext(), "No favorite recipes found.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Observe the list of "My Recipes"
+        myRecipesViewModel.myRecipes.observe(viewLifecycleOwner) { recipes ->
+            if (recipes != null) {
+                recipeAdapter.submitList(recipes) // Update the RecyclerView
+            } else {
+                Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Observe loading state (progress bar visibility)
+        myRecipesViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.GONE
+            }
+        }
+
+        // Observe error messages
+        myRecipesViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

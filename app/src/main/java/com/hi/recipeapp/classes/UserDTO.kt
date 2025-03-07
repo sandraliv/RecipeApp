@@ -10,6 +10,12 @@ data class UserDTO(
     val profilePictureUrl: String?
 )
 
+data class FavoriteRecipesDTO(
+    val favoriteRecipes: List<RecipeCard> // List of user's favorited recipes
+
+)
+
+
 data class UserCreateDTO(
     val role: String,
     val name: String,

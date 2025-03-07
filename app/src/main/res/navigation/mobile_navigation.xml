@@ -36,6 +36,21 @@
         </action>
     </fragment>
 
+    <fragment
+        android:id="@+id/navigation_myrecipes"
+        android:name="com.hi.recipeapp.ui.myrecipes.MyRecipesFragment"
+        android:label="@string/title_my_recipes"
+        tools:layout="@layout/fragment_my_recipes">
+
+        <action
+        android:id="@+id/action_myRecipesFragment_to_fullRecipeFragment"
+        app:destination="@id/fullRecipeFragment">
+        <argument
+            android:name="recipeId"
+            app:argType="integer"/>
+        </action>
+    </fragment>
+
 
     <!-- Full Recipe Fragment -->
     <fragment
@@ -47,13 +62,6 @@
             android:name="recipeId"
             app:argType="integer" />
     </fragment>
-
-    <!-- Other Fragments (Dashboard, Notifications, Settings) -->
-    <fragment
-        android:id="@+id/navigation_myrecipes"
-        android:name="com.hi.recipeapp.ui.myrecipes.MyRecipesFragment"
-        android:label="@string/title_my_recipes"
-        tools:layout="@layout/fragment_my_recipes" />
 
     <fragment
         android:id="@+id/navigation_settings"

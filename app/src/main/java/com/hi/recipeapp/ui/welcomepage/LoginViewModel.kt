@@ -1,6 +1,7 @@
 package com.hi.recipeapp.ui.welcomepage
 
 import androidx.lifecycle.*
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,7 +9,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userService: UserService
+    private val userService: UserService,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _loginResult = MutableLiveData<UserDTO?>()
@@ -31,6 +33,10 @@ class LoginViewModel @Inject constructor(
             _isLoading.postValue(false)
             if (user != null) {
                 _loginResult.postValue(user) // Innskráning tókst
+                // Save user data to session
+                sessionManager.saveUserId(user.id)  // Save user ID
+                sessionManager.saveUserName(user.username)  // Save user name
+
             } else {
                 _errorMessage.postValue(error ?: "Unknown error, please try again") // ❌ Villa í innskráningu
             }

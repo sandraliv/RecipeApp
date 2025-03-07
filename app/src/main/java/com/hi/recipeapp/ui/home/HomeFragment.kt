@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.recipeapp.databinding.FragmentHomeBinding
+import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,18 +18,20 @@ class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModels() // Get ViewModel instance
     private lateinit var recipeAdapter: RecipeAdapter
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
         // Initialize the adapter with the click listener
-        recipeAdapter = RecipeAdapter { recipe ->  // recipe here is of type RecipeCard
-            val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
-            val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
-            findNavController().navigate(action)
-        }
-
+        recipeAdapter = RecipeAdapter(
+            onClick = { recipe ->
+                val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
+                val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
+                findNavController().navigate(action)
+            }
+        )
         binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recipeRecyclerView.adapter = recipeAdapter
 

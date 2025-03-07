@@ -1,7 +1,10 @@
 package com.hi.recipeapp.services
 
 import android.util.Log
+import com.hi.recipeapp.classes.FavoriteRecipesDTO
 import com.hi.recipeapp.classes.LoginRequest
+import com.hi.recipeapp.classes.RecipeCard
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.ui.networking.NetworkService
@@ -11,7 +14,8 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class UserService @Inject constructor(
-    private val networkService: NetworkService
+    private val networkService: NetworkService,
+    private val sessionManager: SessionManager
 ) {
 
     fun login(username: String, password: String, callback: (UserDTO?, String?) -> Unit) {
@@ -51,9 +55,11 @@ class UserService @Inject constructor(
                         val user = UserDTO(role, name, email, password, username, 0, null)
                         callback(user, null)  // Successfully registered
                     }
+
                     409 -> {
                         callback(null, "Signup failed: User already registered with this email.")
                     }
+
                     else -> {
                         callback(null, "Signup failed: ${response.message()}")
                     }
@@ -65,5 +71,38 @@ class UserService @Inject constructor(
             }
         })
     }
+
+
+    suspend fun getUserFavorites(): Result<List<RecipeCard>> {
+        return try {
+            // Get the userId from the session manager
+            val userId = sessionManager.getUserId()
+
+            // Check if the userId is valid (not null and not -1)
+            if (userId == null || userId == -1) {
+                return Result.failure(Exception("User is not logged in"))
+            }
+
+            // Make the network call to get the favorite recipes
+            val response = networkService.getUserFavorites(userId)
+
+            if (response.isSuccessful) {
+                // If the response is successful, return the result wrapped in a success
+                Result.success(response.body() ?: emptyList())
+            } else {
+                // If the response is not successful, return failure with an error message
+                Result.failure(Exception("Failed to fetch favorite recipes"))
+            }
+        } catch (e: Exception) {
+            // If there is an error during the network call, catch it and return failure
+            Result.failure(e)
+        }
+    }
+
 }
+
+
+
+
+
 
