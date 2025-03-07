@@ -8,6 +8,7 @@ import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
+import com.hi.recipeapp.classes.UserRecipeCard
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -46,6 +47,14 @@ interface NetworkService {
     suspend fun addRecipeToFavorites(
         @Path("id") recipeId: Int // No need for userId in headers
     ): Response<String>
+
+    @GET("user-recipes/{userId}/getUserRecipes")
+    suspend fun getUserRecipes(
+        @Path("userId") userId: Int,       // Corrected to match the Path variable
+        @Query("page") page: Int = 0,      // Default page is 0
+        @Query("size") size: Int = 10      // Default size is 10
+    ): Response<List<UserRecipeCard>>
+
 
     @GET("users/1")
     fun getRoot(): Call<UserDTO>

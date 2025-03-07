@@ -1,5 +1,6 @@
 package com.hi.recipeapp.ui.myrecipes
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import com.hi.recipeapp.classes.FavoriteRecipesDTO
+import com.hi.recipeapp.classes.UserRecipeCard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,8 +25,8 @@ class MyRecipesViewModel @Inject constructor(
     private val _favoriteRecipes = MutableLiveData<List<RecipeCard>?>()
     val favoriteRecipes: LiveData<List<RecipeCard>?> = _favoriteRecipes
 
-    private val _myRecipes = MutableLiveData<List<RecipeCard>?>()
-    val myRecipes: LiveData<List<RecipeCard>?> = _myRecipes
+    private val _userRecipes = MutableLiveData<List<UserRecipeCard>?>()
+    val userRecipes: LiveData<List<UserRecipeCard>?> = _userRecipes
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -54,6 +56,19 @@ class MyRecipesViewModel @Inject constructor(
             }
 
             _isLoading.value = false  // End loading
+        }
+    }
+
+    // Function to load user recipes
+    fun fetchUserRecipes(page: Int = 0, size: Int = 10) {
+        viewModelScope.launch {
+            val result = userService.getUserRecipes(page, size)
+            result.onSuccess { recipes ->
+                _userRecipes.postValue(recipes)  // Update the LiveData with fetched recipes
+            }.onFailure { exception ->
+                // Handle failure (e.g., show error message)
+                Log.e("UserRecipes", "Failed to fetch recipes: ${exception.message}")
+            }
         }
     }
 

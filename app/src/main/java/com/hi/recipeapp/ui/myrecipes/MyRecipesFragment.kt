@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.hi.recipeapp.classes.UserRecipeCard
 import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
 import com.hi.recipeapp.ui.home.HomeViewModel
 import com.hi.recipeapp.ui.home.RecipeAdapter
@@ -21,7 +22,7 @@ class MyRecipesFragment : Fragment() {
     private lateinit var binding: FragmentMyRecipesBinding
     private val myRecipesViewModel: MyRecipesViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var userRecipeAdapter: UserRecipeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +36,14 @@ class MyRecipesFragment : Fragment() {
             val action = MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
             findNavController().navigate(action)
         }
+
+        // Initialize userRecipeAdapter here
+        userRecipeAdapter = UserRecipeAdapter { userRecipe ->
+            val recipeId = userRecipe.id
+            val action = MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
+            findNavController().navigate(action)
+        }
+
 
         // Set up the RecyclerViews with LayoutManager and Adapter
         setupRecyclerView()
@@ -53,7 +62,7 @@ class MyRecipesFragment : Fragment() {
         binding.favoritesButton.setOnClickListener {
             // Display Favorites and hide My Recipes
             binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
-            binding.myRecipesRecyclerView.visibility = View.GONE
+            binding.userRecipesRecyclerView.visibility = View.GONE
 
             // Fetch user's favorite recipes
             myRecipesViewModel.fetchFavoriteRecipes()
@@ -63,10 +72,10 @@ class MyRecipesFragment : Fragment() {
         binding.myRecipesButton.setOnClickListener {
             // Display My Recipes and hide Favorites
             binding.favoriteRecipeRecyclerView.visibility = View.GONE
-            binding.myRecipesRecyclerView.visibility = View.VISIBLE
+            binding.userRecipesRecyclerView.visibility = View.VISIBLE
 
             // Fetch user's own recipes
-            homeViewModel.fetchRecipes()
+            myRecipesViewModel.fetchUserRecipes( 0 , 10 )
         }
     }
 
@@ -77,9 +86,9 @@ class MyRecipesFragment : Fragment() {
             adapter = recipeAdapter
         }
 
-        binding.myRecipesRecyclerView.apply {
+        binding.userRecipesRecyclerView.apply {
             layoutManager = LinearLayoutManager(context) // Ensure LayoutManager is set
-            adapter = recipeAdapter
+            adapter = userRecipeAdapter
         }
     }
 
@@ -93,10 +102,9 @@ class MyRecipesFragment : Fragment() {
             }
         }
 
-        // Observe the list of "My Recipes"
-        myRecipesViewModel.myRecipes.observe(viewLifecycleOwner) { recipes ->
-            if (recipes != null) {
-                recipeAdapter.submitList(recipes) // Update the RecyclerView
+        myRecipesViewModel.userRecipes.observe(viewLifecycleOwner) { userrecipes ->
+            if (userrecipes != null) {
+                userRecipeAdapter.submitList(userrecipes) // Update the RecyclerView
             } else {
                 Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
             }

@@ -12,7 +12,6 @@ data class UserDTO(
 
 data class FavoriteRecipesDTO(
     val favoriteRecipes: List<RecipeCard> // List of user's favorited recipes
-
 )
 
 

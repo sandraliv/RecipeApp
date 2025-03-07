@@ -49,7 +49,17 @@
             android:name="recipeId"
             app:argType="integer"/>
         </action>
+        <!-- Action to navigate to UserFullRecipeFragment -->
+        <action
+            android:id="@+id/action_myRecipesFragment_to_userFullRecipeFragment"
+            app:destination="@id/userFullRecipeFragment">
+            <argument
+                android:name="recipeId"
+                app:argType="integer"/>
+        </action>
     </fragment>
+
+
 
 
     <!-- Full Recipe Fragment -->
@@ -58,6 +68,17 @@
         android:name="com.hi.recipeapp.ui.fullrecipe.FullRecipeFragment"
         android:label="Full Recipe"
         tools:layout="@layout/fragment_full_recipe">
+        <argument
+            android:name="recipeId"
+            app:argType="integer" />
+    </fragment>
+
+    <!-- User Full Recipe Fragment -->
+    <fragment
+        android:id="@+id/userFullRecipeFragment"
+        android:name="com.hi.recipeapp.ui.fullrecipe.UserFullRecipeFragment"
+        android:label="User Full Recipe"
+        tools:layout="@layout/fragment_user_full_recipe">
         <argument
             android:name="recipeId"
             app:argType="integer" />
