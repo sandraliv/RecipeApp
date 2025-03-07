@@ -2,11 +2,13 @@ package com.hi.recipeapp.services
 
 import android.util.Log
 import com.hi.recipeapp.classes.FavoriteRecipesDTO
+import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
+import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.classes.UserRecipeCard
 import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
@@ -116,6 +118,27 @@ class UserService @Inject constructor(
             Result.failure(e)
         }
     }
+    // In the Service (or repository)
+    suspend fun fetchUserRecipeById(id: Int): UserFullRecipe? {
+        return try {
+            // Get userId from session manager
+            val userId = sessionManager.getUserId()
+
+            // Call the network service's suspend function directly
+            val response = networkService.getUserRecipeById(id, userId)
+
+            // Check if the response is successful
+            if (response.isSuccessful) {
+                response.body() // Return the recipe if successful
+            } else {
+                null // Return null if the response is not successful
+            }
+        } catch (e: Exception) {
+            // Handle any errors (network issues, etc.)
+            null
+        }
+    }
+
 
 
 }

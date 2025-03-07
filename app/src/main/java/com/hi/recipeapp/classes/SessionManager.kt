@@ -32,7 +32,8 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         Log.d(TAG, "Retrieved User ID: $userId")
         if (userId == -1) {
             Log.e(TAG, "User ID not found in session")
-            throw IllegalStateException("User ID not found in session")
+            // Consider handling the case where the user is not logged in, instead of throwing an exception
+            return -1 // Return -1 or handle this case gracefully in your activity or fragment
         }
         return userId
     }
@@ -60,5 +61,10 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         editor.clear()
         editor.apply()
         Log.d(TAG, "Session cleared successfully.")
+    }
+
+    // Check if the user is logged in by verifying if userId is not -1
+    fun isUserLoggedIn(): Boolean {
+        return getUserId() != -1
     }
 }

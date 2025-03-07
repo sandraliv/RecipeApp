@@ -17,7 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.FullRecipe
+import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentUserFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -25,12 +25,12 @@ import java.util.Locale
 @AndroidEntryPoint
 class UserFullRecipeFragment : Fragment() {
 
-    private val fullRecipeViewModel: FullRecipeViewModel by viewModels() // Get ViewModel instance
+    private val userFullRecipeViewModel: UserFullRecipeViewModel by viewModels() // Get ViewModel instance
     private lateinit var binding: FragmentUserFullRecipeBinding
 
 
     // Safe Args: Retrieve arguments passed to the fragment
-    private val args: FullRecipeFragmentArgs by navArgs()
+    private val args: UserFullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
 
     override fun onCreateView(
@@ -42,20 +42,20 @@ class UserFullRecipeFragment : Fragment() {
 
 
         // Fetch full recipe data
-        fullRecipeViewModel.fetchRecipeById(recipeId)
+        userFullRecipeViewModel.fetchUserRecipeById(recipeId)
 
         // Observe the full recipe data
-        fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
-            Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
+        userFullRecipeViewModel.userrecipe.observe(viewLifecycleOwner) { userrecipe ->
+            Log.d("FullRecipeFragment", "Observer triggered, recipe: $userrecipe")
 
-            recipe?.let {
+            userrecipe?.let {
                 // Bind the full recipe data to the UI
                 bindRecipeData(it)
             }
         }
 
         // Observe error messages
-        fullRecipeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+        userFullRecipeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 // Handle error (show toast, etc.)
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -65,7 +65,7 @@ class UserFullRecipeFragment : Fragment() {
         return binding.root
     }
 
-    private fun bindRecipeData(recipe: FullRecipe) {
+    private fun bindRecipeData(recipe: UserFullRecipe) {
         // Bind the recipe data to the UI
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description

@@ -8,6 +8,7 @@ import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
+import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.classes.UserRecipeCard
 import retrofit2.Call
 import retrofit2.Response
@@ -54,6 +55,12 @@ interface NetworkService {
         @Query("page") page: Int = 0,      // Default page is 0
         @Query("size") size: Int = 10      // Default size is 10
     ): Response<List<UserRecipeCard>>
+
+    @GET("user-recipes/{id}") // Get a specific user recipe by ID
+    suspend fun getUserRecipeById(
+        @Path("id") recipeId: Int, // Path parameter for recipe ID
+        @Query("userId") userId: Int // Query parameter for user ID
+    ): Response<UserFullRecipe>
 
 
     @GET("users/1")
