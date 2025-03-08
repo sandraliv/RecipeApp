@@ -14,7 +14,11 @@ class RecipeService @Inject constructor(
     private val networkService: NetworkService
 ) {
 
-    fun searchRecipes(query: String, tags: Set<String>?, callback: (List<RecipeCard>?, String?) -> Unit) {
+    fun searchRecipes(
+        query: String,
+        tags: Set<String>?,
+        callback: (List<RecipeCard>?, String?) -> Unit
+    ) {
         // Log the query and tags
         Log.d("RECIPE_SERVICE", "Query: $query, Tags: $tags")
 
@@ -23,7 +27,10 @@ class RecipeService @Inject constructor(
             query.takeIf { it.isNotEmpty() },  // Only pass query if it's not empty
             tags.takeIf { it.isNullOrEmpty().not() } // Only pass tags if they're not null or empty
         ).enqueue(object : Callback<List<RecipeCard>> {
-            override fun onResponse(call: Call<List<RecipeCard>>, response: Response<List<RecipeCard>>) {
+            override fun onResponse(
+                call: Call<List<RecipeCard>>,
+                response: Response<List<RecipeCard>>
+            ) {
                 if (response.isSuccessful) {
                     val recipes = response.body()
                     Log.d("NETWORK_RESPONSE", "Received recipes: $recipes")
@@ -39,7 +46,6 @@ class RecipeService @Inject constructor(
             }
         })
     }
-
 
 
     // Fetch all recipes (for initial display or fallback)
@@ -79,6 +85,24 @@ class RecipeService @Inject constructor(
             }
         })
     }
+
+    suspend fun createRecipe(recipe: FullRecipe): Boolean {
+        return try {
+            val response = networkService.createRecipe(recipe)
+            if (response.isSuccessful) {
+                Log.d("RecipeService", "Recipe created successfully: ${response.body()}")
+                true
+            } else {
+                Log.e("RecipeService", "Failed to create recipe: ${response.code()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("RecipeService", "Exception: ${e.localizedMessage}")
+            false
+        }
+    }
+
+
 
 }
 

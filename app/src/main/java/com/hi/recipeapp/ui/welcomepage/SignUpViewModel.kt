@@ -19,6 +19,9 @@ class SignupViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _navigateToLogin = MutableLiveData<Boolean>()
+    val navigateToLogin: LiveData<Boolean> get() = _navigateToLogin
+
     fun signup(role: String, name: String, email: String, password: String, username: String) {
         if (role.isBlank() || name.isBlank() || email.isBlank() || password.isBlank() || username.isBlank()) {
             _errorMessage.value = "Please fill in all fields"
@@ -34,5 +37,8 @@ class SignupViewModel @Inject constructor(
                 _errorMessage.postValue(error ?: "Signup failed, please try again")
             }
         }
+    }
+    fun onNavigateToLoginComplete() {
+        _navigateToLogin.value = false // Reset event
     }
 }

@@ -71,6 +71,14 @@ class MainActivity : AppCompatActivity() {
                         }
                         true
                     }
+
+                    R.id.navigation_add_recipe -> { // ✅ Plús takkinn fer í AddRecipeFragment
+                        if (navController.currentDestination?.id != R.id.AddRecipeFragment) {
+                            navController.navigate(R.id.AddRecipeFragment)
+                        }
+                        true
+                    }
+
                     R.id.navigation_myrecipes -> {
                         // Check if already on NotificationsFragment to prevent unnecessary action
                         if (navController.currentDestination?.id != R.id.navigation_myrecipes) {

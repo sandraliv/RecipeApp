@@ -102,4 +102,11 @@
             app:destination="@id/navigation_change_password" />
     </fragment>
 
+    <fragment
+        android:id="@+id/AddRecipeFragment"
+        android:name="com.hi.recipeapp.ui.addrecipe.AddRecipeFragment"
+        android:label="Add Recipe"
+        tools:layout="@layout/fragment_add_recipe"/>
+
+
 </navigation>
