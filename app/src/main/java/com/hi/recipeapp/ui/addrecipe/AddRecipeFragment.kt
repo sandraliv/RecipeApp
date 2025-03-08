@@ -78,7 +78,10 @@ class AddRecipeFragment : Fragment() {
         // Instruction Number TextView
         val instructionNumberTextView = TextView(requireContext()).apply {
             text = "$instructionCount."
-            layoutParams = TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = TableRow.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
         }
 
         // Instruction Text EditText
@@ -96,4 +99,6 @@ class AddRecipeFragment : Fragment() {
 
         instructionCount++
     }
+
+
 }

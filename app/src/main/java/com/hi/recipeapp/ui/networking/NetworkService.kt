@@ -72,8 +72,12 @@ interface NetworkService {
     @POST("users/Register")
     fun signup(@Body signupRequest: UserCreateDTO): Call<String> // ✅ Call<String> í stað Call<UserDTO>
 
-    @POST("recipes/newRecipe")
-    suspend fun createRecipe(@Body recipe: FullRecipe): Response<FullRecipe>
+    @POST("user-recipes/{userId}/upload")
+    suspend fun uploadRecipe(
+        @Path("userId") userId: Int,
+        @Body recipe: UserFullRecipe
+    ): Response<UserFullRecipe>
+
 
 
 }

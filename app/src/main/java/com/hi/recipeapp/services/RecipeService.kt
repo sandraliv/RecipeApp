@@ -4,6 +4,7 @@ import android.util.Log
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.RecipeTag
+import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
 import retrofit2.Callback
@@ -86,14 +87,14 @@ class RecipeService @Inject constructor(
         })
     }
 
-    suspend fun createRecipe(recipe: FullRecipe): Boolean {
+    suspend fun uploadUserRecipe(userId: Int, recipe: UserFullRecipe): Boolean {
         return try {
-            val response = networkService.createRecipe(recipe)
+            val response = networkService.uploadRecipe(userId, recipe)
             if (response.isSuccessful) {
-                Log.d("RecipeService", "Recipe created successfully: ${response.body()}")
+                Log.d("RecipeService", "Recipe uploaded successfully: ${response.body()}")
                 true
             } else {
-                Log.e("RecipeService", "Failed to create recipe: ${response.code()}")
+                Log.e("RecipeService", "Failed to upload recipe: ${response.code()}")
                 false
             }
         } catch (e: Exception) {
@@ -101,6 +102,8 @@ class RecipeService @Inject constructor(
             false
         }
     }
+
+
 
 
 
