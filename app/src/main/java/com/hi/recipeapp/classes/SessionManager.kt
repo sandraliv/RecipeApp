@@ -15,6 +15,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         const val KEY_USER_ID = "user_id"
         const val KEY_USER_NAME = "user_name"
         private const val TAG = "SessionManager"
+        const val KEY_USER_PROFILE_PIC = "user_pic"
     }
 
     // Save user ID (if needed)
@@ -36,6 +37,16 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
             return -1 // Return -1 or handle this case gracefully in your activity or fragment
         }
         return userId
+    }
+
+    fun getProfilePic(): String? {
+        val profilePic = sharedPreferences.getString(KEY_USER_PROFILE_PIC, "")
+        Log.d(TAG,"Retreived profilepic url: $profilePic")
+        if (profilePic == ""){
+            Log.e(TAG, "No profile pic for user")
+            return ""
+        }
+        return profilePic
     }
 
     // Save user name (if needed)
@@ -66,5 +77,13 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     // Check if the user is logged in by verifying if userId is not -1
     fun isUserLoggedIn(): Boolean {
         return getUserId() != -1
+    }
+
+    fun saveProfilePic(profilePictureUrl: String?) {
+        Log.d(TAG, "Saving ProfilePIC URL: $profilePictureUrl")
+        val editor = sharedPreferences.edit()
+        editor.putString(KEY_USER_PROFILE_PIC, profilePictureUrl)
+        editor.apply()
+        Log.d(TAG, "User Profile Pic saved successfully.")
     }
 }

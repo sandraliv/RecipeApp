@@ -37,6 +37,13 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_change_password"
+        android:name="com.hi.recipeapp.ui.settings.PasswordFragment"
+        android:label="@string/change_password"
+        tools:layout="@layout/fragment_password">
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_myrecipes"
         android:name="com.hi.recipeapp.ui.myrecipes.MyRecipesFragment"
         android:label="@string/title_my_recipes"
@@ -87,6 +94,12 @@
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.hi.recipeapp.ui.settings.SettingsFragment"
-        android:label="@string/title_settings"
-        tools:layout="@layout/fragment_settings" />
+        android:label="@string/account"
+        tools:layout="@layout/fragment_settings">
+
+        <action
+            android:id="@+id/settingsFragment_to_passwordFragment"
+            app:destination="@id/navigation_change_password" />
+    </fragment>
+
 </navigation>

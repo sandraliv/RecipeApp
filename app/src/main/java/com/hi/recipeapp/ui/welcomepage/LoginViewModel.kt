@@ -36,6 +36,7 @@ class LoginViewModel @Inject constructor(
                 // Save user data to session
                 sessionManager.saveUserId(user.id)  // Save user ID
                 sessionManager.saveUserName(user.username)  // Save user name
+                sessionManager.saveProfilePic(user.profilePictureUrl)
 
             } else {
                 _errorMessage.postValue(error ?: "Unknown error, please try again") // ❌ Villa í innskráningu
