@@ -108,5 +108,17 @@
         android:label="Add Recipe"
         tools:layout="@layout/fragment_add_recipe"/>
 
+    <fragment
+        android:id="@+id/uploadPhotoFragment"
+        android:name="com.hi.recipeapp.ui.uploadphoto.UploadPhotoFragment"
+        android:label="Upload Photo"
+        tools:layout="@layout/fragment_upload_photo">
+    </fragment>
+
+    <action
+        android:id="@+id/action_addRecipeFragment_to_uploadPhotoFragment"
+        app:destination="@id/uploadPhotoFragment"/>
+
+
 
 </navigation>

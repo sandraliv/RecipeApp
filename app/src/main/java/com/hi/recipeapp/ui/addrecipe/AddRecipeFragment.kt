@@ -38,6 +38,11 @@ class AddRecipeFragment : Fragment() {
             addInstructionRow()
         }
 
+        binding.uploadPhotoButton.setOnClickListener {
+            findNavController().navigate(R.id.action_addRecipeFragment_to_uploadPhotoFragment)
+        }
+
+
         return binding.root
     }
 
@@ -71,6 +76,7 @@ class AddRecipeFragment : Fragment() {
         ingredientCount++
     }
 
+
     // Function to add a new instruction row with numbered steps
     private fun addInstructionRow() {
         val tableRow = TableRow(requireContext())
@@ -99,6 +105,7 @@ class AddRecipeFragment : Fragment() {
 
         instructionCount++
     }
+
 
 
 }
