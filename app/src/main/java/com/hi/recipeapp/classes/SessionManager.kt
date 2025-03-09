@@ -86,7 +86,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         editor.apply()
         Log.d(TAG, "User Profile Pic saved successfully.")
     }
-}
+
 
     fun setFavoritedStatus(userId: Int, recipeId: Int, isFavorited: Boolean) {
         val editor = sharedPreferences.edit()
