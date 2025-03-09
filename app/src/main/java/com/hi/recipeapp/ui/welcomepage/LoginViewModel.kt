@@ -5,6 +5,7 @@ import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,18 +30,45 @@ class LoginViewModel @Inject constructor(
         }
 
         _isLoading.value = true
-        userService.login(username, password) { user, error ->
-            _isLoading.postValue(false)
-            if (user != null) {
-                _loginResult.postValue(user) // Innskráning tókst
-                // Save user data to session
-                sessionManager.saveUserId(user.id)  // Save user ID
-                sessionManager.saveUserName(user.username)  // Save user name
+        viewModelScope.launch {
+            try {
+                val user = userService.login(username, password) // Call the suspend login function
 
-            } else {
-                _errorMessage.postValue(error ?: "Unknown error, please try again") // ❌ Villa í innskráningu
+                _isLoading.value = false
+
+                if (user != null) {
+                    _loginResult.value = user // Successful login
+                    // Save user data to session
+                    sessionManager.saveUserId(user.id)
+                    sessionManager.saveUserName(user.username)
+
+                    // Fetch and save the favorite status of all recipes for this user
+                    saveUserFavoriteStatus(user.id)
+                } else {
+                    _errorMessage.value = "Login failed" // Failed login
+                }
+            } catch (e: Exception) {
+                _isLoading.value = false
+                _errorMessage.value = e.message ?: "Unknown error"
             }
         }
     }
+
+    // Make the function suspend so we can call suspend functions inside it
+    private suspend fun saveUserFavoriteStatus(userId: Int) {
+        try {
+            val result = userService.getUserFavorites(userId) // Pass the userId to the service
+            if (result.isSuccess) {
+                val favoriteRecipes = result.getOrDefault(emptyList())
+                val favoriteRecipeIds = favoriteRecipes.map { it.id }.toSet()
+                sessionManager.saveFavoriteRecipeIds(favoriteRecipeIds) // Save the recipe IDs to session
+            } else {
+                _errorMessage.value = "Failed to fetch favorites"
+            }
+        } catch (e: Exception) {
+            _errorMessage.value = "Error fetching favorites: ${e.message}"
+        }
+    }
+
 }
 

@@ -28,37 +28,17 @@ class MyRecipesViewModel @Inject constructor(
     private val _userRecipes = MutableLiveData<List<UserRecipeCard>?>()
     val userRecipes: LiveData<List<UserRecipeCard>?> = _userRecipes
 
+    private val _favoriteResult = MutableLiveData<Result<String>>()
+    val favoriteResult: LiveData<Result<String>> get() = _favoriteResult
+
+    private val _favoriteActionMessage = MutableLiveData<String?>()
+    val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
-
-    fun fetchFavoriteRecipes() {
-        _isLoading.value = true  // Start loading
-        viewModelScope.launch {
-            try {
-                // Fetch the favorite recipes wrapped in FavoriteRecipesDTO from the service
-                val result = userService.getUserFavorites()  // This should return Result<FavoriteRecipesDTO>
-
-                result.onSuccess { favoriteRecipes ->
-                    // Handle the successful result
-                    _favoriteRecipes.value = favoriteRecipes // List of favorite recipes
-                }
-
-                result.onFailure { error ->
-                    // On failure, update the error message
-                    _errorMessage.value = error.localizedMessage ?: "Unknown error"
-                }
-            } catch (e: Exception) {
-                // Handle exceptions or network failures
-                _errorMessage.value = "Network request failed: ${e.message}"
-            }
-
-            _isLoading.value = false  // End loading
-        }
-    }
-
     // Function to load user recipes
     fun fetchUserRecipes(page: Int = 0, size: Int = 10) {
         viewModelScope.launch {
@@ -72,5 +52,57 @@ class MyRecipesViewModel @Inject constructor(
         }
     }
 
-}
+    fun fetchFavoriteRecipes() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val userId = sessionManager.getUserId()
+                if (userId != -1) {
+                    val result = userService.getUserFavorites(userId)
+                    result.onSuccess { favoriteRecipes ->
+                        favoriteRecipes.forEach { recipe ->
+                            recipe.isFavoritedByUser = true
+                        }
+                        _favoriteRecipes.value = favoriteRecipes
+                        _isLoading.value = false
+                    }
+                    result.onFailure { error ->
+                        _errorMessage.value = error.localizedMessage ?: "Failed to fetch favorite recipes"
+                        _isLoading.value = false
+                    }
+                } else {
+                    _errorMessage.value = "User not logged in"
+                    _isLoading.value = false
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Network request failed: ${e.message}"
+                _isLoading.value = false
+            }
+        }
+    }
 
+    fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
+        viewModelScope.launch {
+            val userId = sessionManager.getUserId()
+            if (userId != -1) {
+                sessionManager.setFavoritedStatus(userId, recipe.id, isFavorited)
+
+                try {
+                    if (isFavorited) {
+                        recipeService.addRecipeToFavorites(recipe.id)
+                        _favoriteActionMessage.value = "Recipe added to favorites"
+                    } else {
+                        recipeService.removeRecipeFromFavorites(recipe.id)
+                        _favoriteActionMessage.value = "Recipe removed from favorites"
+                    }
+
+                    _favoriteRecipes.value = _favoriteRecipes.value?.map {
+                        if (it.id == recipe.id) it.copy(isFavoritedByUser = isFavorited) else it
+                    }
+                } catch (e: Exception) {
+                    _favoriteActionMessage.value = "Failed to update favorite status"
+                }
+            }
+        }
+    }
+}

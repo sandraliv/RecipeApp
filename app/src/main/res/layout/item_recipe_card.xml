@@ -13,15 +13,37 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/heartIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_heart_empty"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"/>
+        <!-- Heart Buttons: Empty heart and Filled heart -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <!-- Empty Heart Button (Add to Favorites) -->
+            <ImageButton
+                android:id="@+id/emptyHeartButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_heart_empty"
+                android:contentDescription="Add to Favorites"
+                android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+            <!-- Filled Heart Button (Remove from Favorites) -->
+            <ImageButton
+                android:id="@+id/filledHeartButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_heart_filled"
+                android:contentDescription="Remove from Favorites"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                 /> <!-- Initially hidden, shown when recipe is favorited -->
+
+        </LinearLayout>
 
         <!-- Recipe image -->
         <ImageView
@@ -83,4 +105,3 @@
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
-

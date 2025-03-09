@@ -1,6 +1,7 @@
 package com.hi.recipeapp.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.databinding.FragmentHomeBinding
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,18 +20,22 @@ class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModels() // Get ViewModel instance
     private lateinit var recipeAdapter: RecipeAdapter
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
-        // Initialize the adapter with the click listener
+
+        // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
                 val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
                 val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
                 findNavController().navigate(action)
+            },
+            onFavoriteClick = { recipe, isFavorited ->
+                // When the heart button is clicked, call updateFavoriteStatus from ViewModel
+                homeViewModel.updateFavoriteStatus(recipe, isFavorited)
             }
         )
         binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -56,19 +62,29 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Observe progress bar visibility (assuming you want to use it while fetching data)
+        // Observe the loading state
         homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
-                binding.progressBar.visibility = View.VISIBLE // Show progress bar when loading
+                Log.d("HomeFragment", "Loading data...")
+                binding.progressBar.visibility = View.VISIBLE
             } else {
-                binding.progressBar.visibility = View.GONE // Hide progress bar when done
+                Log.d("HomeFragment", "Loading complete.")
+                binding.progressBar.visibility = View.GONE
             }
         }
-        
+
+        // Observe the favorite action message LiveData
+        homeViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                // Show the message using a Snackbar
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // Fetch recipes when fragment is created
         homeViewModel.fetchRecipes()
+
         return binding.root
     }
-
 }
-
 

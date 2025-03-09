@@ -67,4 +67,35 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     fun isUserLoggedIn(): Boolean {
         return getUserId() != -1
     }
+
+    fun setFavoritedStatus(userId: Int, recipeId: Int, isFavorited: Boolean) {
+        val editor = sharedPreferences.edit()
+        val key = "user_${userId}_recipe_$recipeId"
+        editor.putBoolean(key, isFavorited)
+        editor.apply()
+    }
+
+    fun getFavoritedStatus(userId: Int, recipeId: Int): Boolean {
+        val key = "user_${userId}_recipe_${recipeId}"
+        return sharedPreferences.getBoolean(key, false)
+    }
+
+
+    fun logout() {
+        clearSession()
+        // Perform other logout-related actions if needed
+    }
+
+    fun saveFavoriteRecipeIds(favoriteRecipeIds: Set<Int>) {
+        val editor = sharedPreferences.edit()
+        editor.putStringSet("FAVORITE_RECIPES", favoriteRecipeIds.map { it.toString() }.toSet()) // Save as Set of Strings
+        editor.apply()
+    }
+
+    fun getFavoriteRecipeIds(): Set<Int> {
+        val favorites = sharedPreferences.getStringSet("FAVORITE_RECIPES", emptySet())
+        return favorites?.map { it.toInt() }?.toSet() ?: emptySet()
+    }
+
 }
+

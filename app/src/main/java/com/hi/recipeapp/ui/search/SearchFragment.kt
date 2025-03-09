@@ -5,12 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.databinding.FragmentSearchBinding
 import com.hi.recipeapp.ui.home.RecipeAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +38,25 @@ class SearchFragment : Fragment() {
         observeViewModel()
         setupRecyclerView()
         setupTagSelection()
+
+        // Observe the result of adding recipe to favorites
+        searchViewModel.favoriteResult.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { successMessage ->
+                // Handle success (e.g., show a success message)
+                Toast.makeText(requireContext(), successMessage, Toast.LENGTH_SHORT).show()
+            }.onFailure { exception ->
+                // Handle failure (e.g., show error message)
+                Toast.makeText(requireContext(), exception.message ?: "An error occurred.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Observe the result of adding recipe to favorites
+        searchViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
+            if (message != null) {
+                // Show the Snackbar with the success or error message
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+            }
+        }
         return binding.root
     }
 
@@ -88,12 +109,18 @@ class SearchFragment : Fragment() {
 
 
     private fun setupRecyclerView() {
-        recipeAdapter = RecipeAdapter { recipe ->
-            val recipeId = recipe.id
-            val action = SearchFragmentDirections.actionSearchFragmentToFullRecipeFragment(recipeId)
-            findNavController().navigate(action)
-        }
-
+        recipeAdapter = RecipeAdapter(
+            onClick = { recipe ->
+                // Handle recipe click (navigate to detailed recipe page)
+                val recipeId = recipe.id
+                val action = SearchFragmentDirections.actionSearchFragmentToFullRecipeFragment(recipeId)
+                findNavController().navigate(action)
+            },
+            onFavoriteClick = { recipe, isFavorited ->
+                // When the heart button is clicked, call updateFavoriteStatus from ViewModel
+                searchViewModel.updateFavoriteStatus(recipe, isFavorited)
+            }
+        )
         binding.recipeCardContainer.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recipeAdapter

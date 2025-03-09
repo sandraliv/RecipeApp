@@ -21,25 +21,22 @@ class UserService @Inject constructor(
     private val sessionManager: SessionManager
 ) {
 
-    fun login(username: String, password: String, callback: (UserDTO?, String?) -> Unit) {
+    // In UserService
+    suspend fun login(username: String, password: String): UserDTO? {
         val loginRequest = LoginRequest(username, password)
 
-        networkService.login(loginRequest).enqueue(object : Callback<UserDTO> {
-            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                if (response.isSuccessful) {
-                    response.body()?.let { user ->
-                        callback(user, null) // Login tókst
-                    } ?: callback(null, "Invalid response from server")
-                } else {
-                    callback(null, "Invalid credentials") // Villuskilaboð
-                }
+        return try {
+            val response = networkService.login(loginRequest) // Assuming networkService.login() is a suspend function
+            if (response.isSuccessful) {
+                response.body() // Return the UserDTO if successful
+            } else {
+                null // Return null if not successful
             }
-
-            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
-                callback(null, "Network error: ${t.localizedMessage}")
-            }
-        })
+        } catch (e: Exception) {
+            null // Handle any exceptions and return null in case of errors
+        }
     }
+
 
     fun signup(
         role: String,
@@ -76,14 +73,10 @@ class UserService @Inject constructor(
     }
 
 
-    suspend fun getUserFavorites(): Result<List<RecipeCard>> {
+    // Update the signature of the getUserFavorites method to accept a userId
+    suspend fun getUserFavorites(userId: Int): Result<List<RecipeCard>> {
         return try {
-            val userId = sessionManager.getUserId()
-            if (userId == null || userId == -1) {
-                return Result.failure(Exception("User is not logged in"))
-            }
-            val response = networkService.getUserFavorites(userId)
-
+            val response = networkService.getUserFavorites(userId)  // Ensure your network service accepts userId
             if (response.isSuccessful) {
                 Result.success(response.body() ?: emptyList())
             } else {
@@ -93,13 +86,14 @@ class UserService @Inject constructor(
             Result.failure(e)
         }
     }
+
     suspend fun getUserRecipes(page: Int = 0, size: Int = 10): Result<List<UserRecipeCard>> {
         return try {
             // Get the userId from the session manager
             val userId = sessionManager.getUserId()
 
             // Check if the userId is valid (not null and not -1)
-            if (userId == null || userId == -1) {
+            if (userId == -1) {
                 return Result.failure(Exception("User is not logged in"))
             }
 

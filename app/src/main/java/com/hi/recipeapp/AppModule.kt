@@ -1,6 +1,8 @@
 package com.hi.recipeapp
 
+import android.app.Application
 import com.google.gson.GsonBuilder
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.ui.networking.NetworkService
 import dagger.Module
@@ -24,8 +26,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRecipeService(networkService: NetworkService): RecipeService {
-        return RecipeService(networkService)
+    fun provideRecipeService(
+        networkService: NetworkService,
+        sessionManager: SessionManager // Add sessionManager as a parameter here
+    ): RecipeService {
+        return RecipeService(networkService, sessionManager) // Pass sessionManager to the RecipeService constructor
     }
 
     @Provides
@@ -41,6 +46,13 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson)) // Add the customized Gson instance here
             .build()
+    }
+
+    // Add a provider for SessionManager
+    @Provides
+    @Singleton
+    fun provideSessionManager(application: Application): SessionManager {
+        return SessionManager(application) // Provide SessionManager instance
     }
 
 
