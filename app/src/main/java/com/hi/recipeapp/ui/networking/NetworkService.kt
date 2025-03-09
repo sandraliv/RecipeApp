@@ -10,13 +10,16 @@ import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.classes.UserRecipeCard
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -77,6 +80,17 @@ interface NetworkService {
         @Path("userId") userId: Int,
         @Body recipe: UserFullRecipe
     ): Response<UserFullRecipe>
+
+
+    interface ImageUploadService {
+        @Multipart
+        @POST("recipes/{recipeId}/upload")  // API Endpoint úr bakenda
+        suspend fun uploadImageToRecipe(
+            @Path("recipeId") recipeId: Int,
+            @Part file: MultipartBody.Part
+        ): Response<String>
+    }
+
 
 
 
