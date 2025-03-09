@@ -1,18 +1,15 @@
 package com.hi.recipeapp.ui.home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Call
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +22,7 @@ class HomeViewModel @Inject constructor(
     private val _recipes = MutableLiveData<List<RecipeCard>?>()
     val recipes: LiveData<List<RecipeCard>?> get() = _recipes
 
-    private val _favoriteActionMessage = MutableLiveData<String?>() // LiveData for favorite action message
+    private val _favoriteActionMessage = MutableLiveData<String?>()
     val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
     private val _errorMessage = MutableLiveData<String?>()
@@ -39,7 +36,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun fetchRecipes() {
-        val userId = sessionManager.getUserId()  // Get the user ID from session
+        val userId = sessionManager.getUserId()
         _isLoading.value = true
 
         // Step 1: Fetch all recipes
@@ -62,7 +59,6 @@ class HomeViewModel @Inject constructor(
                         _recipes.value = recipes
                     }
                 } else {
-                    // If no user is logged in, set all favorites to false
                     recipes?.forEach { recipe ->
                         recipe.isFavoritedByUser = false
                     }
@@ -77,7 +73,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
             if (userId != -1) {
-                // Save the favorited status to the session or backend
                 sessionManager.setFavoritedStatus(userId, recipe.id, isFavorited)
 
                 // Update the backend

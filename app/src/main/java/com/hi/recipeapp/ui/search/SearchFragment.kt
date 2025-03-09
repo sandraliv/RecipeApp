@@ -42,10 +42,8 @@ class SearchFragment : Fragment() {
         // Observe the result of adding recipe to favorites
         searchViewModel.favoriteResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { successMessage ->
-                // Handle success (e.g., show a success message)
                 Toast.makeText(requireContext(), successMessage, Toast.LENGTH_SHORT).show()
             }.onFailure { exception ->
-                // Handle failure (e.g., show error message)
                 Toast.makeText(requireContext(), exception.message ?: "An error occurred.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -53,7 +51,6 @@ class SearchFragment : Fragment() {
         // Observe the result of adding recipe to favorites
         searchViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             if (message != null) {
-                // Show the Snackbar with the success or error message
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
             }
         }
@@ -70,14 +67,14 @@ class SearchFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // Convert selectedTags (Set<RecipeTag>) to Set<String> before passing it
-                val tagNames = selectedTags.map { it.name }.toSet() // Converts to Set<String>
+                val tagNames = selectedTags.map { it.name }.toSet()
                 searchViewModel.searchByQuery(query ?: "", tagNames)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 // Convert selectedTags (Set<RecipeTag>) to Set<String> before passing it
-                val tagNames = selectedTags.map { it.name }.toSet() // Converts to Set<String>
+                val tagNames = selectedTags.map { it.name }.toSet()
                 searchViewModel.searchByQuery(newText ?: "", tagNames)
                 return true
             }
@@ -85,8 +82,8 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupTagSelection() {
-        val chipGroup = binding.chipGroupTags // Assuming you have a ChipGroup for tags
-        chipGroup.removeAllViews()  // Remove old chips
+        val chipGroup = binding.chipGroupTags
+        chipGroup.removeAllViews()
 
         // Add chips dynamically for tags
         RecipeTag.values().forEach { tag ->
@@ -100,7 +97,7 @@ class SearchFragment : Fragment() {
                     selectedTags.remove(tag)
                 }
                 // Convert selectedTags (Set<RecipeTag>) to Set<String> before passing it
-                val tagNames = selectedTags.map { it.name }.toSet() // Converts to Set<String>
+                val tagNames = selectedTags.map { it.name }.toSet()
                 searchViewModel.searchByQuery(binding.searchDashboard.query.toString(), tagNames)
             }
             chipGroup.addView(chip)
@@ -111,13 +108,11 @@ class SearchFragment : Fragment() {
     private fun setupRecyclerView() {
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
-                // Handle recipe click (navigate to detailed recipe page)
                 val recipeId = recipe.id
                 val action = SearchFragmentDirections.actionSearchFragmentToFullRecipeFragment(recipeId)
                 findNavController().navigate(action)
             },
             onFavoriteClick = { recipe, isFavorited ->
-                // When the heart button is clicked, call updateFavoriteStatus from ViewModel
                 searchViewModel.updateFavoriteStatus(recipe, isFavorited)
             }
         )
@@ -131,12 +126,12 @@ class SearchFragment : Fragment() {
         // Observe search results from the ViewModel and update RecyclerView
         searchViewModel.searchResults.observe(viewLifecycleOwner) { results ->
             if (results.isNullOrEmpty()) {
-                binding.textDashboard.text = "No recipes found."  // Show "No recipes found" message
-                binding.recipeCardContainer.visibility = View.GONE  // Hide RecyclerView
+                binding.textDashboard.text = "No recipes found."
+                binding.recipeCardContainer.visibility = View.GONE
             } else {
-                binding.textDashboard.text = ""  // Clear any previous "No results" text
-                binding.recipeCardContainer.visibility = View.VISIBLE  // Show RecyclerView
-                recipeAdapter.submitList(results)  // Submit the new results to the adapter
+                binding.textDashboard.text = ""
+                binding.recipeCardContainer.visibility = View.VISIBLE
+                recipeAdapter.submitList(results)
                 Log.d("SEARCH_RESULTS", "Submitted list to adapter: $results")
             }
         }
@@ -144,17 +139,17 @@ class SearchFragment : Fragment() {
         // Observe any error messages
         searchViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             if (error != null) {
-                binding.textDashboard.text = error  // Show the error message
-                binding.recipeCardContainer.visibility = View.GONE  // Hide RecyclerView in case of an error
+                binding.textDashboard.text = error
+                binding.recipeCardContainer.visibility = View.GONE
             }
         }
 
     }
 
     fun resetSearchState() {
-        binding.textDashboard.text = ""  // Clear any previous search results
-        binding.searchDashboard.setQuery("", false) // Clear the search view query
-        binding.searchDashboard.clearFocus() // Remove focus from the search view
+        binding.textDashboard.text = ""
+        binding.searchDashboard.setQuery("", false)
+        binding.searchDashboard.clearFocus()
     }
 
     override fun onDestroyView() {

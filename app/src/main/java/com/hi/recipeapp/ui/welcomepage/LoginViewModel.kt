@@ -32,7 +32,7 @@ class LoginViewModel @Inject constructor(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val user = userService.login(username, password) // Call the suspend login function
+                val user = userService.login(username, password)
 
                 _isLoading.value = false
 
@@ -41,11 +41,11 @@ class LoginViewModel @Inject constructor(
                     // Save user data to session
                     sessionManager.saveUserId(user.id)
                     sessionManager.saveUserName(user.username)
+                    sessionManager.saveProfilePic(user.profilePictureUrl)
 
-                    // Fetch and save the favorite status of all recipes for this user
                     saveUserFavoriteStatus(user.id)
                 } else {
-                    _errorMessage.value = "Login failed" // Failed login
+                    _errorMessage.value = "Login failed"
                 }
             } catch (e: Exception) {
                 _isLoading.value = false
@@ -57,11 +57,11 @@ class LoginViewModel @Inject constructor(
     // Make the function suspend so we can call suspend functions inside it
     private suspend fun saveUserFavoriteStatus(userId: Int) {
         try {
-            val result = userService.getUserFavorites(userId) // Pass the userId to the service
+            val result = userService.getUserFavorites(userId)
             if (result.isSuccess) {
                 val favoriteRecipes = result.getOrDefault(emptyList())
                 val favoriteRecipeIds = favoriteRecipes.map { it.id }.toSet()
-                sessionManager.saveFavoriteRecipeIds(favoriteRecipeIds) // Save the recipe IDs to session
+                sessionManager.saveFavoriteRecipeIds(favoriteRecipeIds)
             } else {
                 _errorMessage.value = "Failed to fetch favorites"
             }

@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
-    private val homeViewModel: HomeViewModel by viewModels() // Get ViewModel instance
+    private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
 
     override fun onCreateView(
@@ -29,12 +29,11 @@ class HomeFragment : Fragment() {
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
-                val recipeId = recipe.id  // Extract the id from the clicked RecipeCard
+                val recipeId = recipe.id
                 val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
                 findNavController().navigate(action)
             },
             onFavoriteClick = { recipe, isFavorited ->
-                // When the heart button is clicked, call updateFavoriteStatus from ViewModel
                 homeViewModel.updateFavoriteStatus(recipe, isFavorited)
             }
         )
@@ -45,12 +44,12 @@ class HomeFragment : Fragment() {
         homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
             if (recipes != null) {
                 if (recipes.isEmpty()) {
-                    binding.textHome.visibility = View.VISIBLE // Show message if no recipes
+                    binding.textHome.visibility = View.VISIBLE
                     binding.recipeRecyclerView.visibility = View.GONE
                 } else {
-                    binding.textHome.visibility = View.GONE // Hide message if recipes are found
+                    binding.textHome.visibility = View.GONE
                     binding.recipeRecyclerView.visibility = View.VISIBLE
-                    recipeAdapter.submitList(recipes) // Update RecyclerView
+                    recipeAdapter.submitList(recipes)
                 }
             }
         }
@@ -76,7 +75,6 @@ class HomeFragment : Fragment() {
         // Observe the favorite action message LiveData
         homeViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
-                // Show the message using a Snackbar
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }
