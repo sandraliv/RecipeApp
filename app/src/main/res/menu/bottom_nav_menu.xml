@@ -12,12 +12,18 @@
         android:title="@string/title_dashboard" />
 
     <item
+        android:id="@+id/navigation_add_recipe"
+        android:icon="@drawable/add_icon"
+        android:title="Add" />
+
+
+    <item
         android:id="@+id/navigation_myrecipes"
         android:icon="@drawable/outline_assignment_24"
         android:title="@string/title_my_recipes" />
 
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@drawable/baseline_settings_applications_24"
-        android:title="@string/title_settings" />
+        android:icon="@drawable/baseline_account_box_24"
+        android:title="@string/account" />
 </menu>

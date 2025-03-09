@@ -5,6 +5,7 @@ import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.classes.SessionManager
+import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.ui.networking.NetworkService
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,7 +19,11 @@ class RecipeService @Inject constructor(
     private val sessionManager: SessionManager
 ) {
 
-    fun searchRecipes(query: String, tags: Set<String>?, callback: (List<RecipeCard>?, String?) -> Unit) {
+    fun searchRecipes(
+        query: String,
+        tags: Set<String>?,
+        callback: (List<RecipeCard>?, String?) -> Unit
+    ) {
         // Log the query and tags
         Log.d("RECIPE_SERVICE", "Query: $query, Tags: $tags")
 
@@ -27,7 +32,10 @@ class RecipeService @Inject constructor(
             query.takeIf { it.isNotEmpty() },  // Only pass query if it's not empty
             tags.takeIf { it.isNullOrEmpty().not() } // Only pass tags if they're not null or empty
         ).enqueue(object : Callback<List<RecipeCard>> {
-            override fun onResponse(call: Call<List<RecipeCard>>, response: Response<List<RecipeCard>>) {
+            override fun onResponse(
+                call: Call<List<RecipeCard>>,
+                response: Response<List<RecipeCard>>
+            ) {
                 if (response.isSuccessful) {
                     val recipes = response.body()
                     Log.d("NETWORK_RESPONSE", "Received recipes: $recipes")
@@ -59,7 +67,6 @@ class RecipeService @Inject constructor(
             }
         })
     }
-
 
 
     // Fetch all recipes (for initial display or fallback)
@@ -121,6 +128,26 @@ class RecipeService @Inject constructor(
             Result.failure(e)
         }
     }
+
+
+
+
+    suspend fun uploadUserRecipe(userId: Int, recipe: UserFullRecipe): Boolean {
+        return try {
+            val response = networkService.uploadRecipe(userId, recipe)
+            if (response.isSuccessful) {
+                Log.d("RecipeService", "Recipe uploaded successfully: ${response.body()}")
+                true
+            } else {
+                Log.e("RecipeService", "Failed to upload recipe: ${response.code()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("RecipeService", "Exception: ${e.localizedMessage}")
+            false
+        }
+    }
+
 
 
 

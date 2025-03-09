@@ -23,4 +23,11 @@
             android:id="@+id/action_signupFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_add_recipe"
+        android:name="com.hi.recipeapp.ui.addrecipe.AddRecipeFragment"
+        android:label="Add Recipe"
+        tools:layout="@layout/fragment_add_recipe"/>
+
 </navigation>

@@ -35,15 +35,19 @@ data class UserRecipeCard(
     val id:Int,
 )
 
-
 data class UserFullRecipe(
     @SerializedName("image_url") val imageUrl: String,
     val title: String,
     val description: String,
-    val id:Int,
+    val id: Int,
     val instructions: String,
     @SerializedName("ingredients") val ingredients: Map<String, String>
 )
+
+
+
+
+
 
 enum class RecipeTag {
     @SerializedName("VEGETARIAN")

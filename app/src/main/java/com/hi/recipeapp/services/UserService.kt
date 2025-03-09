@@ -125,10 +125,10 @@ class UserService @Inject constructor(
             if (response.isSuccessful) {
                 response.body() // Return the recipe if successful
             } else {
-                null // Return null if the response is not successful
+                null
             }
         } catch (e: Exception) {
-            // Handle any errors (network issues, etc.)
+
             null
         }
     }
