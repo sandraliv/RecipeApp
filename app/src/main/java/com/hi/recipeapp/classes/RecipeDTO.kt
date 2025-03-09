@@ -22,9 +22,9 @@ data class FullRecipe(
     val ratingCount: Int,
     val id:Int,
     val instructions: String,
-    @SerializedName("ingredients") val ingredients: Map<String, String>, // Map for ingredient_name and ingredient_quantity
+    @SerializedName("ingredients") val ingredients: Map<String, String>,
     @SerializedName("tags") val tags: Set<RecipeTag>,
-    @SerializedName("categories") val categories: Set<Category>, // Set of Category enums
+    @SerializedName("categories") val categories: Set<Category>,
     var isFavoritedByUser: Boolean
 )
 
@@ -43,11 +43,6 @@ data class UserFullRecipe(
     val instructions: String,
     @SerializedName("ingredients") val ingredients: Map<String, String>
 )
-
-
-
-
-
 
 enum class RecipeTag {
     @SerializedName("VEGETARIAN")

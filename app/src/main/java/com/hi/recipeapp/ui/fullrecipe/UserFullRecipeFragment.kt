@@ -29,7 +29,6 @@ class UserFullRecipeFragment : Fragment() {
     private lateinit var binding: FragmentUserFullRecipeBinding
 
 
-    // Safe Args: Retrieve arguments passed to the fragment
     private val args: UserFullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
 
@@ -39,9 +38,6 @@ class UserFullRecipeFragment : Fragment() {
     ): View {
         binding = FragmentUserFullRecipeBinding.inflate(inflater, container, false)
 
-
-
-        // Fetch full recipe data
         userFullRecipeViewModel.fetchUserRecipeById(recipeId)
 
         // Observe the full recipe data
@@ -121,8 +117,6 @@ class UserFullRecipeFragment : Fragment() {
             binding.ingredientsLayout.addView(tableRow)  // Add the entire row
         }
 
-
-
         // Set instructions with numbering
         val instructions = recipe.instructions.split(".") // Split by periods (.)
 
@@ -136,8 +130,6 @@ class UserFullRecipeFragment : Fragment() {
         }
 
         binding.instructionsTextView.text = formattedInstructions.toString()
-
-
 
     }
 

@@ -1,8 +1,5 @@
 package com.hi.recipeapp.services
 
-import android.util.Log
-import com.hi.recipeapp.classes.FavoriteRecipesDTO
-import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
@@ -21,22 +18,20 @@ class UserService @Inject constructor(
     private val sessionManager: SessionManager
 ) {
 
-    // In UserService
     suspend fun login(username: String, password: String): UserDTO? {
         val loginRequest = LoginRequest(username, password)
 
         return try {
-            val response = networkService.login(loginRequest) // Assuming networkService.login() is a suspend function
+            val response = networkService.login(loginRequest)
             if (response.isSuccessful) {
-                response.body() // Return the UserDTO if successful
+                response.body()
             } else {
-                null // Return null if not successful
+                null
             }
         } catch (e: Exception) {
-            null // Handle any exceptions and return null in case of errors
+            null
         }
     }
-
 
     fun signup(
         role: String,
@@ -65,18 +60,16 @@ class UserService @Inject constructor(
                     }
                 }
             }
-
             override fun onFailure(call: Call<String>, t: Throwable) {
                 callback(null, "Network error: ${t.localizedMessage}")
             }
         })
     }
 
-
-    // Update the signature of the getUserFavorites method to accept a userId
-    suspend fun getUserFavorites(userId: Int): Result<List<RecipeCard>> {
+    suspend fun getUserFavorites(userId: Int):
+            Result<List<RecipeCard>> {
         return try {
-            val response = networkService.getUserFavorites(userId)  // Ensure your network service accepts userId
+            val response = networkService.getUserFavorites(userId)
             if (response.isSuccessful) {
                 Result.success(response.body() ?: emptyList())
             } else {
@@ -87,53 +80,38 @@ class UserService @Inject constructor(
         }
     }
 
-    suspend fun getUserRecipes(page: Int = 0, size: Int = 10): Result<List<UserRecipeCard>> {
+    suspend fun getUserRecipes(
+        page: Int = 0, size: Int = 10): Result<List<UserRecipeCard>> {
         return try {
-            // Get the userId from the session manager
-            val userId = sessionManager.getUserId()
 
-            // Check if the userId is valid (not null and not -1)
+            val userId = sessionManager.getUserId()
             if (userId == -1) {
                 return Result.failure(Exception("User is not logged in"))
             }
-
-            // Make the network call to get the user recipes
             val response = networkService.getUserRecipes(userId, page, size)
-
             if (response.isSuccessful) {
-                // If the response is successful, return the result wrapped in a success
                 Result.success(response.body() ?: emptyList())
             } else {
-                // If the response is not successful, return failure with an error message
                 Result.failure(Exception("Failed to fetch user recipes"))
             }
         } catch (e: Exception) {
-            // If there is an error during the network call, catch it and return failure
             Result.failure(e)
         }
     }
-    // In the Service (or repository)
+
     suspend fun fetchUserRecipeById(id: Int): UserFullRecipe? {
         return try {
-            // Get userId from session manager
             val userId = sessionManager.getUserId()
-
-            // Call the network service's suspend function directly
             val response = networkService.getUserRecipeById(id, userId)
-
-            // Check if the response is successful
             if (response.isSuccessful) {
-                response.body() // Return the recipe if successful
+                response.body()
             } else {
                 null
             }
         } catch (e: Exception) {
-
             null
         }
     }
-
-
 
 }
 

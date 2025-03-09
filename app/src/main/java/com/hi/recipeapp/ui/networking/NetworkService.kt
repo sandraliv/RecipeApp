@@ -39,19 +39,8 @@ interface NetworkService {
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
 
-
     @GET("users/{id}/getUserFav")
     suspend fun getUserFavorites(@Path("id") userId: Int): Response<List<RecipeCard>>
-
-    @POST("recipes/{id}/removeFromFav")
-    suspend fun removeRecipeFromFavorites(
-        @Path("id") recipeId: Int // No need for userId in headers
-    ): Response<String>
-
-    @POST("recipes/{id}/addAsFav")
-    suspend fun addRecipeToFavorites(
-        @Path("id") recipeId: Int // No need for userId in headers
-    ): Response<String>
 
     @GET("user-recipes/{userId}/getUserRecipes")
     suspend fun getUserRecipes(
@@ -70,7 +59,7 @@ interface NetworkService {
     suspend fun removeRecipeFromFavorites(
         @Path("recipeId") recipeId: Int,
         @Query("userId") userId: Int
-    ): Response<String>  // Assuming the response is a simple String message
+    ): Response<String>
 
     @GET("user-recipes/{id}")
     suspend fun getUserRecipeById(

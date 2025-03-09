@@ -39,17 +39,10 @@ class FullRecipeFragment : Fragment() {
     ): View {
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
 
-
-
-        // Fetch full recipe data
         fullRecipeViewModel.fetchRecipeById(recipeId)
-
-        // Observe the full recipe data
         fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
-
             recipe?.let {
-                // Bind the full recipe data to the UI
                 bindRecipeData(it)
             }
         }
@@ -57,7 +50,6 @@ class FullRecipeFragment : Fragment() {
         // Observe error messages
         fullRecipeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
-                // Handle error (show toast, etc.)
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         }
@@ -121,8 +113,6 @@ class FullRecipeFragment : Fragment() {
             binding.ingredientsLayout.addView(tableRow)  // Add the entire row
         }
 
-
-
         // Set instructions with numbering
         val instructions = recipe.instructions.split(".") // Split by periods (.)
 
@@ -138,11 +128,9 @@ class FullRecipeFragment : Fragment() {
         binding.instructionsTextView.text = formattedInstructions.toString()
 
 
-        val rating = recipe.averageRating.toFloat() // Directly convert to float
+        val rating = recipe.averageRating.toFloat()
         binding.ratingBar.rating = rating
 
-
-        // Set the rating count (if 0, it will still display the text)
         binding.ratingCountTextView.text = "${recipe.ratingCount} ratings"
 
         // Display tags (if necessary)

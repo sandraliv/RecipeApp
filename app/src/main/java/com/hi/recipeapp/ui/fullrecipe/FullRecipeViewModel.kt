@@ -4,12 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.services.RecipeService
-import com.hi.recipeapp.ui.networking.NetworkService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel

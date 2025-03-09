@@ -30,12 +30,10 @@ class SearchViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    // LiveData to hold the result of favorite status updates
     private val _favoriteResult = MutableLiveData<Result<String>>()
     val favoriteResult: LiveData<Result<String>> get() = _favoriteResult
 
-    // LiveData to hold the result of favorite status updates
-    private val _favoriteActionMessage = MutableLiveData<String?>()  // LiveData for favorite action message
+    private val _favoriteActionMessage = MutableLiveData<String?>()
     val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
     // Function to search recipes by query and tags

@@ -4,7 +4,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,11 +11,10 @@ import com.bumptech.glide.Glide
 import com.hi.recipeapp.R
 import com.hi.recipeapp.databinding.ItemRecipeCardBinding
 import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.classes.SessionManager
 
 class RecipeAdapter(
     private val onClick: (RecipeCard) -> Unit,
-    private val onFavoriteClick: (RecipeCard, Boolean) -> Unit // Now it takes a boolean indicating whether to add or remove
+    private val onFavoriteClick: (RecipeCard, Boolean) -> Unit
 ) : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -25,7 +23,7 @@ class RecipeAdapter(
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        val recipe = getItem(position) // Use getItem() to get the data
+        val recipe = getItem(position)
         holder.bind(recipe)
     }
 
@@ -40,13 +38,13 @@ class RecipeAdapter(
             // Handle empty heart button click (add to favorites)
             binding.emptyHeartButton.setOnClickListener {
                 recipe.isFavoritedByUser = true
-                onFavoriteClick(recipe, true) // Pass true to indicate that the recipe is being added to favorites
+                onFavoriteClick(recipe, true)
             }
 
             // Handle filled heart button click (remove from favorites)
             binding.filledHeartButton.setOnClickListener {
                 recipe.isFavoritedByUser = false
-                onFavoriteClick(recipe, false) // Pass false to indicate that the recipe is being removed from favorites
+                onFavoriteClick(recipe, false)
             }
 
             binding.recipeName.text = recipe.title
@@ -72,7 +70,7 @@ class RecipeAdapter(
 
             // Handle item click to navigate to recipe details
             binding.root.setOnClickListener {
-                onClick(recipe)  // Navigate to recipe details
+                onClick(recipe)
             }
         }
         private fun updateHeartButtonVisibility(recipe: RecipeCard) {
