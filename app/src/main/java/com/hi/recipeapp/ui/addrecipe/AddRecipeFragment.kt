@@ -28,13 +28,13 @@ class AddRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout
+
         binding = FragmentAddRecipeBinding.inflate(inflater, container, false)
 
-        // 🔥 Frumstilltu SessionManager
+
         sessionManager = SessionManager(requireContext())
 
-        // 🔥 Event listeners
+        // Event listeners
         binding.addIngredientButton.setOnClickListener { addIngredientRow() }
         binding.addInstructionButton.setOnClickListener { addInstructionRow() }
         binding.uploadPhotoButton.setOnClickListener { findNavController().navigate(R.id.action_addRecipeFragment_to_uploadPhotoFragment) }
@@ -43,7 +43,7 @@ class AddRecipeFragment : Fragment() {
         return binding.root
     }
 
-    // Function to add a new ingredient row with checkboxes
+    // Adds a new ingredient row with checkboxes
     private fun addIngredientRow() {
         val tableRow = TableRow(requireContext())
 
@@ -102,20 +102,20 @@ class AddRecipeFragment : Fragment() {
 
         instructionCount++
     }
-
+    // Validates user input and creates a UserFullRecipe object
     private fun submitRecipe() {
         val title = binding.recipeTitleEditText.text.toString().trim()
         val description = binding.recipeDescriptionEditText.text.toString().trim()
 
-        // Villumeðhöndlun - notandi verður að fylla inn title og description
+
         if (title.isEmpty() || description.isEmpty()) {
-            Toast.makeText(requireContext(), "Title og description verða að vera fyllt út!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Title og description need to be filled", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val userId = sessionManager.getUserId() // Sækja notanda ID
+        val userId = sessionManager.getUserId() // Get UserId
 
-
+        // Retrieves the ingredient names and quantities from input fields and puts them into Map
         val ingredientsMap = mutableMapOf<String, String>()
         for (i in 0 until binding.ingredientsTableLayout.childCount) {
             val row = binding.ingredientsTableLayout.getChildAt(i) as? TableRow
@@ -127,7 +127,7 @@ class AddRecipeFragment : Fragment() {
             }
         }
 
-
+        // Retrieves instructions from the input fields and stores them in a list
         val instructionsList = mutableListOf<String>()
         for (i in 0 until binding.instructionsTableLayout.childCount) {
             val row = binding.instructionsTableLayout.getChildAt(i) as? TableRow
@@ -137,21 +137,21 @@ class AddRecipeFragment : Fragment() {
             }
         }
 
-        // Uppskriftarhlutur sem passar við bakenda
+        // UserFullRecipe object
         val recipe = UserFullRecipe(
-            id = 0, // Látum bakenda búa til ID
+            id = 0,
             title = title,
             description = description,
-            ingredients = ingredientsMap, // Listi af hráefnum
-            instructions = instructionsList.joinToString(". "), // Samtengjum í eina streng með punkti
-            imageUrl = "default" // Placeholder fyrir mynd
+            ingredients = ingredientsMap,
+            instructions = instructionsList.joinToString(". "),
+            imageUrl = "default"
         )
 
 
         viewModel.uploadRecipe(userId, recipe)
 
-        // Láta notanda vita að uppskrift var send
-        Toast.makeText(requireContext(), "Uppskrift send!", Toast.LENGTH_SHORT).show()
+        // Lets user know that recipe is sent
+        Toast.makeText(requireContext(), "Recipe sent!", Toast.LENGTH_SHORT).show()
 
     }
 

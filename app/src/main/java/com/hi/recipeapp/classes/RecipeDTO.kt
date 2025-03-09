@@ -41,7 +41,7 @@ data class UserFullRecipe(
     val description: String,
     val id: Int,
     val instructions: String,
-    @SerializedName("ingredients") val ingredients: Map<String, String> // 🔥 Breytt í Map
+    @SerializedName("ingredients") val ingredients: Map<String, String>
 )
 
 

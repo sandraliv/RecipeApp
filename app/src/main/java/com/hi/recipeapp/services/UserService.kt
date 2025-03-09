@@ -28,10 +28,10 @@ class UserService @Inject constructor(
             override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                 if (response.isSuccessful) {
                     response.body()?.let { user ->
-                        callback(user, null) // Login tókst
+                        callback(user, null)
                     } ?: callback(null, "Invalid response from server")
                 } else {
-                    callback(null, "Invalid credentials") // Villuskilaboð
+                    callback(null, "Invalid credentials")
                 }
             }
 
@@ -98,7 +98,7 @@ class UserService @Inject constructor(
             // Get the userId from the session manager
             val userId = sessionManager.getUserId()
 
-            // Check if the userId is valid (not null and not -1)
+            // Check if the userId is valid
             if (userId == null || userId == -1) {
                 return Result.failure(Exception("User is not logged in"))
             }
@@ -131,10 +131,10 @@ class UserService @Inject constructor(
             if (response.isSuccessful) {
                 response.body() // Return the recipe if successful
             } else {
-                null // Return null if the response is not successful
+                null
             }
         } catch (e: Exception) {
-            // Handle any errors (network issues, etc.)
+
             null
         }
     }
