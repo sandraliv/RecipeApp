@@ -9,7 +9,6 @@ import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
-import com.hi.recipeapp.classes.FavoriteRecipesDTO
 import com.hi.recipeapp.classes.UserRecipeCard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
