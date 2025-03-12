@@ -41,7 +41,7 @@ class SignupFragment : Fragment() {
                 Toast.makeText(requireContext(), "Signup successful! Welcome, ${user.username}", Toast.LENGTH_SHORT).show()
                 Log.d("SignupSuccess", "User: ${user.username}")
 
-                // ✅ Fara í LoginFragment eftir vel heppnaða skráningu
+
                 findNavController().navigate(R.id.action_signupFragment_to_loginFragment)
             }
         }

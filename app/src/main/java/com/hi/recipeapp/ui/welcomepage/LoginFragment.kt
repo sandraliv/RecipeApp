@@ -48,7 +48,7 @@ class LoginFragment : Fragment() {
                 ).show()
                 Log.d("LoginSuccess", "User: ${user.username}")
 
-                // ✅ Fara í MainActivity og loka LoginFragment
+
                 startActivity(Intent(requireContext(), MainActivity::class.java))
                 requireActivity().finish()
             }
