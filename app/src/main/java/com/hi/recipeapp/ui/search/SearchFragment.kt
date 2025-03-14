@@ -35,9 +35,9 @@ class SearchFragment : Fragment() {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         setupSearchView()
-        observeViewModel()
-        setupRecyclerView()
         setupTagSelection()
+        setupRecyclerView()
+        observeViewModel()
 
         // Observe the result of adding recipe to favorites
         searchViewModel.favoriteResult.observe(viewLifecycleOwner) { result ->
