@@ -16,6 +16,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         const val KEY_USER_NAME = "user_name"
         private const val TAG = "SessionManager"
         const val KEY_USER_PROFILE_PIC = "user_pic"
+        const val KEY_USER_PASSWORD = "user_pw"
     }
 
     // Save user ID (if needed)
@@ -56,6 +57,17 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         editor.putString(KEY_USER_NAME, userName)
         editor.apply()
         Log.d(TAG, "User Name saved successfully.")
+    }
+
+    fun savePassword(password: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(KEY_USER_PASSWORD, password)
+        editor.apply()
+    }
+
+    fun getPassword(): String? {
+        val password = sharedPreferences.getString(KEY_USER_PASSWORD, null)
+        return password
     }
 
     // Retrieve user name (if needed)

@@ -1,5 +1,6 @@
 package com.hi.recipeapp.services
 
+import android.util.Log
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
@@ -66,6 +67,33 @@ class UserService @Inject constructor(
         })
     }
 
+    suspend fun changePassword(
+        userId: Int,
+        currentPassword: String,
+        newPassword: String,
+        confirmNewPassword: String
+    ): Result<String> {
+        val updates = mapOf(
+            "currentPassword" to currentPassword,
+            "newPassword" to newPassword,
+            "confirmNewPassword" to confirmNewPassword
+        )
+        return try {
+            Log.d("HELLO", "I AM CALLING THE NET WORK SERVICE")
+            val response = networkService.patchUpdateUserPassword(userId, updates)
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: /* fallback if null */ "")
+            } else {
+                Result.failure(Exception("Failed to update password"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+
+    }
+
+
     suspend fun getUserFavorites(userId: Int):
             Result<List<RecipeCard>> {
         return try {
@@ -112,6 +140,7 @@ class UserService @Inject constructor(
             null
         }
     }
+
 
 }
 

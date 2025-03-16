@@ -85,4 +85,3 @@ class UploadPhotoFragment : Fragment() {
         private const val REQUEST_IMAGE_PICK = 2
     }
 }
-

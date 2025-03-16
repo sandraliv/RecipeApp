@@ -31,7 +31,10 @@ class AddRecipeFragment : Fragment() {
 
         binding = FragmentAddRecipeBinding.inflate(inflater, container, false)
 
-
+        //@Hildur, í staðinn fyrir að sækja session manager hingað, notaðu frekar viewmodelið.
+        //Session manager er injectaður þar inn og tilbúinn til notkunar
+        //Viewmodelið á að sjá um allt logic og fragmentið á bara að sjá um að update-a ui
+        //og þegar view model biður um það.
         sessionManager = SessionManager(requireContext())
 
         // Event listeners
