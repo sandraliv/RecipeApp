@@ -88,7 +88,7 @@ class SearchFragment : Fragment() {
         // Add chips dynamically for tags
         RecipeTag.values().forEach { tag ->
             val chip = Chip(context)
-            chip.text = tag.name
+            chip.text = tag.getDisplayName()
             chip.isCheckable = true
             chip.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {

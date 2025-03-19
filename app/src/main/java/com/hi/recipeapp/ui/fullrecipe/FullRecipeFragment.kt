@@ -134,7 +134,7 @@ class FullRecipeFragment : Fragment() {
         binding.ratingCountTextView.text = "${recipe.ratingCount} ratings"
 
         // Display tags (if necessary)
-        binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.name.replace("_", " ") }  // Display tags as comma-separated
+        binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.getDisplayName() }
         // Display categories (if necessary)
         binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.name.replace("_", " ").replaceFirstChar { it.uppercase(
             Locale.ROOT) } } // Replace underscores and capitalize

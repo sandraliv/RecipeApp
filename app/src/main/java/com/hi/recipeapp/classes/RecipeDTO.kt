@@ -62,8 +62,20 @@ enum class RecipeTag {
 
     @SerializedName("LOW_CARB")
     LOW_CARB;
-}
 
+    // Method to get the display name from the serialized name
+    fun getDisplayName(): String {
+        return when (this) {
+            VEGETARIAN -> "Vegetarian"
+            VEGAN -> "Vegan"
+            GLUTEN_FREE -> "Gluten Free"
+            KETO -> "Keto"
+            DAIRY_FREE -> "Dairy Free"
+            LOW_CARB -> "Low Carb"
+        }
+
+    }
+}
 
 
 enum class Category{
