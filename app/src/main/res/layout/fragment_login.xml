@@ -31,7 +31,8 @@
             android:textSize="20sp"
             android:background="@drawable/rounded_circle"
             android:padding="18dp"
-            android:inputType="text"/>
+            android:inputType="text"
+            android:autofillHints="off"/>
 
         <EditText
             android:id="@+id/password_input"
