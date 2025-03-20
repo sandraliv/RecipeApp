@@ -135,9 +135,9 @@ class FullRecipeFragment : Fragment() {
 
         // Display tags (if necessary)
         binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.getDisplayName() }
-        // Display categories (if necessary)
-        binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.name.replace("_", " ").replaceFirstChar { it.uppercase(
-            Locale.ROOT) } } // Replace underscores and capitalize
+        // Display categories using getDisplayName
+        binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.getDisplayName() }
+
     }
 
 }

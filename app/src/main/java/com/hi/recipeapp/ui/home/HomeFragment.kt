@@ -10,15 +10,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
+import com.hi.recipeapp.R
+import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.databinding.FragmentHomeBinding
 import com.hi.recipeapp.services.UserService
+import com.hi.recipeapp.ui.bycategory.CategoryButtonAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
+    private lateinit var categoryButtonAdapter:CategoryButtonAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +44,9 @@ class HomeFragment : Fragment() {
         )
         binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recipeRecyclerView.adapter = recipeAdapter
+
+        // Set up Category Button RecyclerView
+        setupCategoryRecyclerView(binding)
 
         // Observe the recipes LiveData from HomeViewModel
         homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
@@ -84,5 +92,34 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
+
+    private fun setupCategoryRecyclerView(binding: FragmentHomeBinding) {
+        // Prepare the list of categories
+        val categories = Category.values().toList()
+
+        Log.d("CategoryRecyclerView", "Categories: $categories")
+
+        categoryButtonAdapter = CategoryButtonAdapter(
+            categories = categories,
+            onCategoryClick = { category ->
+                Log.d("CategoryRecyclerView", "Category clicked: ${category.name}")
+                navigateToCategoryFragment(category)
+            }
+        )
+
+        // Set up the RecyclerView for category buttons
+        binding.categoryRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.categoryRecyclerView.adapter = categoryButtonAdapter
+
+
+    }
+
+    private fun navigateToCategoryFragment(category: Category) {
+        val action = HomeFragmentDirections.actionHomeFragmentToCategoryFragment(category.name)  // Pass category name
+        findNavController().navigate(action)
+    }
+
+
 }
 

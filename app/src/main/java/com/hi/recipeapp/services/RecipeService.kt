@@ -1,6 +1,7 @@
 package com.hi.recipeapp.services
 
 import android.util.Log
+import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
@@ -128,6 +129,39 @@ class RecipeService @Inject constructor(
             false
         }
     }
+
+    // Fetch recipes by category with callback
+    fun getRecipesByCategory(
+        category: Category,
+        callback: (List<RecipeCard>?, String?) -> Unit
+    ) {
+        Log.d("RECIPE_SERVICE", "Category: $category")
+
+        // Convert the enum category to a string
+        val categoryName = category.name
+
+        // Make the network call to get recipes by category
+        networkService.getRecipesByCategory(setOf(categoryName)).enqueue(object : Callback<List<RecipeCard>> {
+            override fun onResponse(
+                call: Call<List<RecipeCard>>,
+                response: Response<List<RecipeCard>>
+            ) {
+                if (response.isSuccessful) {
+                    val recipes = response.body()
+                    Log.d("NETWORK_RESPONSE", "Received recipes: $recipes")
+                    callback(recipes, null) // Return the recipes to the callback
+                } else {
+                    Log.e("NETWORK_ERROR", "Error response: ${response.code()}")
+                    callback(null, "Error: ${response.code()}") // Return error message
+                }
+            }
+
+            override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
+                callback(null, "Network error: ${t.localizedMessage}") // Handle network failure
+            }
+        })
+    }
+
 
 }
 

@@ -1,5 +1,6 @@
-package com.hi.recipeapp.ui.home
+package com.hi.recipeapp.ui.bycategory
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,61 +15,69 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class CategoryViewModel @Inject constructor(
     private val recipeService: RecipeService,
     private val userService: UserService,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    private val _recipes = MutableLiveData<List<RecipeCard>?>()
-    val recipes: LiveData<List<RecipeCard>?> get() = _recipes
+    private val _recipesByCategory = MutableLiveData<List<RecipeCard>>(emptyList()) // Non-nullable, initial value is empty list
+    val recipesByCategory: LiveData<List<RecipeCard>> = _recipesByCategory
 
-    private val _favoriteActionMessage = MutableLiveData<String?>()
-    val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> get() = _errorMessage
+    private val _errorMessage = MutableLiveData<String?>() // Nullable type for error message
+    val errorMessage: LiveData<String?> = _errorMessage
+
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    init {
-        fetchRecipes()
-    }
+    private val _favoriteActionMessage = MutableLiveData<String?>()
+    val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
-    fun fetchRecipes() {
-        val userId = sessionManager.getUserId()
+    fun getRecipesByCategory(category: Category) {
+        _errorMessage.value = null
         _isLoading.value = true
+        Log.d("CATEGORY_QUERY", "Category: $category")
 
-        // Step 1: Fetch all recipes
-        recipeService.fetchRecipes { recipes, error ->
-            if (error != null) {
-                _errorMessage.value = error
-                _isLoading.value = false
-            } else {
-                // Step 2: Fetch the user's favorite recipes
+
+        // Call the RecipeService to get recipes by category
+        recipeService.getRecipesByCategory(category) { recipes, error ->
+            _isLoading.value = false
+
+            // Ensure that recipes is not null before assigning it
+            val nonNullRecipes = recipes ?: emptyList()  // If recipes is null, use an empty list.
+
+            if (nonNullRecipes.isNotEmpty()) {
+                // Step 1: Get the user's favorite recipes
+                val userId = sessionManager.getUserId()
                 if (userId != -1) {
                     viewModelScope.launch {
                         val userFavorites = userService.getUserFavorites(userId).getOrNull() ?: emptyList()
 
-                        // Step 3: Mark favorited recipes
-                        recipes?.forEach { recipe ->
+                        // Step 2: Mark favorited recipes
+                        nonNullRecipes.forEach { recipe ->
                             recipe.isFavoritedByUser = userFavorites.any { it.id == recipe.id }
                         }
 
-                        // Step 4: Update the LiveData with the updated recipes
-                        _recipes.value = recipes
+                        _recipesByCategory.value = nonNullRecipes // Assign non-null list
                     }
                 } else {
-                    recipes?.forEach { recipe ->
+                    // If no user is logged in, set all favorites to false
+                    nonNullRecipes.forEach { recipe ->
                         recipe.isFavoritedByUser = false
                     }
-                    _recipes.value = recipes
+                    _recipesByCategory.value = nonNullRecipes // Assign non-null list
                 }
-                _isLoading.value = false
+            } else {
+                // If no recipes found, assign an empty list
+                _recipesByCategory.value = emptyList() // Assign non-null empty list
+                _errorMessage.value = error ?: "No results found"
             }
         }
     }
+
+
 
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
@@ -87,7 +96,7 @@ class HomeViewModel @Inject constructor(
                     }
 
                     // Update the local list with the new favorited status
-                    _recipes.value = _recipes.value?.map {
+                    _recipesByCategory.value = _recipesByCategory.value?.map {
                         if (it.id == recipe.id) it.copy(isFavoritedByUser = isFavorited) else it
                     }
                 } catch (e: Exception) {
@@ -96,6 +105,4 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
 }
-

@@ -13,6 +13,7 @@ constraintlayout = "2.1.4"
 lifecycleLivedataKtx = "2.6.1"
 lifecycleViewmodelKtx = "2.6.1"
 navigationFragmentKtx = "2.6.0"
+navigationSafeArgsGradlePlugin = "2.8.9"
 navigationUiKtx = "2.6.0"
 retrofit = "2.9.0"
 okhttp = "4.9.3"
@@ -25,6 +26,8 @@ hilt = "2.55"
 navigationFragment = "2.8.7"
 
 [libraries]
+androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationFragment" }
+androidx-navigation-safe-args-gradle-plugin-v289 = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
 artifactid = { module = "groupId:artifactId", version.ref = "artifactid" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }

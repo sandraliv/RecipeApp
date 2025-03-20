@@ -79,10 +79,28 @@ enum class RecipeTag {
 
 
 enum class Category{
+    @SerializedName("BREAKFAST")
     BREAKFAST,
+    @SerializedName("APPETIZER")
     APPETIZER,
+    @SerializedName("MAIN_COURSE")
     MAIN_COURSE,
+    @SerializedName("SNACK")
     SNACK,
+    @SerializedName("DESSERT")
     DESSERT,
+    @SerializedName("BAKING")
     BAKING;
+
+    // Method to get the display name for each category
+    fun getDisplayName(): String {
+        return when (this) {
+            BREAKFAST -> "Breakfast"
+            APPETIZER -> "Appetizer"
+            MAIN_COURSE -> "Main Course"
+            SNACK -> "Snack"
+            DESSERT -> "Dessert"
+            BAKING -> "Baking"
+        }
+    }
 }

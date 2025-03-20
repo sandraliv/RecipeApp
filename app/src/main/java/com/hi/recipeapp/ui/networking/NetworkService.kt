@@ -36,6 +36,11 @@ interface NetworkService {
     @GET("recipes/all")
     fun getAllRecipes(): Call<List<RecipeCard>>
 
+    @GET("/recipes/byCategory")
+    fun getRecipesByCategory(
+        @Query("categories") categories: Set<String> // Using String to represent enum names
+    ): Call<List<RecipeCard>> // Return Call for asynchronous processing
+
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
 
