@@ -1,87 +1,96 @@
-package com.hi.recipeapp.ui.uploadphoto
 
-import android.app.Activity
+package com.hi.recipeapp.ui.addrecipe
+
 import android.app.AlertDialog
-import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import com.hi.recipeapp.R
+import com.hi.recipeapp.databinding.FragmentUploadPhotoBinding
+import java.io.File
 
 class UploadPhotoFragment : Fragment() {
 
-    private lateinit var imageView: ImageView
-    private lateinit var uploadPhotoButton: Button
-    private var selectedImageUri: Uri? = null  // Store selected image URI
+    private var _binding: FragmentUploadPhotoBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = inflater.inflate(R.layout.fragment_upload_photo, container, false)
+    // The URI where the captured image will be stored
+    private lateinit var photoUri: Uri
 
-        imageView = view.findViewById(R.id.imageView)
-        uploadPhotoButton = view.findViewById(R.id.uploadPhotoButton)
+    // Launcher for taking a full-resolution photo
+    private val takePhotoLauncher: ActivityResultLauncher<Uri> =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                // If success == true, the full-res image is in photoUri
+                binding.imageView.setImageURI(photoUri)
+                // TODO: If you need to upload:
+                // - Convert photoUri to a File or byte[] and upload to your API
+                // - Láttu view model sjá um að gera það og view modelið kallar á user-service
+            } else {
+                // Handle failure if needed
+            }
+        }
 
-        uploadPhotoButton.setOnClickListener {
+    // Launcher for picking an image from the gallery (optional)
+    private val galleryLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                binding.imageView.setImageURI(it)
+                // If you need to upload this to an API, same approach: open an input stream, read the bytes, etc.
+            }
+        }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentUploadPhotoBinding.inflate(inflater, container, false)
+
+
+        binding.uploadPhotoButton.setOnClickListener {
             showPhotoDialog()
         }
 
-        return view
+        return binding.root
     }
-    // Open dialog
+
     private fun showPhotoDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Select Option")
-
-        builder.setItems(options) { dialog, which ->
-            when (which) {
-                0 -> openCamera()      // Take Photo
-                1 -> openGallery()     // Choose from Gallery
-                2 -> dialog.dismiss()  // Cancel
+        AlertDialog.Builder(requireContext())
+            .setTitle("Select Option")
+            .setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> openCamera()
+                    1 -> openGallery()
+                    2 -> dialog.dismiss()
+                }
             }
-        }
-        builder.show()
+            .show()
     }
-    // Opens camera
+
     private fun openCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+        // 1) Create a temp file in your app's cache directory (or files directory).
+        val photoFile = File.createTempFile(
+            "my_cake_image",  // prefix
+            ".jpg",           // suffix
+            requireContext().cacheDir // directory
+        )
+
+        // 2) Get a Uri from the FileProvider (Make sure to define <provider> in AndroidManifest)
+        photoUri = FileProvider.getUriForFile(
+            requireContext(),
+            requireContext().packageName + ".provider",
+            photoFile
+        )
+
+        // 3) Launch the camera to take a picture and save it to photoUri
+        takePhotoLauncher.launch(photoUri)
     }
-    //Opens gallery
+
     private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.type = "image/*"
-        startActivityForResult(intent, REQUEST_IMAGE_PICK)
-    }
-    // Handles photo selection
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_IMAGE_CAPTURE -> {
-                    val imageBitmap = data?.extras?.get("data") as Bitmap
-                    imageView.setImageBitmap(imageBitmap)
-                }
-                REQUEST_IMAGE_PICK -> {
-                    selectedImageUri = data?.data
-                    imageView.setImageURI(selectedImageUri)
-                }
-            }
-        }
-    }
-
-    companion object {
-        private const val REQUEST_IMAGE_CAPTURE = 1
-        private const val REQUEST_IMAGE_PICK = 2
+        // "image/*" filters only images from the gallery
+        galleryLauncher.launch("image/*")
     }
 }

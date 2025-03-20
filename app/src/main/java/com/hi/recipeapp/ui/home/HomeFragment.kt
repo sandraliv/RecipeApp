@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.databinding.FragmentHomeBinding
+import com.hi.recipeapp.databinding.FragmentPasswordBinding
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,12 +20,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
