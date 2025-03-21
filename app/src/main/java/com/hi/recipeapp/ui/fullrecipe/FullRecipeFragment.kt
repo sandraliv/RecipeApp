@@ -6,6 +6,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
@@ -34,6 +35,7 @@ class FullRecipeFragment : Fragment() {
     // Safe Args: Retrieve arguments passed to the fragment
     private val args: FullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
+    private var selectedRating = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -209,34 +211,98 @@ class FullRecipeFragment : Fragment() {
     private fun showRatingStars() {
         // Show the rating stars layout and dynamically add 5 clickable stars
         binding.ratingStarsLayout.visibility = View.VISIBLE
+        binding.ratingTextView.visibility = View.VISIBLE  // Show the rating text as well
         binding.ratingStarsLayout.removeAllViews()
+
+        binding.ratingTextView.text = "Rate this recipe:"  // Initially just show "Rate this recipe:"
+
 
         for (i in 1..5) {
             val star = ImageView(requireContext()).apply {
                 setImageResource(R.drawable.ic_star_empty)  // Initially empty star
+
                 setOnClickListener {
-                    updateRating(i)  // When clicked, update rating
+                    selectedRating = i  // When clicked, set selected rating
+                    updateStars()  // Update the filled stars
+                    updateRatingText()  // Update the rating text
+                    showSubmitButton()  // Change the "Rate this recipe" button to "Submit"
                 }
+
+                // Adding hover-like effect for touch (shows filled stars)
+                setOnTouchListener { v, event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_MOVE -> {
+                            // Fill stars up to the hovered index
+                            for (j in 1..5) {
+                                val starToUpdate = binding.ratingStarsLayout.getChildAt(j - 1) as ImageView
+                                if (j <= i) {
+                                    starToUpdate.setImageResource(R.drawable.ic_star_filled) // Filled star
+                                } else {
+                                    starToUpdate.setImageResource(R.drawable.ic_star_empty) // Empty star
+                                }
+                            }
+                        }
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            // Reset all stars to their current state when the touch ends
+                            updateStars()
+                        }
+                        MotionEvent.ACTION_DOWN -> {
+                            // Perform the click when the user taps down
+                            performClick() // This is important for accessibility
+                        }
+                    }
+                    true
+                }
+
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             }
+
             binding.ratingStarsLayout.addView(star)
         }
     }
-    private fun updateRating(newRating: Int) {
-        // Update the backend with the new rating
-        fullRecipeViewModel.rateRecipe(recipeId, newRating)
 
-        // Update the UI with the new rating
-        binding.recipeRatingStars.text = "⭐".repeat(newRating) // Update the star UI
+    // Helper function to update the stars based on selected rating
+    private fun updateStars() {
+        // Iterate through all child views in the ratingStarsLayout
+        for (i in 0 until binding.ratingStarsLayout.childCount) {
+            val star = binding.ratingStarsLayout.getChildAt(i) as ImageView
+            if (i < selectedRating) {
+                star.setImageResource(R.drawable.ic_star_filled) // Set the star as filled
+            } else {
+                star.setImageResource(R.drawable.ic_star_empty) // Set the star as empty
+            }
+        }
+    }
 
-        // Optionally, hide the stars after a rating is submitted
-        binding.ratingStarsLayout.visibility = View.GONE
+
+    private fun updateRatingText() {
+        // Update the rating text with the number of stars selected
+        if (selectedRating > 0) {
+            binding.ratingTextView.text = "Rate this recipe: $selectedRating stars"
+        }
+    }
+
+
+    private fun showSubmitButton() {
+        // Hide the "Rate this recipe" button and show the "Submit" button
+        binding.rateRecipeButton.text = "Submit Rating"
+        binding.rateRecipeButton.setOnClickListener {
+            submitRating()  // Call the submit function
+        }
+    }
+
+    private fun submitRating() {
+        // Code to handle rating submission (e.g., network call or saving to a database)
+        fullRecipeViewModel.rateRecipe(recipeId, selectedRating)
+
+        // Optionally, hide the submit button after the rating is submitted
+        binding.rateRecipeButton.isEnabled = false
 
         // Show a message to the user
-        Toast.makeText(context, "You rated this recipe $newRating stars", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "You rated this recipe $selectedRating stars", Toast.LENGTH_SHORT).show()
     }
 
 }

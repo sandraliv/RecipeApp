@@ -172,6 +172,16 @@
                 android:layout_marginTop="16dp"
                 android:text="Rate this Recipe" />
 
+            <!-- Submit Button (Initially hidden) -->
+            <Button
+                android:id="@+id/submitRatingButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="Submit Rating"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:id="@+id/ratingStarsLayout"
                 android:layout_width="match_parent"
@@ -180,7 +190,18 @@
                 android:orientation="horizontal"
                 android:visibility="gone">
                 <!-- Stars will be dynamically added here -->
+                <!-- Rating TextView -->
             </LinearLayout>
+            <!-- Rating TextView -->
+            <TextView
+                android:id="@+id/ratingTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Rate this recipe:"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
