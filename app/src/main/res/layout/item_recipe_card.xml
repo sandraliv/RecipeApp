@@ -5,13 +5,13 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
-    android:layout_margin="8dp">
+    android:layout_margin="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="2dp">
 
         <!-- Heart Buttons: Empty heart and Filled heart -->
         <LinearLayout
@@ -23,10 +23,10 @@
             <!-- Empty Heart Button (Add to Favorites) -->
             <ImageButton
                 android:id="@+id/emptyHeartButton"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingTop="4dp"
+                android:layout_marginEnd="4dp"
                 android:src="@drawable/ic_heart_empty"
                 android:contentDescription="Add to Favorites"
                 android:background="?android:attr/selectableItemBackgroundBorderless" />
@@ -34,10 +34,10 @@
             <!-- Filled Heart Button (Remove from Favorites) -->
             <ImageButton
                 android:id="@+id/filledHeartButton"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingTop="4dp"
+                android:layout_marginEnd="4dp"
                 android:src="@drawable/ic_heart_filled"
                 android:contentDescription="Remove from Favorites"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
@@ -49,9 +49,9 @@
         <ImageView
             android:id="@+id/recipe_image"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="125dp"
             android:contentDescription="Recipe image"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:scaleType="centerCrop" />
 
         <!-- Recipe name -->
@@ -60,9 +60,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Recipe Name"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="4dp"/>
 
         <!-- Recipe description -->
         <TextView
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:text="Recipe Description"
             android:textColor="@android:color/darker_gray"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:layout_marginTop="4dp" />
 
         <!-- Rating layout -->
@@ -80,8 +80,10 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:layout_marginTop="8dp">
+            android:gravity="end|bottom"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            >
 
             <!-- Rating stars -->
             <TextView
@@ -89,8 +91,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⭐⭐⭐⭐"
-                android:textSize="18sp"
-                android:layout_marginEnd="8dp"/>
+                android:textSize="14sp"
+                android:layout_marginEnd="4dp"
+                />
+
 
             <!-- Rating count -->
             <TextView
@@ -98,9 +102,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="(50)"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@android:color/darker_gray"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                />
 
         </LinearLayout>
     </LinearLayout>

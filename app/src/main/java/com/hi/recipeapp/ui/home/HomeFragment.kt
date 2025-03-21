@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
@@ -43,7 +44,9 @@ class HomeFragment : Fragment() {
             }
         )
 
-        binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
+        val gridLayoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
 
         // Set up Category Button RecyclerView
