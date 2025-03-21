@@ -3,110 +3,117 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="6dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    android:layout_margin="4dp">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="2dp">
+       >
 
-        <!-- Heart Buttons: Empty heart and Filled heart -->
-        <LinearLayout
+        <!-- FrameLayout to overlay heart buttons over the recipe image -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:layout_height="wrap_content">
 
-            <!-- Empty Heart Button (Add to Favorites) -->
-            <ImageButton
-                android:id="@+id/emptyHeartButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:paddingTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_heart_empty"
-                android:contentDescription="Add to Favorites"
-                android:background="?android:attr/selectableItemBackgroundBorderless" />
+            <!-- Recipe image -->
+            <ImageView
+                android:id="@+id/recipe_image"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="Recipe image"
+                android:scaleType="centerCrop" />
 
-            <!-- Filled Heart Button (Remove from Favorites) -->
-            <ImageButton
-                android:id="@+id/filledHeartButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:paddingTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_heart_filled"
-                android:contentDescription="Remove from Favorites"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                 /> <!-- Initially hidden, shown when recipe is favorited -->
+            <!-- Heart Buttons: Empty heart and Filled heart -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end|top"
+                android:orientation="horizontal">
 
-        </LinearLayout>
+                <!-- Empty Heart Button (Add to Favorites) -->
+                <ImageButton
+                    android:id="@+id/emptyHeartButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Add to Favorites"
+                    android:src="@drawable/ic_heart_empty"
+                    android:scaleType="center"
+                    android:layout_gravity="end|top"
+                    android:elevation="2dp"
+                    />
 
-        <!-- Recipe image -->
-        <ImageView
-            android:id="@+id/recipe_image"
-            android:layout_width="match_parent"
-            android:layout_height="125dp"
-            android:contentDescription="Recipe image"
-            android:layout_marginBottom="4dp"
-            android:scaleType="centerCrop" />
+                <ImageButton
+                    android:id="@+id/filledHeartButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Remove from Favorites"
+                    android:src="@drawable/ic_heart_filled"
+                    android:scaleType="center"
+                    android:layout_gravity="end|top" />
+            </LinearLayout>
+        </FrameLayout>
 
         <!-- Recipe name -->
         <TextView
             android:id="@+id/recipe_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:text="Recipe Name"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
-            android:layout_marginTop="4dp"/>
+            />
 
         <!-- Recipe description -->
         <TextView
             android:id="@+id/recipe_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:text="Recipe Description"
             android:textColor="@android:color/darker_gray"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp" />
+            android:textSize="11sp" />
 
         <!-- Rating layout -->
         <LinearLayout
             android:id="@+id/recipe_rating_layout"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end|bottom"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            >
+            android:gravity="end|bottom"
+            android:orientation="horizontal">
 
-            <!-- Rating stars -->
-            <TextView
-                android:id="@+id/recipe_rating_stars"
+            <!-- Dynamically added Rating stars -->
+            <LinearLayout
+                android:id="@+id/starRatingLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⭐⭐⭐⭐"
-                android:textSize="14sp"
-                android:layout_marginEnd="4dp"
-                />
-
+                android:layout_marginEnd="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
 
             <!-- Rating count -->
             <TextView
                 android:id="@+id/recipe_rating_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="(50)"
-                android:textSize="11sp"
-                android:textColor="@android:color/darker_gray"
                 android:layout_gravity="center_vertical"
-                />
-
+                android:text="(50)"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

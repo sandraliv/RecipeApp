@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.classes.UserRecipeCard
@@ -26,6 +27,13 @@ class MyRecipesFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var userRecipeAdapter: UserRecipeAdapter
 
+    // Define star size and space between stars
+    private val starSize = 30  // Example size for stars
+    private val spaceBetweenStars = 3  // Example space between stars
+
+    // Define the number of columns for the grid layout
+    private val gridColumnCount = 2  // Change this to control the number of columns in the grid
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,7 +49,9 @@ class MyRecipesFragment : Fragment() {
             },
             onFavoriteClick = { recipe, isFavorited ->
                 myRecipesViewModel.updateFavoriteStatus(recipe, isFavorited)
-            }
+            },
+            starSize = starSize,  // Pass starSize
+            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
         )
 
         userRecipeAdapter = UserRecipeAdapter { userRecipe ->
@@ -80,13 +90,15 @@ class MyRecipesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        // Set up GridLayoutManager for favorite recipes
         binding.favoriteRecipeRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = GridLayoutManager(context, gridColumnCount)
             adapter = recipeAdapter
         }
 
+        // Set up GridLayoutManager for user recipes
         binding.userRecipesRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = GridLayoutManager(context, gridColumnCount)
             adapter = userRecipeAdapter
         }
     }

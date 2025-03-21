@@ -28,6 +28,10 @@ class SearchFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private val selectedTags = mutableSetOf<RecipeTag>() // Only tags now
 
+    // Define star size and space between stars
+    private val starSize = 30  // Example size for stars
+    private val spaceBetweenStars = 3  // Example space between stars
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -114,7 +118,9 @@ class SearchFragment : Fragment() {
             },
             onFavoriteClick = { recipe, isFavorited ->
                 searchViewModel.updateFavoriteStatus(recipe, isFavorited)
-            }
+            },
+            starSize = starSize,  // Pass starSize
+            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
         )
         binding.recipeCardContainer.apply {
             layoutManager = LinearLayoutManager(context)

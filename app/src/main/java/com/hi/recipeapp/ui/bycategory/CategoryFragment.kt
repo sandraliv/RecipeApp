@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.databinding.FragmentBycategoryBinding
@@ -27,7 +28,11 @@ class CategoryFragment : Fragment() {
 
     // Safe Args: Retrieve arguments passed to the fragment
     private val args: CategoryFragmentArgs by navArgs()
-     private val categoryName: String get() = args.categoryName // Retrieve the category name string
+     private val categoryName: String get() = args.categoryName
+
+    // Define star size and space between stars
+    private val starSize = 30
+    private val spaceBetweenStars = 3
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,9 +43,7 @@ class CategoryFragment : Fragment() {
         // Convert the passed category name (string) back to the Category enum
         val category = Category.valueOf(categoryName)
 
-        // Set the category name dynamically to the TextView
         binding.textCategoryName.text = category.getDisplayName() // Set the category title here
-
 
         // Fetch recipes based on category (only once)
         categoryViewModel.getRecipesByCategory(category)
@@ -54,11 +57,14 @@ class CategoryFragment : Fragment() {
             },
             onFavoriteClick = { recipe, isFavorited ->
                 categoryViewModel.updateFavoriteStatus(recipe, isFavorited)
-            }
+            },
+            starSize = starSize,  // Pass starSize
+            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
         )
 
-        // Set up RecyclerView
-        binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
+        val gridLayoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
 
         categoryViewModel.recipesByCategory.observe(viewLifecycleOwner) { recipes ->

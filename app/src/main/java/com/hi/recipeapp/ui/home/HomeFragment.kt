@@ -26,11 +26,16 @@ class HomeFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var categoryButtonAdapter:CategoryButtonAdapter
 
+    // Define star size and space between stars
+    private val starSize = 30  // Example size for stars
+    private val spaceBetweenStars = 3  // Example space between stars
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater, container, false)
+
 
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
@@ -41,8 +46,11 @@ class HomeFragment : Fragment() {
             },
             onFavoriteClick = { recipe, isFavorited ->
                 homeViewModel.updateFavoriteStatus(recipe, isFavorited)
-            }
+            },
+            starSize = starSize,  // Pass starSize
+            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
         )
+
 
         // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)

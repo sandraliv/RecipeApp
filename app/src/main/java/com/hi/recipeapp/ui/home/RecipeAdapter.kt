@@ -4,6 +4,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +16,9 @@ import com.hi.recipeapp.classes.RecipeCard
 
 class RecipeAdapter(
     private val onClick: (RecipeCard) -> Unit,
-    private val onFavoriteClick: (RecipeCard, Boolean) -> Unit
+    private val onFavoriteClick: (RecipeCard, Boolean) -> Unit,
+    private val starSize: Int,  // Add starSize as a parameter
+    private val spaceBetweenStars: Int  // Add spaceBetweenStars as a parameter
 ) : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -24,12 +28,14 @@ class RecipeAdapter(
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
         val recipe = getItem(position)
-        holder.bind(recipe)
+
+        // Call bind() with custom size and space
+        holder.bind(recipe, starSize, spaceBetweenStars)
     }
 
     inner class RecipeViewHolder(private val binding: ItemRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(recipe: RecipeCard) {
+        fun bind(recipe: RecipeCard,starSize: Int, spaceBetweenStars: Int) {
             Log.d("RecipeViewHolder", "isFavoritedByUser: ${recipe.isFavoritedByUser}")
 
             // Handle heart icon visibility based on whether the recipe is favorited
@@ -54,12 +60,38 @@ class RecipeAdapter(
             val fullStars = recipe.averageRating.toInt()
             val hasHalfStar = recipe.averageRating % 1 >= 0.5
             val emptyStars = 5 - fullStars - if (hasHalfStar) 1 else 0
-            val starRating = StringBuilder().apply {
-                append("⭐".repeat(fullStars))
-                if (hasHalfStar) append("🌟")
-                append("☆".repeat(emptyStars))
+
+            // Add full stars to the layout
+            for (i in 0 until fullStars) {
+                val filledStar = ImageView(binding.root.context)
+                filledStar.setImageResource(R.drawable.ic_star_filled) // Full star drawable
+                val layoutParams = LinearLayout.LayoutParams(starSize, starSize)
+                layoutParams.setMargins(0, 0, spaceBetweenStars, 0) // Set space between stars
+                filledStar.layoutParams = layoutParams
+                binding.starRatingLayout.addView(filledStar)
             }
-            binding.recipeRatingStars.text = starRating.toString()
+
+            // Add half star if needed
+            if (hasHalfStar) {
+                val halfStar = ImageView(binding.root.context)
+                halfStar.setImageResource(R.drawable.ic_star_half) // Half star drawable
+                val layoutParams = LinearLayout.LayoutParams(starSize, starSize)
+                layoutParams.setMargins(0, 0, spaceBetweenStars, 0) // Set space between stars
+                halfStar.layoutParams = layoutParams
+                binding.starRatingLayout.addView(halfStar)
+            }
+
+            // Add empty stars
+            for (i in 0 until emptyStars) {
+                val emptyStar = ImageView(binding.root.context)
+                emptyStar.setImageResource(R.drawable.ic_star_empty) // Empty star drawable
+                val layoutParams = LinearLayout.LayoutParams(starSize, starSize)
+                layoutParams.setMargins(0, 0, spaceBetweenStars, 0) // Set space between stars
+                emptyStar.layoutParams = layoutParams
+                binding.starRatingLayout.addView(emptyStar)
+            }
+
+
             binding.recipeRatingCount.text = "(${recipe.ratingCount})"
 
             Glide.with(binding.root.context)
