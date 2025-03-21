@@ -41,6 +41,13 @@ interface NetworkService {
         @Query("categories") categories: Set<String> // Using String to represent enum names
     ): Call<List<RecipeCard>> // Return Call for asynchronous processing
 
+    @POST("recipes/{id}/addRating")
+    suspend fun addRatingToRecipe(
+        @Path("id") recipeId: Int,
+        @Query("userId") userId: Int,
+        @Query("score") score: Int
+    ): Response<String>
+
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
 

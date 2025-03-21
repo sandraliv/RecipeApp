@@ -29,4 +29,6 @@
     <string name="new_password">New password</string>
     <string name="repeat_new_password">Repeat new password</string>
     <string name="account">Account</string>
+    <string name="recipe_image">Recipe image</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
 </resources>

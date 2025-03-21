@@ -1,103 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.fullrecipe.FullRecipeFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="100dp">
 
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Recipe image" />
-
-        <TextView
-            android:id="@+id/titleTextView"
+        <!-- ProgressBar to show loading state -->
+        <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:paddingTop="8dp"/>
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/descriptionTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:paddingTop="8dp" />
-
-        <TableLayout
-            android:id="@+id/ingredientsLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:stretchColumns="1"
-            android:paddingBottom="16dp"
-            android:background="@color/rosybrown_100">
-
-       </TableLayout>
-
-
-    <TextView
-            android:id="@+id/instructionsTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:paddingTop="16dp"/>
-
-        <!-- Add Categories TextView -->
-        <TextView
-            android:id="@+id/categoriesTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:paddingTop="16dp"
-            android:text="Categories: " />
-
-        <!-- Add Tags TextView -->
-        <TextView
-            android:id="@+id/tagsTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:paddingTop="8dp"
-            android:text="Tags: " />
-
+        <!-- Container holding the main content (excluding ProgressBar) -->
         <LinearLayout
-            android:layout_width="297dp"
+            android:id="@+id/contentLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start"
-            android:orientation="horizontal"
-            android:paddingTop="16dp">
+            android:orientation="vertical">
 
-            <RatingBar
-                android:id="@+id/ratingBar"
-                android:layout_width="wrap_content"
+            <!-- Heart Buttons: Empty heart and Filled heart -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <!-- Empty Heart Button (Add to Favorites) -->
+                <ImageButton
+                    android:id="@+id/emptyHeartButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Add to Favorites"
+                    android:src="@drawable/ic_heart_empty" />
+
+                <!-- Filled Heart Button (Remove from Favorites) -->
+                <ImageButton
+                    android:id="@+id/filledHeartButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/remove_from_favorites"
+                    android:src="@drawable/ic_heart_filled" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:maxWidth="100dp"
-                android:minHeight="24dp"
-                android:numStars="5"
-                android:stepSize="0.5" />
+                android:contentDescription="@string/recipe_image"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout
+                android:id="@+id/recipe_rating_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="end"
+                android:orientation="horizontal">
+                <!-- Rating stars -->
+                <TextView
+                    android:id="@+id/recipe_rating_stars"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="18sp" />
+
+                <!-- Rating count -->
+                <TextView
+                    android:id="@+id/recipe_rating_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/ratingCountTextView"
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/descriptionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="16sp" />
+
+            <TableLayout
+                android:id="@+id/ingredientsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/rosybrown_100"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:stretchColumns="1"></TableLayout>
+
+            <TextView
+                android:id="@+id/instructionsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="8dp">
+
+                <!-- Categories TextView, aligned to the left -->
+                <TextView
+                    android:id="@+id/categoriesTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:singleLine="true"
+                    android:text="Categories: "
+                    android:textSize="16sp" />
+
+                <!-- Tags TextView, aligned to the right -->
+                <TextView
+                    android:id="@+id/tagsTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:singleLine="true"
+                    android:text="Tags: "
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/rateRecipeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="(50)"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp" />
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="Rate this Recipe" />
+
+            <LinearLayout
+                android:id="@+id/ratingStarsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+                <!-- Stars will be dynamically added here -->
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

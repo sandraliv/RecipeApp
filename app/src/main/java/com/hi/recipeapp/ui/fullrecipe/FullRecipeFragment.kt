@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -16,11 +17,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.databinding.FragmentFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
+
 
 @AndroidEntryPoint
 class FullRecipeFragment : Fragment() {
@@ -37,7 +39,18 @@ class FullRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
+        // Observe the loading state
+        fullRecipeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE  // Show the ProgressBar
+                binding.contentLayout.visibility = View.GONE    // Hide the content layout
+            } else {
+                binding.progressBar.visibility = View.GONE    // Hide the ProgressBar
+                binding.contentLayout.visibility = View.VISIBLE // Show the content layout
+            }
+        }
 
         fullRecipeViewModel.fetchRecipeById(recipeId)
         fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
@@ -52,6 +65,17 @@ class FullRecipeFragment : Fragment() {
             error?.let {
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
+        }
+        // Observe the favorite action message LiveData
+        fullRecipeViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // Handle rate recipe button click
+        binding.rateRecipeButton.setOnClickListener {
+            showRatingStars()
         }
 
         return binding.root
@@ -68,6 +92,31 @@ class FullRecipeFragment : Fragment() {
             .placeholder(R.drawable.placeholder)  // Placeholder image
             .error(R.drawable.error_image)        // Error image
             .into(binding.imageView)
+
+        // Set the rating stars using a method to generate stars
+        setRatingStars(recipe.averageRating)
+
+        // Set the rating count
+        binding.recipeRatingCount.text = "(${recipe.ratingCount})"
+
+        // Handle favorite status for heart button
+        updateHeartButtonVisibility(recipe)
+
+        // Handle empty heart button click (add to favorites)
+        binding.emptyHeartButton.setOnClickListener {
+            recipe.isFavoritedByUser = true
+            updateHeartButtonVisibility(recipe)
+            fullRecipeViewModel.updateFavoriteStatus(recipe.id, true) // Pass only the recipe id
+        }
+
+        // Handle filled heart button click (remove from favorites)
+        binding.filledHeartButton.setOnClickListener {
+            recipe.isFavoritedByUser = false
+            updateHeartButtonVisibility(recipe)
+            fullRecipeViewModel.updateFavoriteStatus(recipe.id, false) // Pass only the recipe id
+        }
+
+
 
         recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
             val formattedIngredientName = ingredientName.replace("_", " ") // Replace underscores with spaces
@@ -127,17 +176,67 @@ class FullRecipeFragment : Fragment() {
 
         binding.instructionsTextView.text = formattedInstructions.toString()
 
-
-        val rating = recipe.averageRating.toFloat()
-        binding.ratingBar.rating = rating
-
-        binding.ratingCountTextView.text = "${recipe.ratingCount} ratings"
-
         // Display tags (if necessary)
         binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.getDisplayName() }
         // Display categories using getDisplayName
         binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.getDisplayName() }
 
+    }
+
+    private fun setRatingStars(averageRating: Double) {
+        val fullStars = averageRating.toInt()
+        val hasHalfStar = averageRating % 1 >= 0.5
+        val emptyStars = 5 - fullStars - if (hasHalfStar) 1 else 0
+        val starRating = StringBuilder().apply {
+            append("⭐".repeat(fullStars))
+            if (hasHalfStar) append("🌟")
+            append("☆".repeat(emptyStars))
+        }
+        binding.recipeRatingStars.text = starRating.toString()
+    }
+
+    private fun updateHeartButtonVisibility(recipe: FullRecipe) {
+        // Show the appropriate button based on the recipe's favorite status
+        if (recipe.isFavoritedByUser) {
+            binding.filledHeartButton.visibility = View.VISIBLE
+            binding.emptyHeartButton.visibility = View.GONE
+        } else {
+            binding.filledHeartButton.visibility = View.GONE
+            binding.emptyHeartButton.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showRatingStars() {
+        // Show the rating stars layout and dynamically add 5 clickable stars
+        binding.ratingStarsLayout.visibility = View.VISIBLE
+        binding.ratingStarsLayout.removeAllViews()
+
+        for (i in 1..5) {
+            val star = ImageView(requireContext()).apply {
+                setImageResource(R.drawable.ic_star_empty)  // Initially empty star
+                setOnClickListener {
+                    updateRating(i)  // When clicked, update rating
+                }
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            binding.ratingStarsLayout.addView(star)
+        }
+    }
+    private fun updateRating(newRating: Int) {
+        // Update the backend with the new rating
+        fullRecipeViewModel.rateRecipe(recipeId, newRating)
+
+        // Update the UI with the new rating
+        binding.recipeRatingStars.text = "⭐".repeat(newRating) // Update the star UI
+
+        // Optionally, hide the stars after a rating is submitted
+        binding.ratingStarsLayout.visibility = View.GONE
+
+        // Show a message to the user
+        Toast.makeText(context, "You rated this recipe $newRating stars", Toast.LENGTH_SHORT).show()
     }
 
 }

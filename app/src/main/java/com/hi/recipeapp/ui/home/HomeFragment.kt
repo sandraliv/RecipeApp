@@ -42,6 +42,7 @@ class HomeFragment : Fragment() {
                 homeViewModel.updateFavoriteStatus(recipe, isFavorited)
             }
         )
+
         binding.recipeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recipeRecyclerView.adapter = recipeAdapter
 
@@ -111,8 +112,6 @@ class HomeFragment : Fragment() {
         binding.categoryRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.categoryRecyclerView.adapter = categoryButtonAdapter
-
-
     }
 
     private fun navigateToCategoryFragment(category: Category) {

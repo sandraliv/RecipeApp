@@ -114,6 +114,31 @@ class RecipeService @Inject constructor(
         }
     }
 
+    suspend fun addRecipeRating(recipeId: Int, score: Int): Result<String> {
+        return try {
+            // Check if the user is logged in
+            val userId = sessionManager.getUserId()  // Assume this returns the userId or -1 if not logged in
+            if (userId == -1) {
+                return Result.failure(Exception("User is not logged in"))
+            }
+
+            // Make the network request to add the rating
+            val response = networkService.addRatingToRecipe(recipeId, userId, score)
+
+            // Check if the response is successful
+            if (response.isSuccessful) {
+                // Rating added successfully
+                Result.success("Rating added successfully")
+            } else {
+                // Handle failure, maybe the response contains an error message
+                Result.failure(Exception("Failed to add rating"))
+            }
+        } catch (e: Exception) {
+            // Catch any exception that may occur and return a failure result
+            Result.failure(e)
+        }
+    }
+
     suspend fun uploadUserRecipe(userId: Int, recipe: UserFullRecipe): Boolean {
         return try {
             val response = networkService.uploadRecipe(userId, recipe)
