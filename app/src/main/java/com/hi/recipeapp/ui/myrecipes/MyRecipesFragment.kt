@@ -5,13 +5,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.UserRecipeCard
 import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
 import com.hi.recipeapp.ui.home.HomeViewModel
@@ -60,6 +63,7 @@ class MyRecipesFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+
         setupRecyclerView()
         setupButtonListeners()
         observeViewModel()
@@ -72,22 +76,42 @@ class MyRecipesFragment : Fragment() {
             }
         }
 
+        // Initially, show the Favorite recipes and fetch them
+        binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
+        binding.userRecipesRecyclerView.visibility = View.GONE
+        binding.favoritesButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
+        binding.myRecipesButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
+
+        // Set the Favorites button as active (and My Recipes button as inactive)
+        setActiveButton(binding.favoritesButton)
+        // Fetch the favorite recipes by default
+        myRecipesViewModel.fetchFavoriteRecipes()
+
         return binding.root
     }
 
     private fun setupButtonListeners() {
         binding.favoritesButton.setOnClickListener {
+            // Set the active/inactive states of the buttons
+            setActiveButton(binding.favoritesButton)
+
+            // Show the favorite recipes and hide the user recipes
             binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
             binding.userRecipesRecyclerView.visibility = View.GONE
             myRecipesViewModel.fetchFavoriteRecipes()
         }
 
         binding.myRecipesButton.setOnClickListener {
+            // Set the active/inactive states of the buttons
+            setActiveButton(binding.myRecipesButton)
+
+            // Show the user recipes and hide the favorite recipes
             binding.favoriteRecipeRecyclerView.visibility = View.GONE
             binding.userRecipesRecyclerView.visibility = View.VISIBLE
             myRecipesViewModel.fetchUserRecipes(0, 10)
         }
     }
+
 
     private fun setupRecyclerView() {
         // Set up GridLayoutManager for favorite recipes
@@ -130,4 +154,40 @@ class MyRecipesFragment : Fragment() {
             }
         }
     }
+
+    private fun setActiveButton(button: Button) {
+        // Log for debugging
+        Log.d("ButtonState", "Setting button background for: ${button.text}")
+        // Create ColorStateList for background tint based on button selected state
+        val selectedTint = ContextCompat.getColorStateList(requireContext(), R.color.button_selected_tint)
+        val defaultTint = ContextCompat.getColorStateList(requireContext(), R.color.button_default_tint)
+
+        // Mark the selected button as active and the other as inactive
+        if (button == binding.favoritesButton) {
+            binding.favoritesButton.isSelected = true
+            binding.myRecipesButton.isSelected = false
+
+            // Set background tint for the active button
+            binding.favoritesButton.backgroundTintList = selectedTint
+            binding.myRecipesButton.backgroundTintList = defaultTint
+
+
+        } else if (button == binding.myRecipesButton) {
+            binding.myRecipesButton.isSelected = true
+            binding.favoritesButton.isSelected = false
+
+            // Set background tint for the active button
+            binding.myRecipesButton.backgroundTintList = selectedTint
+            binding.favoritesButton.backgroundTintList = defaultTint
+
+        }
+
+        // Set text color selector for the buttons
+        binding.favoritesButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
+        binding.myRecipesButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
+    }
+
+
+
+
 }

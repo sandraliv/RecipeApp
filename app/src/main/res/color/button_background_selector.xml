@@ -1,0 +1,8 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When the button is selected, apply the gradient -->
+    <item android:color="@color/rosybrown_100" android:state_selected="true"/>
+
+    <!-- Default state: no tint (no background color change) -->
+    <item android:color="@android:color/transparent"/>
+</selector>
+

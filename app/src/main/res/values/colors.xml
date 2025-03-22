@@ -14,4 +14,10 @@
     <color name="rosybrown_400">#d7bcbc</color>
     <color name="selectedChipBackground">#dbaaaa</color>
     <color name="unselectedChipBackground">#808080</color>
+    <!-- In res/values/colors.xml -->
+    <color name="button_selected_tint">#f2e9e9</color> <!-- Example color for selected state -->
+    <color name="button_pressed_tint">#f2e9e9</color>
+    <color name="button_default_tint">#f8f4f4</color> <!-- Example color for default state -->
+
+
 </resources>

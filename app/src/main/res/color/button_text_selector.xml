@@ -1,0 +1,10 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When the button is selected -->
+    <item android:color="@color/black" android:state_selected="true"/>
+
+    <!-- When the button is pressed -->
+    <item android:color="@color/rosybrown" android:state_pressed="true"/>
+
+    <!-- Default color -->
+    <item android:color="@color/rosybrown"/>
+</selector>

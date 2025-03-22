@@ -17,5 +17,14 @@
         <!-- Status bar color -->
         <item name="android:statusBarColor">@color/rosybrown</item>
         <!-- Customize your theme here. -->
+        <!-- Set button style to avoid background override -->
+        <item name="buttonStyle">@style/CustomButtonStyle</item>
     </style>
+    <!-- Custom Button Style to avoid default background -->
+    <style name="CustomButtonStyle" parent="Widget.MaterialComponents.Button">
+        <!-- Make sure no default background is applied -->
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <!-- Optionally add other properties like padding, text size, etc. -->
+    </style>
+
 </resources>
