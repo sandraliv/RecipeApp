@@ -10,21 +10,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
-import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.Category
+import com.hi.recipeapp.classes.SortType
 import com.hi.recipeapp.databinding.FragmentHomeBinding
-import com.hi.recipeapp.services.UserService
-import com.hi.recipeapp.ui.bycategory.CategoryButtonAdapter
+import com.hi.recipeapp.ui.bottomsheetdialog.CategoryBottomSheetFragment
+import com.hi.recipeapp.ui.bottomsheetdialog.SortBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
+    private lateinit var binding: FragmentHomeBinding
+
     private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
-    private lateinit var categoryButtonAdapter:CategoryButtonAdapter
+
+    private var currentSortType: SortType = SortType.RATING // Declare currentSortType
 
     // Define star size and space between stars
     private val starSize = 30  // Example size for stars
@@ -34,7 +36,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
 
 
         // Initialize the adapter with the click listener and favorite click handler
@@ -57,8 +59,10 @@ class HomeFragment : Fragment() {
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
 
-        // Set up Category Button RecyclerView
-        setupCategoryRecyclerView(binding)
+        // Set up Category Button to open BottomSheet
+        setupCategoryButton()
+
+        setupSortButton()
 
         // Observe the recipes LiveData from HomeViewModel
         homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
@@ -74,12 +78,17 @@ class HomeFragment : Fragment() {
             }
         }
 
+
         // Observe the error message LiveData
         homeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Fetch recipes when fragment is created
+        homeViewModel.fetchRecipesSortedBy(sortType = currentSortType)
+
 
         // Observe the loading state
         homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
@@ -99,37 +108,54 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Fetch recipes when fragment is created
-        homeViewModel.fetchRecipes()
 
         return binding.root
     }
 
-    private fun setupCategoryRecyclerView(binding: FragmentHomeBinding) {
-        // Prepare the list of categories
-        val categories = Category.values().toList()
+    // Setup Sort Button with vector icon
+    private fun setupSortButton() {
+        val sortButton = binding.sortByButton
+        sortButton.setOnClickListener {
+            // Open the BottomSheetDialogFragment when the button is clicked
+            val bottomSheetFragment = SortBottomSheetFragment()
 
-        Log.d("CategoryRecyclerView", "Categories: $categories")
+            // Pass the callback to handle the sorting selection
+            bottomSheetFragment.setOnSortSelectedListener { sortType ->
+                currentSortType = sortType
+                homeViewModel.fetchRecipesSortedBy(currentSortType)
+            }
 
-        categoryButtonAdapter = CategoryButtonAdapter(
-            categories = categories,
-            onCategoryClick = { category ->
-                Log.d("CategoryRecyclerView", "Category clicked: ${category.name}")
+            // Show the Bottom Sheet
+            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+        }
+    }
+
+    // Setup Category Button
+    private fun setupCategoryButton() {
+
+        val categoryButton = binding.categoryButton
+
+        categoryButton.setOnClickListener {
+            // Open the Category BottomSheetDialogFragment when the button is clicked
+            val bottomSheetFragment = CategoryBottomSheetFragment()
+
+            // Pass the callback to handle the category selection
+            bottomSheetFragment.setOnCategorySelectedListener { category ->
+                // Navigate to the Category Fragment when a category is selected
                 navigateToCategoryFragment(category)
             }
-        )
 
-        // Set up the RecyclerView for category buttons
-        binding.categoryRecyclerView.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.categoryRecyclerView.adapter = categoryButtonAdapter
+            // Show the Bottom Sheet
+            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+        }
     }
+
+
 
     private fun navigateToCategoryFragment(category: Category) {
         val action = HomeFragmentDirections.actionHomeFragmentToCategoryFragment(category.name)  // Pass category name
         findNavController().navigate(action)
     }
-
 
 }
 

@@ -30,12 +30,12 @@ class MyRecipesFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var userRecipeAdapter: UserRecipeAdapter
 
-    // Define star size and space between stars
-    private val starSize = 30  // Example size for stars
-    private val spaceBetweenStars = 3  // Example space between stars
 
-    // Define the number of columns for the grid layout
-    private val gridColumnCount = 2  // Change this to control the number of columns in the grid
+    private val starSize = 30
+    private val spaceBetweenStars = 3
+
+
+    private val gridColumnCount = 2
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -162,10 +162,14 @@ class MyRecipesFragment : Fragment() {
         val selectedTint = ContextCompat.getColorStateList(requireContext(), R.color.button_selected_tint)
         val defaultTint = ContextCompat.getColorStateList(requireContext(), R.color.button_default_tint)
 
+
         // Mark the selected button as active and the other as inactive
         if (button == binding.favoritesButton) {
             binding.favoritesButton.isSelected = true
+            binding.favoritesButton.elevation = 0f
+
             binding.myRecipesButton.isSelected = false
+            binding.myRecipesButton.elevation = 2f
 
             // Set background tint for the active button
             binding.favoritesButton.backgroundTintList = selectedTint
@@ -174,7 +178,10 @@ class MyRecipesFragment : Fragment() {
 
         } else if (button == binding.myRecipesButton) {
             binding.myRecipesButton.isSelected = true
+            binding.myRecipesButton.elevation = 0f
+
             binding.favoritesButton.isSelected = false
+            binding.favoritesButton.elevation = 2f
 
             // Set background tint for the active button
             binding.myRecipesButton.backgroundTintList = selectedTint

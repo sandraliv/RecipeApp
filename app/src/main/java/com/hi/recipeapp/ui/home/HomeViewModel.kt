@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
+import com.hi.recipeapp.classes.SortType
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,16 +32,21 @@ class HomeViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+
+
     init {
-        fetchRecipes()
+        fetchRecipesSortedBy(sortType = SortType.RATING)
     }
 
-    fun fetchRecipes() {
+    fun fetchRecipesSortedBy(sortType: SortType) {
         val userId = sessionManager.getUserId()
         _isLoading.value = true
 
-        // Step 1: Fetch all recipes
-        recipeService.fetchRecipes { recipes, error ->
+        // Convert the SortType enum to a string (e.g. "rating" or "date")
+        val sortString = sortType.name.lowercase()
+
+        // Step 1: Fetch sorted recipes
+        recipeService.fetchRecipes(sortString) { recipes, error ->
             if (error != null) {
                 _errorMessage.value = error
                 _isLoading.value = false
@@ -70,6 +75,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
@@ -96,6 +102,17 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    fun updateSortType(newSortType: SortType) {
+        // Optional: Check if the sort type has already been set to avoid unnecessary fetches
+        if (_recipes.value != null) {
+            fetchRecipesSortedBy(newSortType)
+        } else {
+            // If no recipes are currently loaded, fetch with the new sort type
+            fetchRecipesSortedBy(newSortType)
+        }
+    }
+
 
 }
+
 

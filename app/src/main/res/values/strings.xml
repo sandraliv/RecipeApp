@@ -31,4 +31,10 @@
     <string name="account">Account</string>
     <string name="recipe_image">Recipe image</string>
     <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="sort_by_date">Newest</string>
+    <string name="sort_by_rating">Top rated</string>
+    <string name="category_name">Category Name</string>
+    <string name="sort_by">Sort By</string>
+    <string name="no_recipes_available">No recipes available</string>
+    <string name="menu_button">menu</string>
 </resources>

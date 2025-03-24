@@ -78,6 +78,7 @@ enum class RecipeTag {
 }
 
 
+
 enum class Category{
     @SerializedName("BREAKFAST")
     BREAKFAST,
@@ -101,6 +102,21 @@ enum class Category{
             SNACK -> "Snack"
             DESSERT -> "Dessert"
             BAKING -> "Baking"
+        }
+    }
+}
+enum class SortType{
+    @SerializedName("RATING")
+    RATING,
+    @SerializedName("DATE")
+    DATE;
+
+    // Method to get the display name for each category
+    fun getDisplayName(): String {
+        return when (this) {
+            RATING -> "Rating"
+            DATE -> "Date"
+
         }
     }
 }

@@ -34,12 +34,20 @@ interface NetworkService {
     ): Call<List<RecipeCard>>
 
     @GET("recipes/all")
-    fun getAllRecipes(): Call<List<RecipeCard>>
+    fun getAllRecipes(
+        @Query("page") page: Int,       // The page number to fetch
+        @Query("size") size: Int,       // The number of items per page
+        @Query("sort") sort: String     // The sorting criteria, either "rating" or "date"
+    ): Call<List<RecipeCard>>
+
 
     @GET("/recipes/byCategory")
     fun getRecipesByCategory(
-        @Query("categories") categories: Set<String> // Using String to represent enum names
-    ): Call<List<RecipeCard>> // Return Call for asynchronous processing
+        @Query("categories") categories: Set<String>,   // Using String to represent enum names
+        @Query("sort") sort: String,                     // The sorting criteria, either "rating" or "date"
+        @Query("page") page: Int,                       // The page number to fetch
+        @Query("size") size: Int                        // The number of items per page
+    ): Call<List<RecipeCard>>  // Return Call for asynchronous processing
 
     @POST("recipes/{id}/addRating")
     suspend fun addRatingToRecipe(
@@ -50,6 +58,18 @@ interface NetworkService {
 
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
+
+    @GET("recipes/byDate")
+    fun getRecipesSortedByDate(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<List<RecipeCard>>
+
+    @GET("recipes/highestRated")
+    fun getRecipesSortedByRating(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<List<RecipeCard>>
 
     @GET("users/{id}/getUserFav")
     suspend fun getUserFavorites(@Path("id") userId: Int): Response<List<RecipeCard>>

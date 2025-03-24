@@ -40,6 +40,7 @@ class RecipeService @Inject constructor(
                     callback(null, "Error: ${response.code()}")
                 }
             }
+
             override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
                 callback(null, "Network error: ${t.localizedMessage}")
             }
@@ -56,6 +57,7 @@ class RecipeService @Inject constructor(
                     callback(null, "Error: ${response.code()}")
                 }
             }
+
             override fun onFailure(call: Call<FullRecipe>, t: Throwable) {
                 callback(null, "Network error: ${t.localizedMessage}")
             }
@@ -64,23 +66,25 @@ class RecipeService @Inject constructor(
 
 
     // Fetch all recipes (for initial display or fallback)
-    fun fetchRecipes(callback: (List<RecipeCard>?, String?) -> Unit) {
-        networkService.getAllRecipes().enqueue(object : Callback<List<RecipeCard>> {
-            override fun onResponse(
-                call: Call<List<RecipeCard>>,
-                response: Response<List<RecipeCard>>
-            ) {
-                val recipes = response.body()
-                if (response.isSuccessful && !recipes.isNullOrEmpty()) {
-                    callback(recipes, null)
-                } else {
-                    callback(null, "No recipes found.")
+    fun fetchRecipes(sort: String = "rating", callback: (List<RecipeCard>?, String?) -> Unit) {
+        networkService.getAllRecipes(page = 0, size = 20, sort = sort)
+            .enqueue(object : Callback<List<RecipeCard>> {
+                override fun onResponse(
+                    call: Call<List<RecipeCard>>,
+                    response: Response<List<RecipeCard>>
+                ) {
+                    val recipes = response.body()
+                    if (response.isSuccessful && !recipes.isNullOrEmpty()) {
+                        callback(recipes, null)
+                    } else {
+                        callback(null, "No recipes found.")
+                    }
                 }
-            }
-            override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
-                callback(null, "Network error: ${t.localizedMessage}")
-            }
-        })
+
+                override fun onFailure(call: Call<List<RecipeCard>>, t: Throwable) {
+                    callback(null, "Network error: ${t.localizedMessage}")
+                }
+            })
     }
 
     suspend fun addRecipeToFavorites(recipeId: Int): Result<String> {
@@ -117,7 +121,8 @@ class RecipeService @Inject constructor(
     suspend fun addRecipeRating(recipeId: Int, score: Int): Result<String> {
         return try {
             // Check if the user is logged in
-            val userId = sessionManager.getUserId()  // Assume this returns the userId or -1 if not logged in
+            val userId =
+                sessionManager.getUserId()  // Assume this returns the userId or -1 if not logged in
             if (userId == -1) {
                 return Result.failure(Exception("User is not logged in"))
             }
@@ -158,15 +163,21 @@ class RecipeService @Inject constructor(
     // Fetch recipes by category with callback
     fun getRecipesByCategory(
         category: Category,
+        sort: String = "rating", // Add sort parameter with a default value
         callback: (List<RecipeCard>?, String?) -> Unit
     ) {
-        Log.d("RECIPE_SERVICE", "Category: $category")
+        Log.d("RECIPE_SERVICE", "Category: $category, Sort: $sort")
 
         // Convert the enum category to a string
         val categoryName = category.name
 
         // Make the network call to get recipes by category
-        networkService.getRecipesByCategory(setOf(categoryName)).enqueue(object : Callback<List<RecipeCard>> {
+        networkService.getRecipesByCategory(
+            categories = setOf(categoryName),
+            sort = sort,
+            page = 0,  // Default page (can be adjusted)
+            size = 20  // Default size (can be adjusted)
+        ).enqueue(object : Callback<List<RecipeCard>> {
             override fun onResponse(
                 call: Call<List<RecipeCard>>,
                 response: Response<List<RecipeCard>>
@@ -186,9 +197,11 @@ class RecipeService @Inject constructor(
             }
         })
     }
-
-
 }
+
+
+
+
 
 
 
