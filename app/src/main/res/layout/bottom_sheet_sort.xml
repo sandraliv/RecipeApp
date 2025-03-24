@@ -4,6 +4,15 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- ImageView for Rating Icon -->
+    <ImageView
+        android:id="@+id/iconSortByRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:src="@drawable/ic_check"
+        android:visibility="gone" />
+
     <!-- Button to Sort by Rating -->
     <Button
         android:id="@+id/sortByRating"
@@ -11,10 +20,20 @@
         android:layout_height="wrap_content"
         android:text="@string/sort_by_rating" />
 
+    <!-- ImageView for Date Icon -->
+    <ImageView
+        android:id="@+id/iconSortByDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:src="@drawable/ic_check"
+        android:visibility="gone" />
+
     <!-- Button to Sort by Date -->
     <Button
         android:id="@+id/sortByDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sort_by_date" />
+
 </LinearLayout>

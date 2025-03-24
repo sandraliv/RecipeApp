@@ -67,11 +67,13 @@ class CategoryFragment : Fragment() {
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
 
+
         categoryViewModel.recipesByCategory.observe(viewLifecycleOwner) { recipes ->
             Log.d("CategoryFragment", "Received recipes: $recipes")
             if (recipes.isNotEmpty()) {
                 binding.textNoRecipeResults.visibility = View.GONE
                 binding.recipeRecyclerView.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
                 recipeAdapter.submitList(recipes)
             } else {
                 binding.textCategoryName.visibility = View.VISIBLE

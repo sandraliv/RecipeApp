@@ -17,6 +17,11 @@
     <color name="green">#8A9A5B</color>
     <color name="stjarna">#FFEB3B</color>
     <color name="border_stjarna">#3b3b3b</color>
+    <color name="Medium_grey">#373539</color>
+    <color name="Light_grey">#CBCBCB</color>
+    <color name="Dark_gray">#252427</color>
+    <color name="descriptionCard">#AAAAAA</color>
+
 
 
 
