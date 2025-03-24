@@ -87,10 +87,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Fetch recipes when fragment is created
-        homeViewModel.fetchRecipesSortedBy(sortType = currentSortType)
-
-
         // Observe the loading state
         homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
