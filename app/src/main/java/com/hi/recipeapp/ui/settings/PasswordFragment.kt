@@ -57,15 +57,35 @@ class PasswordFragment : Fragment() {
         binding.changePwBtn.setOnClickListener {
             val newPassword = binding.newPw.text.toString()
             val confirmPassword = binding.againNewPw.text.toString()
-
+            Log.d("HALLO", "HALLÓ ÉG ER HJÉRNMA")
             if (newPassword == confirmPassword) {
-                // TODO: Implement password update logic here
-                binding.passwordError.visibility = View.GONE
+                passwordViewModel.updatePassword(newPassword, confirmPassword)
             } else {
                 binding.passwordError.text = "Passwords do not match!"
                 binding.passwordError.visibility = View.VISIBLE
             }
         }
+        /**
+         * Observer which observes when there is a attempted password change. Failed or successfull attempt :)
+         * Makes a toast with successfull or server error fail and clears the password fields for another try
+         */
+        passwordViewModel.passwordChangeState.observe(viewLifecycleOwner) { result ->
+            if(result.isSuccess) {
+                Toast.makeText(requireContext(), "Password changed successfully!", Toast.LENGTH_SHORT).show()
+                clearPasswordFields()
+            } else {
+                val msg = result.exceptionOrNull()?.message ?: "Failed to change password"
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                clearPasswordFields()
+            }
+
+        }
+    }
+
+    private fun clearPasswordFields(){
+        binding.newPw.setText("")
+        binding.againNewPw.setText("")
+        binding.currentPw.setText("")
     }
 
     private fun checkFieldsAndEnableButton() {
@@ -79,8 +99,6 @@ class PasswordFragment : Fragment() {
         binding.changePwBtn.isEnabled = allFieldsFilled
         binding.changePwBtn.alpha = if (allFieldsFilled) 1.0f else 0.5f // Change transparency
     }
-
-
 
 
     override fun onDestroyView() {

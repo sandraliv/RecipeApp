@@ -127,7 +127,7 @@
 
     <fragment
         android:id="@+id/uploadPhotoFragment"
-        android:name="com.hi.recipeapp.ui.uploadphoto.UploadPhotoFragment"
+        android:name="com.hi.recipeapp.ui.addrecipe.UploadPhotoFragment"
         android:label="Upload Photo"
         tools:layout="@layout/fragment_upload_photo">
     </fragment>

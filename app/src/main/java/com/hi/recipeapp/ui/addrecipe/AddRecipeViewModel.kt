@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.FullRecipe
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.services.RecipeService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddRecipeViewModel @Inject constructor(
-    private val recipeService: RecipeService
+    private val recipeService: RecipeService,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _newRecipeSuccess = MutableLiveData<Boolean>()
