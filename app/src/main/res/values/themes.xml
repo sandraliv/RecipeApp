@@ -5,7 +5,7 @@
         <!-- Primary brand color -->
         <item name="colorPrimary">@color/rosybrown</item> <!--Actionbar,Buttons ,selected on bottom nav. -->
         <item name="colorPrimaryVariant">@color/purple_200</item>
-        <item name="colorOnPrimary">@color/green</item><!--color for when you press on , and text on. -->
+        <item name="colorOnPrimary">@color/Dark_gray</item><!--color for when you press on , and text on. -->
 
         <!-- Secondary brand color -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -79,10 +79,27 @@
     </style>
 
 
-    <!-- Contained Button (important like the login in button )-->
+    <!-- Bottom nav-->
     <style name="bottom_nav" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="android:colorPrimary">@color/rosybrown</item>
+        <!-- Item icon and text tint colors -->
+        <item name="itemIconTint">@color/mtrl_navigation_bar_item_tint</item> <!-- Default item icon tint -->
+
+        <item name="itemTextColor">@color/mtrl_navigation_bar_item_tint</item> <!-- Default item text color -->
+        <!-- Ripple color -->
+        <item name="itemRippleColor">@color/mtrl_navigation_bar_ripple_color</item>
+
+    </style>
+
+    <!-- actionbar -->
+    <style name="actionBar" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:colorPrimary">@color/Dark_gray</item>
         <item name="iconTint">@color/rosybrown</item>
+        <item name="android:title">1sp</item>
+        <item name="android:titleTextColor">@color/rosybrown_50</item>
+        <item name="android:background">@color/rosybrown_50</item>
+
+
     </style>
 
 </resources>

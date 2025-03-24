@@ -6,6 +6,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -31,10 +33,10 @@ class FullRecipeFragment : Fragment() {
     private val fullRecipeViewModel: FullRecipeViewModel by viewModels() // Get ViewModel instance
     private lateinit var binding: FragmentFullRecipeBinding
 
-
     // Safe Args: Retrieve arguments passed to the fragment
     private val args: FullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
+
     private var selectedRating = 0
 
     override fun onCreateView(
@@ -42,10 +44,8 @@ class FullRecipeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
-
-
+        fullRecipeViewModel.fetchRecipeById(recipeId)
         // Initial visibility settings
         binding.contentLayout.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
@@ -60,7 +60,7 @@ class FullRecipeFragment : Fragment() {
             }
         }
 
-        fullRecipeViewModel.fetchRecipeById(recipeId)
+
         fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
             recipe?.let {
@@ -126,8 +126,6 @@ class FullRecipeFragment : Fragment() {
             updateHeartButtonVisibility(recipe)
             fullRecipeViewModel.updateFavoriteStatus(recipe.id, false) // Pass only the recipe id
         }
-
-
 
         recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
             val formattedIngredientName = ingredientName.replace("_", " ") // Replace underscores with spaces

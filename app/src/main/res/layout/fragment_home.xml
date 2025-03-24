@@ -14,21 +14,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Recipes"
-        app:layout_constraintBottom_toTopOf="@id/button_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- ProgressBar (Visible while loading data) -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:visibility="gone"
-        style="@style/MyOutlinedButton"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/home_header"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Horizontal ConstraintLayout to hold Sort and Category buttons inline at the top -->
     <androidx.constraintlayout.widget.ConstraintLayout
