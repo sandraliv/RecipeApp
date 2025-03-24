@@ -70,11 +70,11 @@ class CategoryFragment : Fragment() {
         categoryViewModel.recipesByCategory.observe(viewLifecycleOwner) { recipes ->
             Log.d("CategoryFragment", "Received recipes: $recipes")
             if (recipes.isNotEmpty()) {
-                binding.textCategoryResults.visibility = View.GONE
+                binding.textNoRecipeResults.visibility = View.GONE
                 binding.recipeRecyclerView.visibility = View.VISIBLE
                 recipeAdapter.submitList(recipes)
             } else {
-                binding.textCategoryResults.visibility = View.VISIBLE
+                binding.textCategoryName.visibility = View.VISIBLE
                 binding.recipeRecyclerView.visibility = View.GONE
             }
         }
@@ -86,9 +86,14 @@ class CategoryFragment : Fragment() {
             }
         }
 
-        // Observe loading state
+        // Observe loading state and show progress bar while loading
         categoryViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            if (isLoading) {
+                // Show the progress bar while loading
+                binding.progressBar.visibility = View.VISIBLE
+                binding.recipeRecyclerView.visibility = View.GONE
+                binding.textNoRecipeResults.visibility = View.GONE // Hide "No recipes available" while loading
+            }
         }
 
         // Observe the favorite action message LiveData

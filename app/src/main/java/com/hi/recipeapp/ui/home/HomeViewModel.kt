@@ -31,7 +31,8 @@ class HomeViewModel @Inject constructor(
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
-
+    private var pageNumber = 1  // Track the page number for pagination
+    private val pageSize = 20    // Define how many items to load per page
 
 
     init {
@@ -41,7 +42,8 @@ class HomeViewModel @Inject constructor(
     fun fetchRecipesSortedBy(sortType: SortType) {
         val userId = sessionManager.getUserId()
         _isLoading.value = true
-
+        // Clear the existing recipes list before fetching new data
+        _recipes.value = null
         // Convert the SortType enum to a string (e.g. "rating" or "date")
         val sortString = sortType.name.lowercase()
 
@@ -102,6 +104,43 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun loadMoreRecipes() {
+        pageNumber++ // Increment the page number to load the next page
+        _isLoading.value = true
+
+        recipeService.fetchRecipes(page = pageNumber, size = pageSize, sort = "rating") { newRecipes, error ->
+            if (error != null) {
+                _errorMessage.value = error
+                _isLoading.value = false
+            } else {
+                val userId = sessionManager.getUserId()
+                viewModelScope.launch {
+                    // If the user is logged in, fetch their favorite recipes
+                    if (userId != -1) {
+                        val userFavorites = userService.getUserFavorites(userId).getOrNull() ?: emptyList()
+
+                        // Mark the new recipes as favorited or not based on the user's favorites
+                        newRecipes?.forEach { recipe ->
+                            recipe.isFavoritedByUser = userFavorites.any { it.id == recipe.id }
+                        }
+                    } else {
+                        // If the user is not logged in, mark all recipes as not favorited
+                        newRecipes?.forEach { recipe ->
+                            recipe.isFavoritedByUser = false
+                        }
+                    }
+
+                    // Combine the current list of recipes with the new ones
+                    val updatedRecipes = _recipes.value?.toMutableList() ?: mutableListOf()
+                    updatedRecipes.addAll(newRecipes ?: emptyList())
+                    _recipes.value = updatedRecipes
+                    _isLoading.value = false
+                }
+            }
+        }
+    }
+
     fun updateSortType(newSortType: SortType) {
         // Optional: Check if the sort type has already been set to avoid unnecessary fetches
         if (_recipes.value != null) {

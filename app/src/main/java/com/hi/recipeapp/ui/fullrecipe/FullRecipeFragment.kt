@@ -42,7 +42,13 @@ class FullRecipeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
+
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
+
+
+        // Initial visibility settings
+        binding.contentLayout.visibility = View.GONE
+        binding.progressBar.visibility = View.VISIBLE
         // Observe the loading state
         fullRecipeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
@@ -59,6 +65,9 @@ class FullRecipeFragment : Fragment() {
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
             recipe?.let {
                 bindRecipeData(it)
+                // Once data is fetched, show content and hide ProgressBar
+                binding.progressBar.visibility = View.GONE
+                binding.contentLayout.visibility = View.VISIBLE
             }
         }
 

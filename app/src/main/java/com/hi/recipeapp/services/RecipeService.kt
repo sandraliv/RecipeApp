@@ -65,9 +65,8 @@ class RecipeService @Inject constructor(
     }
 
 
-    // Fetch all recipes (for initial display or fallback)
-    fun fetchRecipes(sort: String = "rating", callback: (List<RecipeCard>?, String?) -> Unit) {
-        networkService.getAllRecipes(page = 0, size = 20, sort = sort)
+    fun fetchRecipes(sort: String = "rating", page: Int = 0, size: Int = 20, callback: (List<RecipeCard>?, String?) -> Unit) {
+        networkService.getAllRecipes(page = page, size = size, sort = sort)
             .enqueue(object : Callback<List<RecipeCard>> {
                 override fun onResponse(
                     call: Call<List<RecipeCard>>,
@@ -86,6 +85,7 @@ class RecipeService @Inject constructor(
                 }
             })
     }
+
 
     suspend fun addRecipeToFavorites(recipeId: Int): Result<String> {
         return try {

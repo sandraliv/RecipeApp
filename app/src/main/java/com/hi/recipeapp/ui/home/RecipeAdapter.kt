@@ -60,7 +60,8 @@ class RecipeAdapter(
             val fullStars = recipe.averageRating.toInt()
             val hasHalfStar = recipe.averageRating % 1 >= 0.5
             val emptyStars = 5 - fullStars - if (hasHalfStar) 1 else 0
-
+            // Clear the existing stars in the layout
+            binding.starRatingLayout.removeAllViews()
             // Add full stars to the layout
             for (i in 0 until fullStars) {
                 val filledStar = ImageView(binding.root.context)

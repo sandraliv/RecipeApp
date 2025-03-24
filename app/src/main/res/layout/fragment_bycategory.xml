@@ -42,7 +42,7 @@
 
     <!-- Placeholder Text when no recipes are available -->
     <TextView
-        android:id="@+id/text_category_results"
+        android:id="@+id/text_no_recipe_results"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="No recipes available"

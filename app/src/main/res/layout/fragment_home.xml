@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.home.HomeFragment"
+    android:paddingBottom="35dp">
 
     <!-- ProgressBar (Visible while loading data) -->
     <ProgressBar
@@ -35,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Category"
-            style="@style/CustomButtonStyle"
+            style="@style/MyTextButton"
             android:textAllCaps="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -43,12 +44,13 @@
         <!-- Sort By Button aligned to end -->
         <Button
             android:id="@+id/sortByButton"
-            style="@style/CustomButtonStyle"
+            style="@style/MyTextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:drawableLeft="@drawable/ic_sort"
-            android:layoutDirection="ltr"
+            android:drawablePadding="20dp"
+            android:fontFamily="sans-serif-light"
             android:text="@string/sort_by"
             android:textAllCaps="false"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +67,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_container" />
+        app:layout_constraintTop_toBottomOf="@id/button_container"
+        android:layout_marginBottom="56dp" />
 
     <!-- Placeholder Text when no recipes are available -->
     <TextView
@@ -81,5 +84,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Load More Button -->
+    <Button
+        android:id="@+id/loadMoreButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Load More"
+        android:visibility="gone"
+        style="@style/MyTextButton"
+        android:layout_marginTop="2dp"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/recipe_recycler_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
