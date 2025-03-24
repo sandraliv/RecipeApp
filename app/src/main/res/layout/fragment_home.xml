@@ -41,13 +41,13 @@
         <!-- Category Button aligned to start -->
         <Button
             android:id="@+id/categoryButton"
+            style="@style/MyTextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:fontFamily="@font/playfair_display_semibold"
             android:text="Category"
-            style="@style/MyTextButton"
             android:textAllCaps="false"
-            android:fontFamily="sans-serif-light"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,7 +60,6 @@
             android:layout_marginEnd="16dp"
             android:drawableLeft="@drawable/ic_sort"
             android:drawablePadding="20dp"
-            android:fontFamily="sans-serif-light"
             android:text="@string/sort_by"
             android:textAllCaps="false"
             app:layout_constraintEnd_toEndOf="parent"
