@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="125dp"
                 android:layout_marginBottom="4dp"
-                android:contentDescription="Recipe image"
+                android:contentDescription="@string/recipe_image"
                 android:scaleType="centerCrop" />
 
             <!-- Heart Buttons: Empty heart and Filled heart -->
@@ -40,7 +40,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Add to Favorites"
+                    android:contentDescription="@string/add_to_favorites"
                     android:src="@drawable/ic_heart_empty"
                     android:scaleType="center"
                     android:layout_gravity="end|top"
@@ -52,7 +52,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Remove from Favorites"
+                    android:contentDescription="@string/remove_from_favorites"
                     android:src="@drawable/ic_heart_filled"
                     android:scaleType="center"
                     android:layout_gravity="end|top" />
@@ -67,7 +67,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:text="Recipe Name"
+            android:text="@string/recipe_name"
             android:textSize="13sp"
             android:textStyle="bold"
             />
@@ -80,7 +80,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:text="Recipe Description"
+            android:text="@string/recipe_description"
             android:textColor="@android:color/darker_gray"
             android:textSize="11sp" />
 
@@ -96,6 +96,14 @@
             android:gravity="end|bottom"
             android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/delete_recipe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_recipe"
+                android:textColor="@color/redd"
+                android:visibility="gone"
+                />
             <!-- Dynamically added Rating stars -->
             <LinearLayout
                 android:id="@+id/starRatingLayout"
@@ -111,7 +119,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="(50)"
+                android:text="@string/_50"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="11sp" />
         </LinearLayout>

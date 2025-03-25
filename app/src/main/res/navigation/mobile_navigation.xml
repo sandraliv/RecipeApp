@@ -144,6 +144,13 @@
         tools:layout="@layout/fragment_password">
     </fragment>
 
+    <fragment
+        android:id="@+id/navigation_edit_users"
+        android:name="com.hi.recipeapp.ui.settings.UsersFragment"
+        android:label="@string/user_management"
+        tools:layout="@layout/fragment_admin_users">
+    </fragment>
+
     <!-- Settings Fragment -->
     <fragment
         android:id="@+id/navigation_settings"
@@ -154,6 +161,9 @@
         <action
             android:id="@+id/settingsFragment_to_passwordFragment"
             app:destination="@id/navigation_change_password" />
+        <action
+            android:id="@+id/settingsFragment_to_deleteUsersFragment"
+            app:destination="@id/navigation_edit_users" />
     </fragment>
 
 

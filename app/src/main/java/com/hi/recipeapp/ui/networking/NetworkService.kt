@@ -6,6 +6,7 @@ import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.RecipeTag
+import com.hi.recipeapp.classes.User
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.classes.UserFullRecipe
@@ -39,6 +40,14 @@ interface NetworkService {
         @Query("query") query: String?,
         @Query("tags") tags: Set<String>?
     ): Call<List<RecipeCard>>
+
+    @GET("users")
+    suspend fun getAllUsers(
+    ): Response<List<User>>
+
+    @DELETE("users/{id}")
+    suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
+
 
     @GET("recipes/all")
     fun getAllRecipes(

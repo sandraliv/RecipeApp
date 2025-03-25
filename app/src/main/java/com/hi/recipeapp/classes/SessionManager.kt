@@ -17,6 +17,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         private const val TAG = "SessionManager"
         const val KEY_USER_PROFILE_PIC = "user_pic"
         const val KEY_USER_PASSWORD = "user_pw"
+        const val KEY_USER_ROLE = "user_role"
     }
 
     // Save user ID (if needed)
@@ -51,10 +52,11 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     }
 
     // Save user name (if needed)
-    fun saveUserName(userName: String) {
+    fun saveUserNameAndRole(userName: String, role: String) {
         Log.d(TAG, "Saving User Name: $userName")
         val editor = sharedPreferences.edit()
         editor.putString(KEY_USER_NAME, userName)
+        editor.putString(KEY_USER_ROLE, role)
         editor.apply()
         Log.d(TAG, "User Name saved successfully.")
     }
@@ -75,6 +77,14 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         val userName = sharedPreferences.getString(KEY_USER_NAME, null)
         Log.d(TAG, "Retrieved User Name: $userName")
         return userName
+    }
+
+    fun isAdmin(): Boolean {
+        val userRole = sharedPreferences.getString(KEY_USER_ROLE, null)
+        if (userRole == "admin") {
+            return true
+        }
+        return false
     }
 
     // Clear session (logout)

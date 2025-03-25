@@ -39,7 +39,6 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
@@ -51,7 +50,7 @@ class HomeFragment : Fragment() {
                 homeViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars // Pass spaceBetweenStars
         )
 
 
@@ -139,6 +138,7 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
+
 
     // Setup Sort Button with vector icon
     private fun setupSortButton() {

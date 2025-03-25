@@ -73,7 +73,17 @@
             android:padding="18dp"
             android:text="@string/change_profile_pic"
             android:textColor="@color/white" />
-
+        <Button
+            android:id="@+id/deleteUsers"
+            android:layout_width="295dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20sp"
+            android:backgroundTint="#FFB74D"
+            android:padding="18dp"
+            android:text="@string/user_management"
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

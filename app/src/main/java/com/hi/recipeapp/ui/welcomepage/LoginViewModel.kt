@@ -41,7 +41,7 @@ class LoginViewModel @Inject constructor(
                     // Save user data to session
                     sessionManager.savePassword(user.password)
                     sessionManager.saveUserId(user.id)
-                    sessionManager.saveUserName(user.username)
+                    sessionManager.saveUserNameAndRole(user.username, user.role)
                     sessionManager.saveProfilePic(user.profilePictureUrl)
 
                     saveUserFavoriteStatus(user.id)

@@ -37,4 +37,11 @@
     <string name="sort_by">Sort By</string>
     <string name="no_recipes_available">No recipes available</string>
     <string name="menu_button">menu</string>
+    <string name="user_management">User Management</string>
+    <string name="delete_user">Delete user</string>
+    <string name="recipe_name">Recipe Name</string>
+    <string name="recipe_description">Recipe Description</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="_50">(50)</string>
+    <string name="delete_recipe">Delete recipe</string>
 </resources>

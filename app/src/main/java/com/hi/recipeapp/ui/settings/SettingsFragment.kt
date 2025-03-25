@@ -85,6 +85,17 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        settingsViewModel.isAdmin.observe(viewLifecycleOwner) { isAdmin ->
+            if (isAdmin) {
+                binding.deleteUsers.visibility = View.VISIBLE
+                binding.deleteUsers.setOnClickListener {
+                    // Navigate to your admin screen or show a toast
+                    findNavController().navigate(R.id.settingsFragment_to_deleteUsersFragment)
+                }
+            }
+        }
+
+
     }
 
     private fun navigateToPasswordChange() {

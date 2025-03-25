@@ -59,7 +59,7 @@ class CategoryFragment : Fragment() {
                 categoryViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars,  // Pass spaceBetweenStars
         )
 
         // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)

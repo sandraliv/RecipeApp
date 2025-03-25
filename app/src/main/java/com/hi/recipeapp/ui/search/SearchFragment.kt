@@ -24,16 +24,11 @@ class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-
     private val searchViewModel: SearchViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
     private val selectedTags = mutableSetOf<RecipeTag>() // Only tags now
-
-
     private val starSize = 30
     private val spaceBetweenStars = 3
-
-
     private val gridColumnCount = 2
 
     override fun onCreateView(
@@ -124,7 +119,7 @@ class SearchFragment : Fragment() {
                 searchViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars
         )
         // Use GridLayoutManager with the defined number of columns
         val gridLayoutManager = GridLayoutManager(context, gridColumnCount)

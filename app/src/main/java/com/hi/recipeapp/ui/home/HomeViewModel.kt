@@ -29,6 +29,9 @@ class HomeViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
 
+    private val _isAdmin = MutableLiveData<Boolean?>()
+    val isAdmin: LiveData<Boolean?> get() = _isAdmin
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
     private var pageNumber = 1  // Track the page number for pagination
@@ -37,6 +40,11 @@ class HomeViewModel @Inject constructor(
 
     init {
         fetchRecipesSortedBy(sortType = SortType.RATING)
+        checkIfAdmin()
+    }
+
+    private fun checkIfAdmin(){
+        _isAdmin.value = sessionManager.isAdmin();
     }
 
     fun fetchRecipesSortedBy(sortType: SortType) {

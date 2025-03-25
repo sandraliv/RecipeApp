@@ -4,6 +4,7 @@ import android.util.Log
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
+import com.hi.recipeapp.classes.User
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.classes.UserFullRecipe
@@ -107,6 +108,35 @@ class UserService @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun deleteUser(userId: Int): Result<Unit> {
+        return try {
+            val response = networkService.deleteUser(userId)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Delete failed: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun getAllUsers(): Result<List<User>> {
+        return try {
+            val response = networkService.getAllUsers()
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
+            } else {
+                Result.failure(Exception("Failed to fetch users: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
 
     suspend fun getUserRecipes(
         page: Int = 0, size: Int = 10): Result<List<UserRecipeCard>> {
