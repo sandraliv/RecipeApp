@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentAddRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddRecipeFragment : Fragment() {
@@ -21,8 +23,7 @@ class AddRecipeFragment : Fragment() {
     private lateinit var binding: FragmentAddRecipeBinding
     private var ingredientCount = 1
     private var instructionCount = 1
-    private lateinit var sessionManager: SessionManager
-
+    private var userId: Int? = null  // Store userId from ViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,57 +32,46 @@ class AddRecipeFragment : Fragment() {
 
         binding = FragmentAddRecipeBinding.inflate(inflater, container, false)
 
-        //@Hildur, í staðinn fyrir að sækja session manager hingað, notaðu frekar viewmodelið.
-        //Session manager er injectaður þar inn og tilbúinn til notkunar
-        //Viewmodelið á að sjá um allt logic og fragmentið á bara að sjá um að update-a ui
-        //og þegar view model biður um það.
-        sessionManager = SessionManager(requireContext())
+        // Observe userId from ViewModel
+        viewModel.userId.observe(viewLifecycleOwner) { id ->
+            userId = id
+        }
 
-        // Event listeners
+
         binding.addIngredientButton.setOnClickListener { addIngredientRow() }
         binding.addInstructionButton.setOnClickListener { addInstructionRow() }
-        binding.uploadPhotoButton.setOnClickListener { findNavController().navigate(R.id.action_addRecipeFragment_to_uploadPhotoFragment) }
         binding.addRecipeButton.setOnClickListener { submitRecipe() }
 
         return binding.root
     }
 
-    // Adds a new ingredient row with checkboxes
     private fun addIngredientRow() {
         val tableRow = TableRow(requireContext())
 
-        // Ingredient Name EditText
         val ingredientNameEditText = EditText(requireContext()).apply {
             hint = "Ingredient Name"
             layoutParams = TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         }
 
-        // Ingredient Quantity EditText
         val ingredientQuantityEditText = EditText(requireContext()).apply {
             hint = "Quantity"
             layoutParams = TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         }
 
-        // Ingredient CheckBox for marking
         val ingredientCheckBox = CheckBox(requireContext())
 
-        // Add views to the TableRow
         tableRow.addView(ingredientNameEditText)
         tableRow.addView(ingredientQuantityEditText)
         tableRow.addView(ingredientCheckBox)
 
-        // Add the TableRow to the Ingredients Table
         binding.ingredientsTableLayout.addView(tableRow)
 
         ingredientCount++
     }
 
-
-    // Function to add a new instruction row with numbered steps
     private fun addInstructionRow() {
         val tableRow = TableRow(requireContext())
 
-        // Instruction Number TextView
         val instructionNumberTextView = TextView(requireContext()).apply {
             text = "$instructionCount."
             layoutParams = TableRow.LayoutParams(
@@ -90,35 +80,33 @@ class AddRecipeFragment : Fragment() {
             )
         }
 
-        // Instruction Text EditText
         val instructionTextEditText = EditText(requireContext()).apply {
             hint = "Instruction"
             layoutParams = TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         }
 
-        // Add views to the TableRow
         tableRow.addView(instructionNumberTextView)
         tableRow.addView(instructionTextEditText)
 
-        // Add the TableRow to the Instructions Table
         binding.instructionsTableLayout.addView(tableRow)
 
         instructionCount++
     }
-    // Validates user input and creates a UserFullRecipe object
+
     private fun submitRecipe() {
         val title = binding.recipeTitleEditText.text.toString().trim()
         val description = binding.recipeDescriptionEditText.text.toString().trim()
 
-
         if (title.isEmpty() || description.isEmpty()) {
-            Toast.makeText(requireContext(), "Title og description need to be filled", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Title and description need to be filled", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val userId = sessionManager.getUserId() // Get UserId
+        if (userId == null) {
+            Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        // Retrieves the ingredient names and quantities from input fields and puts them into Map
         val ingredientsMap = mutableMapOf<String, String>()
         for (i in 0 until binding.ingredientsTableLayout.childCount) {
             val row = binding.ingredientsTableLayout.getChildAt(i) as? TableRow
@@ -130,7 +118,6 @@ class AddRecipeFragment : Fragment() {
             }
         }
 
-        // Retrieves instructions from the input fields and stores them in a list
         val instructionsList = mutableListOf<String>()
         for (i in 0 until binding.instructionsTableLayout.childCount) {
             val row = binding.instructionsTableLayout.getChildAt(i) as? TableRow
@@ -140,7 +127,6 @@ class AddRecipeFragment : Fragment() {
             }
         }
 
-        // UserFullRecipe object
         val recipe = UserFullRecipe(
             id = 0,
             title = title,
@@ -150,13 +136,8 @@ class AddRecipeFragment : Fragment() {
             imageUrl = "default"
         )
 
+        viewModel.uploadRecipe(recipe)
 
-        viewModel.uploadRecipe(userId, recipe)
-
-        // Lets user know that recipe is sent
         Toast.makeText(requireContext(), "Recipe sent!", Toast.LENGTH_SHORT).show()
-
     }
-
-
 }

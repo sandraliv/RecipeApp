@@ -129,5 +129,13 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         return favorites?.map { it.toInt() }?.toSet() ?: emptySet()
     }
 
+    fun isDarkModeEnabled(): Boolean {
+        return sharedPreferences.getBoolean("dark_mode", false)
+    }
+
+    fun setDarkMode(enabled: Boolean) {
+        sharedPreferences.edit().putBoolean("dark_mode", enabled).apply()
+    }
+
 }
 
