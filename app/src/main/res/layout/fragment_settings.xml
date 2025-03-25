@@ -5,53 +5,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.settings.SettingsFragment"
-    android:gravity="center">
+    tools:context=".ui.settings.SettingsFragment">
+
 
     <ImageButton
-        android:id="@+id/themeToggleButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="30dp"
+        android:id="@+id/themeDropdownButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Toggle Theme"
-        android:padding="8dp"
-        android:src="@drawable/dark_mode"
+        android:contentDescription="Theme Options"
+        android:src="@drawable/settings_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/colorOnPrimary"/>
-
+        app:tint="?attr/colorOnPrimary" />
 
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/themeDropdownButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        >
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.cardview.widget.CardView
+
+        <FrameLayout
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_marginTop="60dp"
             android:layout_gravity="center"
-            app:cardCornerRadius="80dp"
-            app:cardElevation="4dp"
-            android:clipChildren="true"
-            android:clipToPadding="true">
+            android:layout_marginTop="32dp">
 
-            <ImageView
-                android:id="@+id/profile_pic"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/user_profile_image"
-                android:scaleType="centerCrop"
-                android:src="@drawable/gudni"/>
-        </androidx.cardview.widget.CardView>
+                app:cardCornerRadius="80dp"
+                app:cardElevation="4dp"
+                android:clipChildren="true"
+                android:clipToPadding="true">
+
+                <ImageView
+                    android:id="@+id/profile_pic"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/gudni"
+                    android:contentDescription="@string/user_profile_image"/>
+            </androidx.cardview.widget.CardView>
+
+
+            <ImageButton
+                android:id="@+id/edit_profile_pic_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="6dp"
+                android:src="@drawable/add_icon"
+                android:background="@drawable/circle_background"
+                android:contentDescription="Edit Profile Picture"
+                app:tint="@android:color/white"
+                android:elevation="8dp"/>
+        </FrameLayout>
+
 
         <Button
             android:id="@+id/change_pw"
@@ -63,6 +80,8 @@
             android:padding="18dp"
             android:text="@string/change_pw"
             android:textColor="@color/white" />
+
+
         <Button
             android:id="@+id/log_out"
             android:layout_width="295dp"
@@ -73,6 +92,8 @@
             android:padding="18dp"
             android:text="@string/change_profile_pic"
             android:textColor="@color/white" />
+
+
         <Button
             android:id="@+id/deleteUsers"
             android:layout_width="295dp"
@@ -84,6 +105,6 @@
             android:text="@string/user_management"
             android:textColor="@color/white"
             android:visibility="gone" />
-
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
