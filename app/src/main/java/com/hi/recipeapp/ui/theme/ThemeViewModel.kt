@@ -21,7 +21,7 @@ class ThemeViewModel @Inject constructor(
     init {
         val savedMode = sessionManager.isDarkModeEnabled()
         _isDarkMode.value = savedMode
-        applyTheme(savedMode)
+
     }
 
     fun toggleTheme() {

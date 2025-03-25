@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hi.recipeapp.classes.FullRecipe
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.services.RecipeService
-import com.hi.recipeapp.classes.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,38 +18,16 @@ class AddRecipeViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    // Holds the user ID retrieved from session manager
-    private val _userId = MutableLiveData<Int?>()
-    val userId: LiveData<Int?> = _userId
-
     private val _newRecipeSuccess = MutableLiveData<Boolean>()
     val newRecipeSuccess: LiveData<Boolean> = _newRecipeSuccess
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    init {
-        fetchUserId()
-    }
-
-    // Fetch the user ID from session manager when the ViewModel is created
-    private fun fetchUserId() {
+    fun uploadRecipe(userId: Int, recipe: UserFullRecipe) {
         viewModelScope.launch {
-            val id = sessionManager.getUserId() // Directly get the userId as an Int
-            _userId.postValue(id)
-        }
-    }
-
-    fun uploadRecipe(recipe: UserFullRecipe) {
-        viewModelScope.launch {
-            val userIdValue = _userId.value
-            if (userIdValue == null) {
-                _errorMessage.postValue("User ID not found")
-                return@launch
-            }
-
             try {
-                val success = recipeService.uploadUserRecipe(userIdValue, recipe)
+                val success = recipeService.uploadUserRecipe(userId, recipe) // Passar við API-ið
                 if (success) {
                     _newRecipeSuccess.postValue(true)
                 } else {
@@ -60,7 +39,6 @@ class AddRecipeViewModel @Inject constructor(
         }
     }
 
-
-
 }
+
 
