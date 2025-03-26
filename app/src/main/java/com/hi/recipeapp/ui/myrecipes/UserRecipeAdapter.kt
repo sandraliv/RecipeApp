@@ -29,12 +29,13 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
             binding.recipeName.text = userRecipe.title
             binding.recipeDescription.text = userRecipe.description
 
-            // Load the image
+            // Handle the main image (first image in the list of image URLs)
+            val mainImageUrl = userRecipe.imageUrls?.firstOrNull() // First image
             Glide.with(binding.root.context)
-                .load(userRecipe.imageUrl)
+                .load(mainImageUrl)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.error_image)
-                .into(binding.recipeImage)
+                .into(binding.userRecipeImage)
 
             // Set the click listener to pass the UserRecipeCard to the next screen
             binding.root.setOnClickListener {

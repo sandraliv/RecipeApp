@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation (libs.glide)
+    implementation ("com.github.bumptech.glide:glide:4.12.0")  // Use the correct version
+
     annotationProcessor (libs.compiler)
     implementation(libs.hilt.android) // ✅ Hilt Core
     kapt(libs.hilt.compiler) // ✅ Hilt Compiler
@@ -72,11 +74,14 @@ dependencies {
     kaptAndroidTest(libs.hilt.compiler)
     implementation ("com.google.android.material:material:1.9.0")
     implementation(libs.converter.scalars)
+    implementation ("androidx.appcompat:appcompat:1.2.0")
+    implementation ("androidx.cardview:cardview:1.0.0")
+    implementation ("androidx.core:core-ktx:1.5.0")
 
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
     implementation ("androidx.core:core-ktx:1.9.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.x.x")  // Replace with the latest version
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")  // Replace with the latest version
 
 
 }

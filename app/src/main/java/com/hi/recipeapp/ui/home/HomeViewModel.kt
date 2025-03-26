@@ -1,5 +1,6 @@
 package com.hi.recipeapp.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,8 +32,8 @@ class HomeViewModel @Inject constructor(
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
-    private var pageNumber = 1  // Track the page number for pagination
-    private val pageSize = 20    // Define how many items to load per page
+    private var pageNumber = 0  // Track the page number for pagination
+    private val pageSize = 10    // Define how many items to load per page
 
 
     init {
@@ -44,7 +45,6 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = true
         // Clear the existing recipes list before fetching new data
         _recipes.value = null
-        // Convert the SortType enum to a string (e.g. "rating" or "date")
         val sortString = sortType.name.lowercase()
 
         // Step 1: Fetch sorted recipes
@@ -53,6 +53,18 @@ class HomeViewModel @Inject constructor(
                 _errorMessage.value = error
                 _isLoading.value = false
             } else {
+                // Log each recipe's image URLs directly
+                recipes?.forEach { recipe ->
+                    val imageUrls = recipe.imageUrls  // Access imageUrls directly
+                    if (imageUrls.isNullOrEmpty()) {
+                        Log.d("HomeViewModel", "Recipe ID: ${recipe.id} has no images.")
+                    } else {
+                        imageUrls.forEach { url ->
+                            Log.d("HomeViewModel", "Recipe ID: ${recipe.id} Image URL: $url")
+                        }
+                    }
+                }
+
                 // Step 2: Fetch the user's favorite recipes
                 if (userId != -1) {
                     viewModelScope.launch {
@@ -76,6 +88,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
 
 
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {

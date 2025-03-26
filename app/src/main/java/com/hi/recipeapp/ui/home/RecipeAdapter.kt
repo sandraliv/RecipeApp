@@ -95,8 +95,10 @@ class RecipeAdapter(
 
             binding.recipeRatingCount.text = "(${recipe.ratingCount})"
 
+            // Handle the main image (first image in the list of image URLs)
+            val mainImageUrl = recipe.imageUrls?.firstOrNull() // First image
             Glide.with(binding.root.context)
-                .load(recipe.imageUrl)
+                .load(mainImageUrl)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.error_image)
                 .into(binding.recipeImage)
@@ -105,7 +107,32 @@ class RecipeAdapter(
             binding.root.setOnClickListener {
                 onClick(recipe)
             }
+            // Handle additional images inside the HorizontalScrollView
+            loadImagesIntoHorizontalScrollView(recipe.imageUrls?.drop(1)) // All images except the first one
         }
+        private fun loadImagesIntoHorizontalScrollView(imageUrls: List<String>?) {
+            val imageLayout = binding.imageLayout  // LinearLayout inside HorizontalScrollView
+            imageLayout.removeAllViews()  // Clear any existing images
+
+            // If imageUrls is not null or empty, load images
+            imageUrls?.forEach { url ->
+                val imageView = ImageView(binding.root.context)
+                val layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+                imageView.layoutParams = layoutParams
+
+                Glide.with(binding.root.context)
+                    .load(url)
+                    .placeholder(R.drawable.placeholder)  // Optional placeholder
+                    .error(R.drawable.error_image)  // Optional error image
+                    .into(imageView)
+
+                imageLayout.addView(imageView)  // Add the ImageView to the layout
+            }
+        }
+
         private fun updateHeartButtonVisibility(recipe: RecipeCard) {
             // Show the appropriate button based on the recipe's favorite status
             if (recipe.isFavoritedByUser) {
@@ -116,6 +143,7 @@ class RecipeAdapter(
                 binding.emptyHeartButton.visibility = View.VISIBLE
             }
         }
+
     }
 
     // DiffUtil callback to optimize list updates

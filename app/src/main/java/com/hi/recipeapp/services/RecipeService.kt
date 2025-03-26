@@ -65,7 +65,7 @@ class RecipeService @Inject constructor(
     }
 
 
-    fun fetchRecipes(sort: String = "rating", page: Int = 0, size: Int = 20, callback: (List<RecipeCard>?, String?) -> Unit) {
+    fun fetchRecipes(sort: String = "rating", page: Int = 0, size: Int = 10, callback: (List<RecipeCard>?, String?) -> Unit) {
         networkService.getAllRecipes(page = page, size = size, sort = sort)
             .enqueue(object : Callback<List<RecipeCard>> {
                 override fun onResponse(
@@ -74,6 +74,17 @@ class RecipeService @Inject constructor(
                 ) {
                     val recipes = response.body()
                     if (response.isSuccessful && !recipes.isNullOrEmpty()) {
+                        // Log each recipe's image URLs directly
+                        recipes.forEach { recipe ->
+                            val imageUrls = recipe.imageUrls  // Access imageUrls directly
+                            if (imageUrls.isNullOrEmpty()) {
+                                Log.d("FetchRecipes", "Recipe ID: ${recipe.id} has no images.")
+                            } else {
+                                imageUrls.forEach { url ->
+                                    Log.d("FetchRecipes", "Recipe ID: ${recipe.id} Image URL: $url")
+                                }
+                            }
+                        }
                         callback(recipes, null)
                     } else {
                         callback(null, "No recipes found.")
@@ -85,6 +96,7 @@ class RecipeService @Inject constructor(
                 }
             })
     }
+
 
 
     suspend fun addRecipeToFavorites(recipeId: Int): Result<String> {
