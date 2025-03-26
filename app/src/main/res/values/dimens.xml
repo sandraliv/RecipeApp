@@ -6,4 +6,8 @@
     <dimen name="fragment_horizontal_margin">16dp</dimen>
     <dimen name="fragment_vertical_margin">16dp</dimen>
     <dimen name="written_text_size">26sp</dimen>
+    <!-- Define the image height for consistency -->
+    <dimen name="recipe_card_image_height">125dp</dimen>
+
+
 </resources>

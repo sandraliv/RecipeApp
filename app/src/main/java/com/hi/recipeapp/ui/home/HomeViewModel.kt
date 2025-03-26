@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
     private var pageNumber = 0  // Track the page number for pagination
-    private val pageSize = 10    // Define how many items to load per page
+    private val pageSize = 20    // Define how many items to load per page
 
 
     init {

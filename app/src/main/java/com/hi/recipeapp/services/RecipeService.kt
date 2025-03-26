@@ -65,7 +65,7 @@ class RecipeService @Inject constructor(
     }
 
 
-    fun fetchRecipes(sort: String = "rating", page: Int = 0, size: Int = 10, callback: (List<RecipeCard>?, String?) -> Unit) {
+    fun fetchRecipes(sort: String = "rating", page: Int = 0, size: Int = 20, callback: (List<RecipeCard>?, String?) -> Unit) {
         networkService.getAllRecipes(page = page, size = size, sort = sort)
             .enqueue(object : Callback<List<RecipeCard>> {
                 override fun onResponse(

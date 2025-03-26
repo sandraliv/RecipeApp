@@ -30,14 +30,14 @@
         <LinearLayout
             android:id="@+id/contentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:visibility="gone">
 
             <!-- Heart Buttons: Empty heart and Filled heart -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="end"
                 android:orientation="horizontal">
 
@@ -64,33 +64,15 @@
                     android:src="@drawable/ic_heart_filled" />
             </LinearLayout>
 
-            <!-- Main Recipe Image -->
-            <ImageView
-                android:id="@+id/recipe_image"
+            <!-- ViewPager2 for displaying multiple recipe images -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPagerImages"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:contentDescription="@string/recipe_image"
-                android:scaleType="centerCrop" />
-
-            <!-- Horizontal ScrollView for additional images -->
-            <android.widget.HorizontalScrollView
-                android:id="@+id/horizontalScrollView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <!-- LinearLayout to hold all the images horizontally -->
-                <LinearLayout
-                    android:id="@+id/imageLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <!-- Dynamically loaded images will appear here -->
-                </LinearLayout>
-            </android.widget.HorizontalScrollView>
+                android:layout_marginTop="8dp"
+                android:contentDescription="@string/recipe_image" />
 
             <!-- Rating layout -->
             <LinearLayout
@@ -142,7 +124,7 @@
                 android:background="@color/rosybrown_100"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
-                android:stretchColumns="1"></TableLayout>
+                android:stretchColumns="1"/>
 
             <TextView
                 android:id="@+id/instructionsTextView"

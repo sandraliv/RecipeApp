@@ -9,24 +9,21 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- FrameLayout to overlay heart buttons over the recipe image -->
+        <!-- FrameLayout to overlay heart buttons over the ViewPager2 -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <!-- Main Recipe image (Fixed) -->
-            <ImageView
-                android:id="@+id/recipe_image"
+            <!-- ViewPager2 to display all recipe images -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPagerImages"
                 android:layout_width="match_parent"
-                android:layout_height="125dp"
-                android:layout_marginBottom="4dp"
-                android:contentDescription="Recipe image"
-                android:scaleType="centerCrop" />
+                android:layout_height="match_parent" />
 
-            <!-- Heart Buttons: Empty heart and Filled heart -->
+            <!-- Heart Buttons: Empty heart and Filled heart (Positioned on top of the ViewPager2) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,23 +54,6 @@
                     android:layout_gravity="end|top" />
             </LinearLayout>
         </FrameLayout>
-
-        <!-- Horizontal ScrollView for additional images -->
-        <android.widget.HorizontalScrollView
-            android:id="@+id/horizontalScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- LinearLayout to hold all the images horizontally -->
-            <LinearLayout
-                android:id="@+id/imageLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <!-- Dynamically loaded images will appear here -->
-            </LinearLayout>
-        </android.widget.HorizontalScrollView>
 
         <TextView
             android:id="@+id/recipe_name"
