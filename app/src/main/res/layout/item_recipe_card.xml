@@ -26,9 +26,10 @@
                 <!-- LinearLayout to hold all the images horizontally -->
                 <LinearLayout
                     android:id="@+id/imageLayout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
+
 
                     <!-- Dynamically loaded images will appear here -->
                 </LinearLayout>

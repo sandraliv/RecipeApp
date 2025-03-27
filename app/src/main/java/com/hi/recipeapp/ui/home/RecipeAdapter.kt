@@ -109,7 +109,7 @@ class RecipeAdapter(
                 val imageView = ImageView(binding.root.context)
 
                 val layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,  // Set width to match parent
+                    binding.root.context.resources.getDimensionPixelSize(R.dimen.card_image_width),  // Set width to match parent
                     binding.root.context.resources.getDimensionPixelSize(R.dimen.card_image_height)  // Set fixed height
                 )
 
