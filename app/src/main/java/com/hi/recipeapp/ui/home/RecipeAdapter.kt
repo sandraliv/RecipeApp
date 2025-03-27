@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.hi.recipeapp.R
 import com.hi.recipeapp.databinding.ItemRecipeCardBinding
 import com.hi.recipeapp.classes.RecipeCard
-
 class RecipeAdapter(
     private val onClick: (RecipeCard) -> Unit,
     private val onFavoriteClick: (RecipeCard, Boolean) -> Unit,
@@ -28,14 +28,12 @@ class RecipeAdapter(
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
         val recipe = getItem(position)
-
-        // Call bind() with custom size and space
         holder.bind(recipe, starSize, spaceBetweenStars)
     }
 
     inner class RecipeViewHolder(private val binding: ItemRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(recipe: RecipeCard,starSize: Int, spaceBetweenStars: Int) {
+        fun bind(recipe: RecipeCard, starSize: Int, spaceBetweenStars: Int) {
             Log.d("RecipeViewHolder", "isFavoritedByUser: ${recipe.isFavoritedByUser}")
 
             // Handle heart icon visibility based on whether the recipe is favorited
@@ -92,24 +90,16 @@ class RecipeAdapter(
                 binding.starRatingLayout.addView(emptyStar)
             }
 
-
             binding.recipeRatingCount.text = "(${recipe.ratingCount})"
-
-            // Handle the main image (first image in the list of image URLs)
-            val mainImageUrl = recipe.imageUrls?.firstOrNull() // First image
-            Glide.with(binding.root.context)
-                .load(mainImageUrl)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.error_image)
-                .into(binding.recipeImage)
-
             // Handle item click to navigate to recipe details
             binding.root.setOnClickListener {
                 onClick(recipe)
             }
+
             // Handle additional images inside the HorizontalScrollView
-            loadImagesIntoHorizontalScrollView(recipe.imageUrls?.drop(1)) // All images except the first one
+            loadImagesIntoHorizontalScrollView(recipe.imageUrls) // All images except the first one
         }
+
         private fun loadImagesIntoHorizontalScrollView(imageUrls: List<String>?) {
             val imageLayout = binding.imageLayout  // LinearLayout inside HorizontalScrollView
             imageLayout.removeAllViews()  // Clear any existing images
@@ -117,14 +107,18 @@ class RecipeAdapter(
             // If imageUrls is not null or empty, load images
             imageUrls?.forEach { url ->
                 val imageView = ImageView(binding.root.context)
+
                 val layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
+                    LinearLayout.LayoutParams.MATCH_PARENT,  // Set width to match parent
+                    binding.root.context.resources.getDimensionPixelSize(R.dimen.card_image_height)  // Set fixed height
                 )
+
+                layoutParams.setMargins(0, 0, 0, 4)  // Adjust margin between images
                 imageView.layoutParams = layoutParams
 
                 Glide.with(binding.root.context)
                     .load(url)
+                    .transform(CenterCrop())  // Apply centerCrop transformation
                     .placeholder(R.drawable.placeholder)  // Optional placeholder
                     .error(R.drawable.error_image)  // Optional error image
                     .into(imageView)
@@ -143,7 +137,6 @@ class RecipeAdapter(
                 binding.emptyHeartButton.visibility = View.VISIBLE
             }
         }
-
     }
 
     // DiffUtil callback to optimize list updates
@@ -157,6 +150,3 @@ class RecipeAdapter(
         }
     }
 }
-
-
-

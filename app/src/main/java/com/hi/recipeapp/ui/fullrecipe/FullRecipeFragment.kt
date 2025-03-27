@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.FullRecipe
@@ -46,10 +47,14 @@ class FullRecipeFragment : Fragment() {
     ): View {
 
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
+
         fullRecipeViewModel.fetchRecipeById(recipeId)
+
         // Initial visibility settings
         binding.contentLayout.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
+
+
         // Observe the loading state
         fullRecipeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
@@ -97,14 +102,6 @@ class FullRecipeFragment : Fragment() {
         // Bind the recipe data to the UI
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
-
-        // Handle the main image (first image in the list of image URLs)
-        val mainImageUrl = recipe.imageUrls?.firstOrNull() // First image
-        Glide.with(binding.root.context)
-            .load(mainImageUrl)
-            .placeholder(R.drawable.placeholder)
-            .error(R.drawable.error_image)
-            .into(binding.recipeImage)
 
         // Set the rating stars using a method to generate stars
         setRatingStars(recipe.averageRating)
@@ -193,7 +190,7 @@ class FullRecipeFragment : Fragment() {
         binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.getDisplayName() }
 
         // Handle additional images inside the HorizontalScrollView
-        loadImagesIntoHorizontalScrollView(recipe.imageUrls?.drop(1)) // All images except the first one
+        loadImagesIntoHorizontalScrollView(recipe.imageUrls) // All images except the first one
 
     }
 
@@ -205,13 +202,16 @@ class FullRecipeFragment : Fragment() {
         imageUrls?.forEach { url ->
             val imageView = ImageView(binding.root.context)
             val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT,  // Set width to match parent
+                binding.root.context.resources.getDimensionPixelSize(R.dimen.full_image_height)  // Set fixed height
             )
+
+            layoutParams.setMargins(8, 0, 8, 0)  // Adjust margin between images
             imageView.layoutParams = layoutParams
 
             Glide.with(binding.root.context)
                 .load(url)
+                .transform(CenterCrop())  // Apply centerCrop transformation
                 .placeholder(R.drawable.placeholder)  // Optional placeholder
                 .error(R.drawable.error_image)  // Optional error image
                 .into(imageView)

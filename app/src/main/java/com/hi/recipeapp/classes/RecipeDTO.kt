@@ -3,7 +3,7 @@ package com.hi.recipeapp.classes
 import com.google.gson.annotations.SerializedName
 
 data class RecipeCard(
-    @SerializedName("image_urls") val imageUrls: List<String>?,
+    val imageUrls: List<String>?,
     val title: String,
     val description: String,
     val averageRating: Double,
@@ -15,7 +15,7 @@ data class RecipeCard(
 )
 
 data class FullRecipe(
-    @SerializedName("image_urls") val imageUrls: List<String>?,
+    val imageUrls: List<String>?,
     val title: String,
     val description: String,
     val averageRating: Double,
@@ -29,14 +29,14 @@ data class FullRecipe(
 )
 
 data class UserRecipeCard(
-    @SerializedName("image_urls") val imageUrls: List<String>,
+    val imageUrls: List<String>,
     val title: String,
     val description: String,
     val id:Int,
 )
 
 data class UserFullRecipe(
-    @SerializedName("image_urls") val imageUrls: List<String>,
+    val imageUrls: List<String>,
     val title: String,
     val description: String,
     val id: Int,

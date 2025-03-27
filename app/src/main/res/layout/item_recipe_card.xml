@@ -12,21 +12,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- FrameLayout to overlay heart buttons over the recipe image -->
+        <!-- FrameLayout to overlay heart buttons over the recipe images -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Main Recipe image (Fixed) -->
-            <ImageView
-                android:id="@+id/recipe_image"
+            <!-- Horizontal ScrollView for additional images -->
+            <android.widget.HorizontalScrollView
+                android:id="@+id/horizontalScrollView"
                 android:layout_width="match_parent"
-                android:layout_height="125dp"
-                android:layout_marginBottom="4dp"
-                android:contentDescription="Recipe image"
-                android:scaleType="centerCrop" />
+                android:layout_height="125dp">
 
-            <!-- Heart Buttons: Empty heart and Filled heart -->
+                <!-- LinearLayout to hold all the images horizontally -->
+                <LinearLayout
+                    android:id="@+id/imageLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <!-- Dynamically loaded images will appear here -->
+                </LinearLayout>
+            </android.widget.HorizontalScrollView>
+
+            <!-- Heart Buttons: Empty heart and Filled heart, positioned at the top of images -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,10 +48,9 @@
                     android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Add to Favorites"
-                    android:src="@drawable/ic_heart_empty"
+                    android:elevation="2dp"
                     android:scaleType="center"
-                    android:layout_gravity="end|top"
-                    android:elevation="2dp" />
+                    android:src="@drawable/ic_heart_empty" />
 
                 <!-- Filled Heart Button (Remove from Favorites) -->
                 <ImageButton
@@ -52,35 +59,19 @@
                     android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Remove from Favorites"
-                    android:src="@drawable/ic_heart_filled"
                     android:scaleType="center"
-                    android:layout_gravity="end|top" />
+                    android:src="@drawable/ic_heart_filled" />
             </LinearLayout>
+
         </FrameLayout>
 
-        <!-- Horizontal ScrollView for additional images -->
-        <android.widget.HorizontalScrollView
-            android:id="@+id/horizontalScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- LinearLayout to hold all the images horizontally -->
-            <LinearLayout
-                android:id="@+id/imageLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <!-- Dynamically loaded images will appear here -->
-            </LinearLayout>
-        </android.widget.HorizontalScrollView>
-
+        <!-- Recipe Name -->
         <TextView
             android:id="@+id/recipe_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:text="Recipe Name"
             android:textSize="13sp"
@@ -91,8 +82,8 @@
             android:id="@+id/recipe_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:text="Recipe Description"
             android:textColor="@android:color/darker_gray"
@@ -103,8 +94,8 @@
             android:id="@+id/recipe_rating_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:gravity="end|bottom"
