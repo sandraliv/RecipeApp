@@ -37,8 +37,12 @@ interface NetworkService {
     @GET("recipes")
     fun getRecipesByQueryAndTags(
         @Query("query") query: String?,
-        @Query("tags") tags: Set<String>?
+        @Query("tags") tags: Set<String>?,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String = "RATING"
     ): Call<List<RecipeCard>>
+
 
     @GET("recipes/all")
     fun getAllRecipes(
@@ -66,17 +70,6 @@ interface NetworkService {
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
 
-    @GET("recipes/byDate")
-    fun getRecipesSortedByDate(
-        @Query("page") page: Int,
-        @Query("size") size: Int
-    ): Call<List<RecipeCard>>
-
-    @GET("recipes/highestRated")
-    fun getRecipesSortedByRating(
-        @Query("page") page: Int,
-        @Query("size") size: Int
-    ): Call<List<RecipeCard>>
 
     @GET("users/{id}/getUserFav")
     suspend fun getUserFavorites(@Path("id") userId: Int): Response<List<RecipeCard>>

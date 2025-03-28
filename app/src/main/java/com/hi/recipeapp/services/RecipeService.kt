@@ -20,12 +20,24 @@ class RecipeService @Inject constructor(
     fun searchRecipes(
         query: String,
         tags: Set<String>?,
+        page: Int = 0,            // Default page number to 0
+        size: Int = 10,           // Default size to 10
+        sort: String = "RATING",  // Default sort to "RATING"
         callback: (List<RecipeCard>?, String?) -> Unit
     ) {
-        Log.d("RECIPE_SERVICE", "Query: $query, Tags: $tags")
+        Log.d("RECIPE_SERVICE", "Query: $query, Tags: $tags, Page: $page, Size: $size, Sort: $sort")
+
+        // Prepare query parameters
+        val queryParam = query.takeIf { it.isNotEmpty() }
+        val tagsParam = tags.takeIf { it.isNullOrEmpty().not() }
+
+        // Make the network call with pagination and sorting
         networkService.getRecipesByQueryAndTags(
-            query.takeIf { it.isNotEmpty() },
-            tags.takeIf { it.isNullOrEmpty().not() }
+            queryParam,
+            tagsParam,
+            page,
+            size,
+            sort
         ).enqueue(object : Callback<List<RecipeCard>> {
             override fun onResponse(
                 call: Call<List<RecipeCard>>,
@@ -47,6 +59,7 @@ class RecipeService @Inject constructor(
         })
     }
 
+
     // Fetch recipe by ID
     fun fetchRecipeById(id: Int, callback: (FullRecipe?, String?) -> Unit) {
         networkService.getRecipeById(id).enqueue(object : Callback<FullRecipe> {
@@ -65,7 +78,11 @@ class RecipeService @Inject constructor(
     }
 
 
-    fun fetchRecipes(sort: String = "rating", page: Int = 0, size: Int = 10, callback: (List<RecipeCard>?, String?) -> Unit) {
+    fun fetchRecipes(
+        sort: String = "rating",
+        page: Int = 0,
+        size: Int = 10,
+        callback: (List<RecipeCard>?, String?) -> Unit) {
         networkService.getAllRecipes(page = page, size = size, sort = sort)
             .enqueue(object : Callback<List<RecipeCard>> {
                 override fun onResponse(

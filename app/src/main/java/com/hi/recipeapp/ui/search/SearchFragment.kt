@@ -14,10 +14,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
+import com.hi.recipeapp.R
 import com.hi.recipeapp.databinding.FragmentSearchBinding
 import com.hi.recipeapp.ui.home.RecipeAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import com.hi.recipeapp.classes.RecipeTag
+import com.hi.recipeapp.classes.SortType
+import com.hi.recipeapp.ui.bottomsheetdialog.SortBottomSheetFragment
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
@@ -32,9 +35,8 @@ class SearchFragment : Fragment() {
 
     private val starSize = 30
     private val spaceBetweenStars = 3
-
-
     private val gridColumnCount = 2
+    private var currentSortType: SortType = SortType.RATING
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +48,9 @@ class SearchFragment : Fragment() {
         setupTagSelection()
         setupRecyclerView()
         observeViewModel()
+
+        // Handle sorting button click
+        setupSortButton()
 
         // Observe the result of adding recipe to favorites
         searchViewModel.favoriteResult.observe(viewLifecycleOwner) { result ->
@@ -62,7 +67,46 @@ class SearchFragment : Fragment() {
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
             }
         }
+
+        // Observe "No More Recipes Available"
+        searchViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
+            if (noMoreRecipes) {
+                binding.textDashboard.text = getString(R.string.no_more_recipes_available)
+                binding.textDashboard.visibility = View.VISIBLE
+                binding.loadMoreButton.visibility = View.GONE
+            } else {
+                binding.textDashboard.visibility = View.GONE
+                binding.loadMoreButton.visibility = View.VISIBLE
+            }
+        }
+
+        // Handle Load More button click
+        binding.loadMoreButton.setOnClickListener {
+            // Pass the current query and selected tags to load more recipes
+            val query = binding.searchDashboard.query.toString()
+            val tagNames = selectedTags.map { it.name }.toSet()
+
+            // Pass the parameters to load more recipes
+            searchViewModel.loadMoreRecipes(query, tagNames)
+            binding.loadMoreButton.visibility = View.GONE
+        }
+
         return binding.root
+    }
+
+    private fun setupSortButton() {
+        binding.sortByButton.setOnClickListener {
+            // Open the Sort BottomSheetDialogFragment
+            val bottomSheetFragment = SortBottomSheetFragment()
+            bottomSheetFragment.setCurrentSortType(currentSortType)
+
+            bottomSheetFragment.setOnSortSelectedListener { sortType ->
+                currentSortType = sortType
+                searchViewModel.updateSortType(currentSortType)
+            }
+
+            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+        }
     }
 
     private fun setupSearchView() {
@@ -158,6 +202,8 @@ class SearchFragment : Fragment() {
         }
 
     }
+
+
 
     fun resetSearchState() {
         binding.textDashboard.text = ""
