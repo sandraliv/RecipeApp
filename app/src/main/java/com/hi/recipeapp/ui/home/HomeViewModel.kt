@@ -154,14 +154,15 @@ class HomeViewModel @Inject constructor(
                     val updatedRecipes = _recipes.value?.toMutableList() ?: mutableListOf()
                     updatedRecipes.addAll(newRecipes ?: emptyList())
 
+                    // Update the recipes list
+                    _recipes.value = updatedRecipes
+
                     // Check if there are no more recipes to load
                     if (newRecipes.isNullOrEmpty()) {
-                        _noMoreRecipes.value = true // Set this to true to show "No More Recipes Available" message
-                        binding.loadMoreButton.visibility = View.GONE
-                    } else {
-                        _recipes.value = updatedRecipes
-                        _isLoading.value = false
+                        _noMoreRecipes.value = true // This will notify the UI to show "No More Recipes Available"
                     }
+
+                    _isLoading.value = false
                 }
             }
         }

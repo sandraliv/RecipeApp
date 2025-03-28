@@ -111,13 +111,17 @@ class HomeFragment : Fragment() {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }
-        // In your Fragment or Activity, observe the `noMoreRecipes` LiveData
-        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner, Observer { noMore ->
-            if (noMore) {
+        // Observe the "No More Recipes Available" state
+        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner, Observer { noMoreRecipes ->
+            if (noMoreRecipes) {
+                // Show the "No More Recipes Available" message
                 binding.textHome.text = getString(R.string.no_more_recipes_available)
                 binding.textHome.visibility = View.VISIBLE
+                binding.loadMoreButton.visibility = View.GONE
             } else {
+                // Hide the "No Recipes Available" message
                 binding.textHome.visibility = View.GONE
+                binding.loadMoreButton.visibility = View.VISIBLE
             }
         })
 
