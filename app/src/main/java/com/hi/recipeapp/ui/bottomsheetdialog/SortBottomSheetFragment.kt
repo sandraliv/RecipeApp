@@ -13,11 +13,16 @@ import com.hi.recipeapp.classes.SortType
 class SortBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var onSortSelected: (SortType) -> Unit
-    private var currentSortType: SortType? = null  // Track the current sort type
+    private var currentSortType: SortType? = null
 
     // Set the callback to handle the sort selection
     fun setOnSortSelectedListener(callback: (SortType) -> Unit) {
         this.onSortSelected = callback
+    }
+
+    // Set the initial sort type to be passed from HomeFragment
+    fun setCurrentSortType(sortType: SortType) {
+        currentSortType = sortType
     }
 
     override fun onCreateView(
@@ -36,44 +41,41 @@ class SortBottomSheetFragment : BottomSheetDialogFragment() {
 
         // Set up button click listeners
         view.findViewById<Button>(R.id.sortByRating).setOnClickListener {
-            // Update the current sort type
             currentSortType = SortType.RATING
 
             // Show the corresponding icon for the active sort
             iconSortByRating.visibility = View.VISIBLE
-            iconSortByDate.visibility = View.GONE  // Hide the other icon
+            iconSortByDate.visibility = View.INVISIBLE
 
             // Pass the selected sort type back via the listener
             onSortSelected(SortType.RATING)
-            dismiss()  // Dismiss the bottom sheet after selection
+            dismiss()
         }
 
         view.findViewById<Button>(R.id.sortByDate).setOnClickListener {
-            // Update the current sort type
             currentSortType = SortType.DATE
 
             // Show the corresponding icon for the active sort
-            iconSortByRating.visibility = View.GONE  // Hide the other icon
+            iconSortByRating.visibility = View.INVISIBLE
             iconSortByDate.visibility = View.VISIBLE
 
-            // Pass the selected sort type back via the listener
             onSortSelected(SortType.DATE)
-            dismiss()  // Dismiss the bottom sheet after selection
+            dismiss()
         }
 
-        // Initially, show the correct icon based on the current sort type
+        // Set initial icon visibility based on currentSortType
         when (currentSortType) {
             SortType.RATING -> {
                 iconSortByRating.visibility = View.VISIBLE
-                iconSortByDate.visibility = View.GONE
+                iconSortByDate.visibility = View.INVISIBLE
             }
             SortType.DATE -> {
-                iconSortByRating.visibility = View.GONE
+                iconSortByRating.visibility = View.INVISIBLE
                 iconSortByDate.visibility = View.VISIBLE
             }
             else -> {
-                iconSortByRating.visibility = View.GONE
-                iconSortByDate.visibility = View.GONE
+                iconSortByRating.visibility = View.INVISIBLE
+                iconSortByDate.visibility = View.INVISIBLE
             }
         }
     }

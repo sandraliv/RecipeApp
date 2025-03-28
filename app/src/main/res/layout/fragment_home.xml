@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
-    android:paddingBottom="35dp">
+    android:paddingBottom="35dp"
+    android:layout_marginBottom="30dp">
 
     <!-- TextView above the button container -->
     <TextView
@@ -73,11 +74,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:paddingBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_container"
-        android:layout_marginBottom="56dp" />
+        android:layout_marginBottom="70dp" />
 
     <!-- Placeholder Text when no recipes are available -->
     <TextView

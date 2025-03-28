@@ -1,7 +1,10 @@
 package com.hi.recipeapp.ui.home
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -32,6 +35,7 @@ class RecipeAdapter(
     }
 
     inner class RecipeViewHolder(private val binding: ItemRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
+        private var currentIndex = 0  // Keep track of the current image index
 
         fun bind(recipe: RecipeCard, starSize: Int, spaceBetweenStars: Int) {
             Log.d("RecipeViewHolder", "isFavoritedByUser: ${recipe.isFavoritedByUser}")
@@ -95,40 +99,92 @@ class RecipeAdapter(
             binding.root.setOnClickListener {
                 onClick(recipe)
             }
+            // Handle image click to navigate to recipe details (image click)
+            binding.imageSwitcher.setOnClickListener {
+                onClick(recipe)
+            }
 
-            // Handle additional images inside the HorizontalScrollView
-            loadImagesIntoHorizontalScrollView(recipe.imageUrls) // All images except the first one
+            // Handle image switching using ImageSwitcher and gesture detector
+            loadImagesIntoImageSwitcher(recipe.imageUrls) // Load the images into ImageSwitcher
         }
 
-        private fun loadImagesIntoHorizontalScrollView(imageUrls: List<String>?) {
-            val imageLayout = binding.imageLayout  // LinearLayout inside HorizontalScrollView
-            imageLayout.removeAllViews()  // Clear any existing images
+        @SuppressLint("ClickableViewAccessibility")
+        private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
+            val imageSwitcher = binding.imageSwitcher
 
-            // If imageUrls is not null or empty, load images
-            imageUrls?.forEach { url ->
-                val imageView = ImageView(binding.root.context)
+            if (!imageUrls.isNullOrEmpty()) {
+                currentIndex = 0  // Initialize the image index
+                loadImage(imageUrls[currentIndex])  // Load the first image
 
-                val layoutParams = LinearLayout.LayoutParams(
-                    binding.root.context.resources.getDimensionPixelSize(R.dimen.card_image_width),  // Set width to match parent
-                    binding.root.context.resources.getDimensionPixelSize(R.dimen.card_image_height)  // Set fixed height
-                )
+                // Setup Gesture Detector for swipe actions
+                val gestureDetector = GestureDetector(binding.root.context, object : GestureDetector.OnGestureListener {
+                    override fun onDown(e: MotionEvent): Boolean {
+                        return true
+                    }
 
-                layoutParams.setMargins(0, 0, 0, 4)  // Adjust margin between images
-                imageView.layoutParams = layoutParams
+                    override fun onFling(
+                        e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
+                    ): Boolean {
+                        val SWIPE_THRESHOLD = 100
+                        val SWIPE_VELOCITY_THRESHOLD = 100
 
-                Glide.with(binding.root.context)
-                    .load(url)
-                    .transform(CenterCrop())  // Apply centerCrop transformation
-                    .placeholder(R.drawable.placeholder)  // Optional placeholder
-                    .error(R.drawable.error_image)  // Optional error image
-                    .into(imageView)
+                        // Detecting horizontal swipe (left/right)
+                        if (e1 != null) {
+                            if (Math.abs(e1.y - e2.y) < SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                                if (e1.x - e2.x > SWIPE_THRESHOLD) { // Swiped left
+                                    showNextImage(imageUrls)
+                                } else if (e2.x - e1.x > SWIPE_THRESHOLD) { // Swiped right
+                                    showPreviousImage(imageUrls)
+                                }
+                            }
+                        }
+                        return true
+                    }
 
-                imageLayout.addView(imageView)  // Add the ImageView to the layout
+                    override fun onLongPress(e: MotionEvent) {}
+                    override fun onScroll(
+                        e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float
+                    ): Boolean {
+                        return true
+                    }
+
+                    override fun onShowPress(e: MotionEvent) {}
+                    override fun onSingleTapUp(e: MotionEvent): Boolean {
+                        return true
+                    }
+                })
+
+                binding.imageSwitcher.setOnTouchListener { v, event ->
+                    gestureDetector.onTouchEvent(event)
+                    true
+                }
             }
         }
 
+        private fun loadImage(imageUrl: String) {
+            Glide.with(binding.root.context)
+                .load(imageUrl)
+                .transform(CenterCrop())
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error_image)
+                .into(binding.imageSwitcher.currentView as ImageView)
+        }
+
+        private fun showNextImage(imageUrls: List<String>) {
+            currentIndex = (currentIndex + 1) % imageUrls.size
+            loadImage(imageUrls[currentIndex])
+        }
+
+        private fun showPreviousImage(imageUrls: List<String>) {
+            currentIndex = if (currentIndex - 1 < 0) {
+                imageUrls.size - 1
+            } else {
+                currentIndex - 1
+            }
+            loadImage(imageUrls[currentIndex])
+        }
+
         private fun updateHeartButtonVisibility(recipe: RecipeCard) {
-            // Show the appropriate button based on the recipe's favorite status
             if (recipe.isFavoritedByUser) {
                 binding.filledHeartButton.visibility = View.VISIBLE
                 binding.emptyHeartButton.visibility = View.GONE
@@ -139,7 +195,6 @@ class RecipeAdapter(
         }
     }
 
-    // DiffUtil callback to optimize list updates
     class RecipeDiffCallback : DiffUtil.ItemCallback<RecipeCard>() {
         override fun areItemsTheSame(oldItem: RecipeCard, newItem: RecipeCard): Boolean {
             return oldItem.id == newItem.id

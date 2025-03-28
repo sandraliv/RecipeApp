@@ -32,8 +32,14 @@ class HomeViewModel @Inject constructor(
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
+
+    // Add this to your ViewModel
+    private val _noMoreRecipes = MutableLiveData<Boolean>(false)
+    val noMoreRecipes: LiveData<Boolean> = _noMoreRecipes
+
+
     private var pageNumber = 0  // Track the page number for pagination
-    private val pageSize = 10    // Define how many items to load per page
+    private val pageSize = 20    // Define how many items to load per page
 
 
     init {
@@ -147,12 +153,20 @@ class HomeViewModel @Inject constructor(
                     // Combine the current list of recipes with the new ones
                     val updatedRecipes = _recipes.value?.toMutableList() ?: mutableListOf()
                     updatedRecipes.addAll(newRecipes ?: emptyList())
-                    _recipes.value = updatedRecipes
-                    _isLoading.value = false
+
+                    // Check if there are no more recipes to load
+                    if (newRecipes.isNullOrEmpty()) {
+                        _noMoreRecipes.value = true // Set this to true to show "No More Recipes Available" message
+                        binding.loadMoreButton.visibility = View.GONE
+                    } else {
+                        _recipes.value = updatedRecipes
+                        _isLoading.value = false
+                    }
                 }
             }
         }
     }
+
 
     fun updateSortType(newSortType: SortType) {
         // Optional: Check if the sort type has already been set to avoid unnecessary fetches

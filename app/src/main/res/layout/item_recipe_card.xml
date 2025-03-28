@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="193dp"
+    android:layout_height="218dp"
     android:layout_margin="6dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
@@ -17,24 +17,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Horizontal ScrollView for additional images -->
-            <android.widget.HorizontalScrollView
-                android:id="@+id/horizontalScrollView"
+            <ImageSwitcher
+                android:id="@+id/imageSwitcher"
                 android:layout_width="match_parent"
-                android:layout_height="125dp">
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:inAnimation="@android:anim/slide_in_left"
+                android:outAnimation="@android:anim/slide_out_right">
 
-                <!-- LinearLayout to hold all the images horizontally -->
-                <LinearLayout
-                    android:id="@+id/imageLayout"
+                <ImageView
+                    android:id="@+id/switcherImageView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-
-                    <!-- Dynamically loaded images will appear here -->
-                </LinearLayout>
-            </android.widget.HorizontalScrollView>
-
+                    android:layout_height="125dp"
+                    android:src="@drawable/placeholder"
+                    android:scaleType="centerCrop" />
+            </ImageSwitcher>
             <!-- Heart Buttons: Empty heart and Filled heart, positioned at the top of images -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -75,6 +72,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:text="Recipe Name"
+            android:fontFamily="@font/playfair_display"
             android:textSize="13sp"
             android:textStyle="bold" />
 

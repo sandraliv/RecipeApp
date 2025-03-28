@@ -37,4 +37,12 @@
     <string name="sort_by">Sort By</string>
     <string name="no_recipes_available">No recipes available</string>
     <string name="menu_button">menu</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="appetizer">Appetizer</string>
+    <string name="main_course">Main Course</string>
+    <string name="snack">Snack</string>
+    <string name="dessert">Dessert</string>
+    <string name="baking">Baking</string>
+    <string name="selected_category">selected category</string>
+    <string name="no_more_recipes_available">No more recipes availible</string>
 </resources>
