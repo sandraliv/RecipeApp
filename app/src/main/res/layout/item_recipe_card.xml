@@ -85,7 +85,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
-            android:text="Recipe Description"
+            android:text="@string/recipe_description"
             android:textColor="@android:color/darker_gray"
             android:textSize="11sp" />
 
@@ -101,6 +101,14 @@
             android:gravity="end|bottom"
             android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/delete_recipe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_recipe"
+                android:textColor="@color/redd"
+                android:visibility="gone"
+                />
             <!-- Dynamically added Rating stars -->
             <LinearLayout
                 android:id="@+id/starRatingLayout"
@@ -116,7 +124,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="(50)"
+                android:text="@string/_50"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="11sp" />
         </LinearLayout>

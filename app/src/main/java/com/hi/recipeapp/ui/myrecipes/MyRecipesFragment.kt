@@ -54,7 +54,7 @@ class MyRecipesFragment : Fragment() {
                 myRecipesViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars
         )
 
         userRecipeAdapter = UserRecipeAdapter { userRecipe ->

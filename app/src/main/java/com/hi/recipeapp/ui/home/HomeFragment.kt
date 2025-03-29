@@ -40,6 +40,8 @@ class HomeFragment : Fragment() {
         // Initially hide the "Load More" button
         binding.loadMoreButton.visibility = View.GONE
 //      Initialize the adapter with the click listener and favorite click handler
+
+        // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
                 val recipeId = recipe.id
@@ -50,7 +52,7 @@ class HomeFragment : Fragment() {
                 homeViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars // Pass spaceBetweenStars
         )
 
         // Observe the loading state

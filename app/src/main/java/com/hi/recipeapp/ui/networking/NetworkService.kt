@@ -6,6 +6,7 @@ import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.RecipeTag
+import com.hi.recipeapp.classes.User
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.classes.UserFullRecipe
@@ -43,6 +44,14 @@ interface NetworkService {
         @Query("sort") sort: String = "RATING"
     ): Call<List<RecipeCard>>
 
+    @GET("users")
+    suspend fun getAllUsers(
+    ): Response<List<User>>
+
+    @DELETE("users/{id}")
+    suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
+
+
 
     @GET("recipes/all")
     fun getAllRecipes(
@@ -70,6 +79,17 @@ interface NetworkService {
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
 
+    @GET("recipes/byDate")
+    fun getRecipesSortedByDate(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<List<RecipeCard>>
+
+    @GET("recipes/highestRated")
+    fun getRecipesSortedByRating(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<List<RecipeCard>>
 
     @GET("users/{id}/getUserFav")
     suspend fun getUserFavorites(@Path("id") userId: Int): Response<List<RecipeCard>>
