@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="25dp"
-    android:paddingBottom="35dp"
+    android:layout_marginBottom="80dp"
     tools:context=".ui.fullrecipe.FullRecipeFragment">
 
     <LinearLayout
@@ -13,8 +12,7 @@
         android:orientation="vertical"
         android:paddingStart="8dp"
         android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="100dp">
+        android:paddingEnd="8dp">
 
         <!-- ProgressBar to show loading state -->
         <ProgressBar
@@ -32,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <!-- Heart Buttons: Empty heart and Filled heart -->
             <LinearLayout
@@ -137,7 +135,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="8dp"
-                    android:fontFamily="@font/playfair_display"
                     android:paddingBottom="8dp"
                     android:textSize="16sp" />
 
@@ -166,7 +163,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="8dp"
-                    android:fontFamily="@font/playfair_display_semibold"
                     android:paddingBottom="8dp"
                     android:text="Instructions"
                     android:textSize="18sp" />

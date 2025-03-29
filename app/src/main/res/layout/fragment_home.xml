@@ -42,26 +42,28 @@
         <!-- Category Button aligned to start -->
         <Button
             android:id="@+id/categoryButton"
-            style="@style/MyTextButton"
+            style="@style/MyTextButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:fontFamily="@font/playfair_display_semibold"
             android:text="Category"
+
             android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Sort By Button aligned to end -->
         <Button
             android:id="@+id/sortByButton"
-            style="@style/MyTextButton"
+            style="@style/MyTextButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:drawableLeft="@drawable/ic_sort"
             android:drawablePadding="20dp"
             android:text="@string/sort_by"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textAllCaps="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -69,19 +71,22 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- RecyclerView for displaying recipes -->
+
+    <!-- Placeholder Text when no recipes are available -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recipe_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:paddingBottom="30dp"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_container"
-        android:layout_marginBottom="70dp" />
+        app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Placeholder Text when no recipes are available -->
     <TextView
         android:id="@+id/text_home"
         android:layout_width="match_parent"
@@ -102,11 +107,14 @@
         android:layout_height="wrap_content"
         android:text="@string/load_more"
         android:visibility="gone"
-        style="@style/MyTextButton"
+        android:backgroundTint="@color/white"
+        android:elevation="5dp"
+        android:layout_marginBottom="30dp"
         android:layout_marginTop="2dp"
         android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/recipe_recycler_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

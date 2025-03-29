@@ -37,7 +37,6 @@ class HomeViewModel @Inject constructor(
     private val _noMoreRecipes = MutableLiveData<Boolean>(false)
     val noMoreRecipes: LiveData<Boolean> = _noMoreRecipes
 
-
     private var pageNumber = 0  // Track the page number for pagination
     private val pageSize = 20    // Define how many items to load per page
 
@@ -49,7 +48,6 @@ class HomeViewModel @Inject constructor(
     fun fetchRecipesSortedBy(sortType: SortType) {
         val userId = sessionManager.getUserId()
         _isLoading.value = true
-        // Clear the existing recipes list before fetching new data
         _recipes.value = null
         val sortString = sortType.name.lowercase()
 
@@ -59,24 +57,12 @@ class HomeViewModel @Inject constructor(
                 _errorMessage.value = error
                 _isLoading.value = false
             } else {
-                // Log each recipe's image URLs directly
-                recipes?.forEach { recipe ->
-                    val imageUrls = recipe.imageUrls  // Access imageUrls directly
-                    if (imageUrls.isNullOrEmpty()) {
-                        Log.d("HomeViewModel", "Recipe ID: ${recipe.id} has no images.")
-                    } else {
-                        imageUrls.forEach { url ->
-                            Log.d("HomeViewModel", "Recipe ID: ${recipe.id} Image URL: $url")
-                        }
-                    }
-                }
-
-                // Step 2: Fetch the user's favorite recipes
+                // Step 2: Fetch the user's favorite recipes and update the status
                 if (userId != -1) {
                     viewModelScope.launch {
                         val userFavorites = userService.getUserFavorites(userId).getOrNull() ?: emptyList()
 
-                        // Step 3: Mark favorited recipes
+                        // Step 3: Mark the favorited status correctly
                         recipes?.forEach { recipe ->
                             recipe.isFavoritedByUser = userFavorites.any { it.id == recipe.id }
                         }
@@ -97,14 +83,16 @@ class HomeViewModel @Inject constructor(
 
 
 
+
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
             if (userId != -1) {
-                sessionManager.setFavoritedStatus(userId, recipe.id, isFavorited)
-
-                // Update the backend
                 try {
+                    // Step 1: Update the favorited status in SessionManager
+                    sessionManager.setFavoritedStatus(userId, recipe.id, isFavorited)
+
+                    // Step 2: Update the backend (add or remove from favorites)
                     if (isFavorited) {
                         recipeService.addRecipeToFavorites(recipe.id)
                         _favoriteActionMessage.value = "Recipe added to favorites"
@@ -113,16 +101,31 @@ class HomeViewModel @Inject constructor(
                         _favoriteActionMessage.value = "Recipe removed from favorites"
                     }
 
-                    // Update the local list with the new favorited status
+                    // Step 3: Update the local list of recipes with the new favorited status
                     _recipes.value = _recipes.value?.map {
                         if (it.id == recipe.id) it.copy(isFavoritedByUser = isFavorited) else it
                     }
+
+                    // Step 4: Update the favorite recipe IDs in SessionManager
+                    val currentFavorites = sessionManager.getFavoriteRecipeIds().toMutableSet()
+                    if (isFavorited) {
+                        currentFavorites.add(recipe.id)  // Add to favorites set
+                    } else {
+                        currentFavorites.remove(recipe.id)  // Remove from favorites set
+                    }
+
+                    // Save the updated favorite recipe IDs to SharedPreferences
+                    sessionManager.saveFavoriteRecipeIds(currentFavorites)
+
                 } catch (e: Exception) {
                     _favoriteActionMessage.value = "Failed to update favorite status"
+                    Log.e("HomeViewModel", "Error updating favorite status: ${e.message}")
                 }
             }
         }
     }
+
+
 
     fun loadMoreRecipes() {
         pageNumber++ // Increment the page number to load the next page
@@ -134,36 +137,35 @@ class HomeViewModel @Inject constructor(
                 _isLoading.value = false
             } else {
                 val userId = sessionManager.getUserId()
-                viewModelScope.launch {
-                    // If the user is logged in, fetch their favorite recipes
-                    if (userId != -1) {
-                        val userFavorites = userService.getUserFavorites(userId).getOrNull() ?: emptyList()
 
-                        // Mark the new recipes as favorited or not based on the user's favorites
-                        newRecipes?.forEach { recipe ->
-                            recipe.isFavoritedByUser = userFavorites.any { it.id == recipe.id }
-                        }
-                    } else {
-                        // If the user is not logged in, mark all recipes as not favorited
-                        newRecipes?.forEach { recipe ->
+                // Check if there are any new recipes
+                if (newRecipes != null && newRecipes.isNotEmpty()) {
+                    // Use the sessionManager to mark the new recipes based on the stored favorited status
+                    newRecipes.forEach { recipe ->
+                        // Check if the user is logged in and then use sessionManager to get the favorited status
+                        if (userId != -1) {
+                            val isFavorited = sessionManager.getFavoritedStatus(userId, recipe.id)
+                            recipe.isFavoritedByUser = isFavorited
+                        } else {
+                            // If not logged in, mark the recipe as not favorited
                             recipe.isFavoritedByUser = false
                         }
                     }
 
                     // Combine the current list of recipes with the new ones
                     val updatedRecipes = _recipes.value?.toMutableList() ?: mutableListOf()
-                    updatedRecipes.addAll(newRecipes ?: emptyList())
+                    updatedRecipes.addAll(newRecipes)
 
                     // Update the recipes list
                     _recipes.value = updatedRecipes
-
-                    // Check if there are no more recipes to load
-                    if (newRecipes.isNullOrEmpty()) {
-                        _noMoreRecipes.value = true // This will notify the UI to show "No More Recipes Available"
-                    }
-
-                    _isLoading.value = false
                 }
+
+                // Check if there are no more recipes to load
+                if (newRecipes.isNullOrEmpty()) {
+                    _noMoreRecipes.value = true // This will notify the UI to show "No More Recipes Available"
+                }
+
+                _isLoading.value = false
             }
         }
     }
@@ -178,8 +180,6 @@ class HomeViewModel @Inject constructor(
             fetchRecipesSortedBy(newSortType)
         }
     }
-
-
 }
 
 

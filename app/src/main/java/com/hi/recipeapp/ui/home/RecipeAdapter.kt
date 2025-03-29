@@ -110,7 +110,6 @@ class RecipeAdapter(
 
         @SuppressLint("ClickableViewAccessibility")
         private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
-            val imageSwitcher = binding.imageSwitcher
 
             if (!imageUrls.isNullOrEmpty()) {
                 currentIndex = 0  // Initialize the image index
@@ -161,14 +160,25 @@ class RecipeAdapter(
             }
         }
 
-        private fun loadImage(imageUrl: String) {
-            Glide.with(binding.root.context)
-                .load(imageUrl)
-                .transform(CenterCrop())
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.error_image)
-                .into(binding.imageSwitcher.currentView as ImageView)
+        private fun loadImage(imageUrl: String?) {
+            // Check if the imageUrl is null or empty
+            if (imageUrl.isNullOrEmpty()) {
+                // If the URL is null or empty, load the placeholder image
+                Glide.with(binding.root.context)
+                    .load(R.drawable.placeholder) // Placeholder image
+                    .transform(CenterCrop())
+                    .into(binding.imageSwitcher.currentView as ImageView)
+            } else {
+                // If the imageUrl is valid, load it
+                Glide.with(binding.root.context)
+                    .load(imageUrl)
+                    .transform(CenterCrop())
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.error_image)
+                    .into(binding.imageSwitcher.currentView as ImageView)
+            }
         }
+
 
         private fun showNextImage(imageUrls: List<String>) {
             currentIndex = (currentIndex + 1) % imageUrls.size

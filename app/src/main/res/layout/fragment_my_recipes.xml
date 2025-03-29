@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="2dp"
-        android:weightSum="3.9">
+        android:weightSum="2.01">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/favoritesButton"
@@ -21,7 +21,7 @@
             android:textColor="@color/button_text_selector"
             android:textSize="14sp"
             android:gravity="center"
-            android:layout_weight="1.3"
+            android:layout_weight="1"
             android:layout_marginHorizontal="2dp"
             android:padding="10dp" />
 
@@ -43,30 +43,7 @@
             android:textSize="14sp"
             android:gravity="center"
             android:padding="10dp"
-            android:layout_weight="1.3"
-            android:layout_marginHorizontal="2dp"
-            />
-
-        <!-- Vertical Line -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/rosybrown"
-
-            android:layout_marginHorizontal="2dp"
-            android:layout_weight="0"/>
-
-        <!-- My Recipes Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/calendar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="My Recipes"
-            android:textColor="@color/button_text_selector"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:padding="10dp"
-            android:layout_weight="1.3"
+            android:layout_weight="1"
             android:layout_marginHorizontal="2dp"
             />
 

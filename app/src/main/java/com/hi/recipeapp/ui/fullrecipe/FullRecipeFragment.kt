@@ -3,22 +3,20 @@ package com.hi.recipeapp.ui.fullrecipe
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -194,6 +192,10 @@ class FullRecipeFragment : Fragment() {
             val tableRow = TableRow(requireContext()).apply {
                 gravity = Gravity.CENTER_VERTICAL
                 setPadding(0, 8, 0, 8)
+                layoutParams = TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+                )
             }
 
             // Create the measurement TextView
@@ -202,14 +204,18 @@ class FullRecipeFragment : Fragment() {
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                 gravity = Gravity.CENTER
                 setPadding(16, 0, 16, 0)
+                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f) // Distribute space equally
             }
 
             // Create the ingredient name TextView
             val ingredientNameTextView = TextView(requireContext()).apply {
                 text = formattedIngredientName
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                gravity = Gravity.CENTER
+                gravity = Gravity.START
                 setPadding(16, 0, 16, 0)
+                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f) // Ingredient takes more space
+                maxLines = 2  // Allows wrapping into 2 lines if needed
+                ellipsize = TextUtils.TruncateAt.END  // Handle overflow text gracefully
             }
 
             // Create the CheckBox for the ingredient
@@ -221,7 +227,17 @@ class FullRecipeFragment : Fragment() {
                     ingredientNameTextView.paintFlags = strikeThroughFlag
                 }
                 setPadding(16, 0, 16, 0)
+
+                // Use WRAP_CONTENT for CheckBox and avoid setting weight to 0f
+                layoutParams = TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    gravity = Gravity.CENTER
+                }
             }
+
+
 
             tableRow.addView(ingredientCheckBox)
             tableRow.addView(measurementTextView)

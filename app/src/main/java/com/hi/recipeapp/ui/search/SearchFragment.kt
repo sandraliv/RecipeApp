@@ -12,6 +12,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
@@ -27,11 +28,9 @@ class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-
     private val searchViewModel: SearchViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
     private val selectedTags = mutableSetOf<RecipeTag>() // Only tags now
-
 
     private val starSize = 30
     private val spaceBetweenStars = 3
@@ -43,14 +42,29 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-
+        setupRecyclerView()
         setupSearchView()
         setupTagSelection()
-        setupRecyclerView()
+        setupSortButton()
         observeViewModel()
 
-        // Handle sorting button click
-        setupSortButton()
+        // Observe the loading state
+        searchViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                Log.d("SearchFragment", "Loading data...")
+                binding.progressBar.visibility = View.VISIBLE // Show progress bar
+                binding.recipeCardContainer.visibility = View.GONE // Hide the recipe list
+                binding.loadMoreButton.isEnabled = false // Disable Load More button while loading
+                binding.loadMoreButton.visibility = View.GONE
+            } else {
+                Log.d("SearchFragment", "Loading complete.")
+                binding.progressBar.visibility = View.GONE // Hide progress bar
+                binding.recipeCardContainer.visibility = View.VISIBLE // Show recipe list
+                binding.loadMoreButton.isEnabled = true // Enable Load More button once loading is complete
+                binding.loadMoreButton.visibility = View.GONE
+            }
+        }
+
 
         // Observe the result of adding recipe to favorites
         searchViewModel.favoriteResult.observe(viewLifecycleOwner) { result ->
@@ -103,7 +117,10 @@ class SearchFragment : Fragment() {
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
                 currentSortType = sortType
                 searchViewModel.updateSortType(currentSortType)
+                // Manually scroll to the top of the RecyclerView
+                binding.recipeCardContainer.scrollToPosition(0)
             }
+
 
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
@@ -120,13 +137,18 @@ class SearchFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // Convert selectedTags (Set<RecipeTag>) to Set<String> before passing it
                 val tagNames = selectedTags.map { it.name }.toSet()
+                binding.recipeCardContainer.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.loadMoreButton.visibility = View.GONE
                 searchViewModel.searchByQuery(query ?: "", tagNames)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Convert selectedTags (Set<RecipeTag>) to Set<String> before passing it
                 val tagNames = selectedTags.map { it.name }.toSet()
+                binding.recipeCardContainer.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.loadMoreButton.visibility = View.GONE
                 searchViewModel.searchByQuery(newText ?: "", tagNames)
                 return true
             }
@@ -137,7 +159,6 @@ class SearchFragment : Fragment() {
         val chipGroup = binding.chipGroupTags
         chipGroup.removeAllViews()
 
-        // Add chips dynamically for tags
         RecipeTag.values().forEach { tag ->
             val chip = Chip(context)
             chip.text = tag.getDisplayName()
@@ -167,27 +188,52 @@ class SearchFragment : Fragment() {
             onFavoriteClick = { recipe, isFavorited ->
                 searchViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
-            starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars  // Pass spaceBetweenStars
+            starSize = starSize,
+            spaceBetweenStars = spaceBetweenStars
         )
         // Use GridLayoutManager with the defined number of columns
         val gridLayoutManager = GridLayoutManager(context, gridColumnCount)
-
         binding.recipeCardContainer.apply {
-            layoutManager = gridLayoutManager  // Set the layout manager to GridLayoutManager
+            layoutManager = gridLayoutManager
             adapter = recipeAdapter
         }
+
+        // Detect if the user has scrolled to the bottom of the RecyclerView
+        binding.recipeCardContainer.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as GridLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                // If the user has scrolled to the bottom, show the "Load More" button
+                if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
+                    if (!searchViewModel.isLoading.value!! && !searchViewModel.noMoreRecipes.value!!) {
+                        binding.loadMoreButton.visibility = View.VISIBLE
+                    }
+                } else {
+                    binding.loadMoreButton.visibility = View.GONE
+                }
+            }
+        })
     }
+
 
     private fun observeViewModel() {
         // Observe search results from the ViewModel and update RecyclerView
         searchViewModel.searchResults.observe(viewLifecycleOwner) { results ->
             if (results.isNullOrEmpty()) {
                 binding.textDashboard.text = "No recipes found."
+                binding.progressBar.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.GONE
+                binding.loadMoreButton.visibility = View.GONE
+
             } else {
                 binding.textDashboard.text = ""
                 binding.recipeCardContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.loadMoreButton.visibility = View.GONE
                 recipeAdapter.submitList(results)
                 Log.d("SEARCH_RESULTS", "Submitted list to adapter: $results")
             }
@@ -202,8 +248,6 @@ class SearchFragment : Fragment() {
         }
 
     }
-
-
 
     fun resetSearchState() {
         binding.textDashboard.text = ""
