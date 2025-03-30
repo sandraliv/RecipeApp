@@ -10,6 +10,7 @@ import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.classes.UserRecipeCard
 import com.hi.recipeapp.ui.networking.NetworkService
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -91,15 +92,21 @@ class UserService @Inject constructor(
             Result.failure(e)
         }
 
-
     }
 
+    suspend fun uploadProfilePic(
+        userId: Int,
+        photoPart: MultipartBody.Part
+    ): Response<Map<String, String>> {
+        return networkService.postProfilePic(userId, photoPart)
+    }
 
     suspend fun getUserFavorites(userId: Int):
             Result<List<RecipeCard>> {
         return try {
             val response = networkService.getUserFavorites(userId)
             if (response.isSuccessful) {
+
                 Result.success(response.body() ?: emptyList())
             } else {
                 Result.failure(Exception("Failed to fetch favorite recipes"))
@@ -141,7 +148,6 @@ class UserService @Inject constructor(
     suspend fun getUserRecipes(
         page: Int = 0, size: Int = 10): Result<List<UserRecipeCard>> {
         return try {
-
             val userId = sessionManager.getUserId()
             if (userId == -1) {
                 return Result.failure(Exception("User is not logged in"))

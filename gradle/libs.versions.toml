@@ -2,6 +2,7 @@
 agp = "8.8.0"
 artifactid = "version"
 glide = "4.12.0"
+ksp = "1.9.24-1.0.20"
 kotlin = "1.9.24"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -13,7 +14,6 @@ constraintlayout = "2.1.4"
 lifecycleLivedataKtx = "2.6.1"
 lifecycleViewmodelKtx = "2.6.1"
 navigationFragmentKtx = "2.6.0"
-navigationSafeArgsGradlePlugin = "2.8.9"
 navigationUiKtx = "2.6.0"
 retrofit = "2.9.0"
 okhttp = "4.9.3"
@@ -26,8 +26,6 @@ hilt = "2.55"
 navigationFragment = "2.8.7"
 
 [libraries]
-androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationFragment" }
-androidx-navigation-safe-args-gradle-plugin-v289 = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
 artifactid = { module = "groupId:artifactId", version.ref = "artifactid" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
@@ -55,8 +53,12 @@ androidx-preference = { group = "androidx.preference", name = "preference", vers
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version = "2.6.1" }
+androidx-room-ktx     = { module = "androidx.room:room-ktx",     version = "2.6.1" }
+androidx-room-compiler= { module = "androidx.room:room-compiler",version = "2.6.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-ksp          = { id = "com.google.devtools.ksp", version.ref = "ksp" }
