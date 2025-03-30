@@ -10,7 +10,10 @@ import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import com.hi.recipeapp.classes.UserRecipeCard
+import com.hi.recipeapp.data.local.Recipe
+import com.hi.recipeapp.data.local.RecipeDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,7 +21,8 @@ import javax.inject.Inject
 class MyRecipesViewModel @Inject constructor(
     private val userService: UserService,
     private val recipeService: RecipeService,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val recipeDao: RecipeDao
 ) : ViewModel() {
 
     private val _favoriteRecipes = MutableLiveData<List<RecipeCard>?>()
@@ -59,11 +63,20 @@ class MyRecipesViewModel @Inject constructor(
                 if (userId != -1) {
                     val result = userService.getUserFavorites(userId)
                     result.onSuccess { favoriteRecipes ->
-                        favoriteRecipes.forEach { recipe ->
-                            recipe.isFavoritedByUser = true
-                        }
-                        _favoriteRecipes.value = favoriteRecipes
+
+                        Log.d("TEST", "EKKI VILLA Í VM")
                         _isLoading.value = false
+                        favoriteRecipes.forEach { it.isFavoritedByUser = true }
+                        favoriteRecipes.forEach { recipe ->
+                            Log.d("Recipe", recipe.title)
+                        }
+
+                        _favoriteRecipes.value = favoriteRecipes
+
+                        // Save to local DB directly via DAO
+                        val entities = favoriteRecipes.map { it.toEntity() }
+                        recipeDao.insertAll(entities)
+
                     }
                     result.onFailure { error ->
                         _errorMessage.value = error.localizedMessage ?: "Failed to fetch favorite recipes"
@@ -104,4 +117,18 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
+
+    private fun RecipeCard.toEntity(): Recipe {
+        return Recipe(
+            id = id,
+            title = title,
+            description = description,
+            imageUrl = imageUrl,
+            averageRating = averageRating,
+            ratingCount = ratingCount,
+            tags = tags,
+            isFavoritedByUser = isFavoritedByUser
+        )
+    }
+
 }
