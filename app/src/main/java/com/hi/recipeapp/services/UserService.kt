@@ -9,6 +9,7 @@ import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.classes.UserRecipeCard
+import com.hi.recipeapp.data.local.Recipe
 import com.hi.recipeapp.ui.networking.NetworkService
 import okhttp3.MultipartBody
 import retrofit2.Call

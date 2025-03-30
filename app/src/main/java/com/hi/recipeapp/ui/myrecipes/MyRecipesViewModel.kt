@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
@@ -13,6 +14,7 @@ import com.hi.recipeapp.classes.UserRecipeCard
 import com.hi.recipeapp.data.local.Recipe
 import com.hi.recipeapp.data.local.RecipeDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,8 +61,41 @@ class MyRecipesViewModel @Inject constructor(
         _isLoading.value = true
         viewModelScope.launch {
             try {
+                val localFavorites = recipeDao.getAll().first()
+                if (localFavorites.isNotEmpty()) {
+                    _favoriteRecipes.value = localFavorites
+                    _isLoading.value = false
+                    Log.d("RECIPES TESTING", "I AM TAKING FROM DATABASE HELLO")
+                    getNewestFavouriteRecipes()
+                } else {
+                    fetchMyFavoriteRecipes()
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Database load failed: ${e.message}"
+                Log.d("DATABASE ERROR", "${e.message}")
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun getNewestFavouriteRecipes() {
+        viewModelScope.launch {
+            try {
+                fetchMyFavoriteRecipes() // just call the same suspend method
+            } catch (e: Exception) {
+                // If refresh fails, we still have the cached data
+                Log.e("FavoriteVM", "Refresh failed: ${e.message}")
+            }
+        }
+    }
+
+    private fun fetchMyFavoriteRecipes() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
                 val userId = sessionManager.getUserId()
                 if (userId != -1) {
+
                     val result = userService.getUserFavorites(userId)
                     result.onSuccess { favoriteRecipes ->
 
@@ -73,9 +108,10 @@ class MyRecipesViewModel @Inject constructor(
 
                         _favoriteRecipes.value = favoriteRecipes
 
-                        // Save to local DB directly via DAO
-                        val entities = favoriteRecipes.map { it.toEntity() }
-                        recipeDao.insertAll(entities)
+                        val recipeEntities = favoriteRecipes.map { it.toEntity() }
+                        recipeDao.insertAll(recipeEntities)
+
+                        Log.d("HALLOHEIMUR", "ÉG ER Í DABASE")
 
                     }
                     result.onFailure { error ->
@@ -123,7 +159,7 @@ class MyRecipesViewModel @Inject constructor(
             id = id,
             title = title,
             description = description,
-            imageUrl = imageUrl,
+            imageUrls = imageUrls,
             averageRating = averageRating,
             ratingCount = ratingCount,
             tags = tags,

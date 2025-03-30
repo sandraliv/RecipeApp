@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.UserFullRecipe
+import com.hi.recipeapp.data.local.Recipe
+import com.hi.recipeapp.data.local.RecipeDao
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserFullRecipeViewModel @Inject constructor(
-    private val userService: UserService
+    private val userService: UserService,
+    private val recipeDao: RecipeDao
 ) : ViewModel() {
 
     private val _userrecipe = MutableLiveData<UserFullRecipe?>()
@@ -36,8 +39,4 @@ class UserFullRecipeViewModel @Inject constructor(
         }
     }
 
-    fun clearData() {
-        _userrecipe.value = null
-        _errorMessage.value = null
-    }
 }

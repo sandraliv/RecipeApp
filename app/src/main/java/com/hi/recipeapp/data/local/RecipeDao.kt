@@ -12,6 +12,9 @@ interface RecipeDao {
     @Query("Select * FROM user_recipes")
     fun getAll(): Flow<List<RecipeCard>>
 
+    @Query("Select * FROM user_recipes WHERE id = :id")
+    fun findByPrimaryKey(id: Int): Recipe
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(recipes: List<Recipe>)
 }

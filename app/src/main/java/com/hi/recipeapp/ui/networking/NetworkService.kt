@@ -52,7 +52,6 @@ interface NetworkService {
     suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
 
 
-
     @GET("recipes/all")
     fun getAllRecipes(
         @Query("page") page: Int,       // The page number to fetch

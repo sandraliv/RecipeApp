@@ -3,7 +3,7 @@ package com.hi.recipeapp.classes
 import com.google.gson.annotations.SerializedName
 
 data class RecipeCard(
-    val imageUrls: List<String>?,
+    val imageUrls: List<String>,
     val title: String,
     val description: String,
     val averageRating: Double,
@@ -41,7 +41,7 @@ data class UserFullRecipe(
     val description: String,
     val id: Int,
     val instructions: String,
-    @SerializedName("ingredients") val ingredients: Map<String, String>
+    val ingredients: Map<String, String>
 )
 
 enum class RecipeTag {
