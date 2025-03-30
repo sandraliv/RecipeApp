@@ -46,21 +46,29 @@ class SearchViewModel @Inject constructor(
     private val pageSize = 10
     private var sortType = SortType.RATING
 
+
+
     // Define properties to store the current query and tags
     private var currentQuery: String = ""
     private var currentTags: Set<String>? = null
 
     init {
         // Initialize the search with an empty query and no tags
-        searchByQuery(query = "", tags = null)
+        searchByQuery(query = "", tags = null, sort = SortType.RATING)
     }
 
 
-    fun searchByQuery(query: String, tags: Set<String>?) {
+    fun searchByQuery(query: String, tags: Set<String>?, sort: SortType) {
         _errorMessage.value = null
         _isLoading.value = true
         pageNumber = 0  // Reset to the first page
-        Log.d("SEARCH_QUERY", "Query: $query, Tags: $tags")
+
+        // Update the current query, tags, and sort type
+        currentQuery = query
+        currentTags = tags
+        sortType = sort
+
+        Log.d("SEARCH_QUERY", "Query: $query, Tags: $tags, Sort: $sort")
 
         recipeService.searchRecipes(query, tags, pageNumber, pageSize, sortType.name.lowercase()) { recipes, error ->
             _isLoading.value = false
@@ -93,6 +101,7 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
+
 
 
 
@@ -177,10 +186,11 @@ class SearchViewModel @Inject constructor(
         if (newSortType != sortType) {
             sortType = newSortType
             pageNumber = 0  // Reset to first page when sort type changes
-            // Refetch the recipes with the new sort type, but maintain the current query and tags
-            searchByQuery(query = currentQuery, tags = currentTags)
+            // Re-fetch the results with the current query, tags, and updated sort type
+            searchByQuery(query = currentQuery, tags = currentTags, sort = newSortType)
         }
     }
+
 
 }
 
