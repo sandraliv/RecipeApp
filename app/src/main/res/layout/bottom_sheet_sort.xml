@@ -1,39 +1,66 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- ImageView for Rating Icon -->
-    <ImageView
-        android:id="@+id/iconSortByRating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:src="@drawable/ic_check"
-        android:visibility="gone" />
-
-    <!-- Button to Sort by Rating -->
-    <Button
-        android:id="@+id/sortByRating"
+    <!-- LinearLayout for Rating Icon and Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/sort_by_rating" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <!-- ImageView for Date Icon -->
-    <ImageView
-        android:id="@+id/iconSortByDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:src="@drawable/ic_check"
-        android:visibility="gone" />
+        <!-- ImageView for Rating Icon -->
+        <ImageView
+            android:id="@+id/iconSortByRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="selected sort"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
 
-    <!-- Button to Sort by Date -->
-    <Button
-        android:id="@+id/sortByDate"
+        <!-- Button to Sort by Rating -->
+        <Button
+            android:id="@+id/sortByRating"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/sort_by_rating" />
+    </LinearLayout>
+
+    <!-- LinearLayout for Date Icon and Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/sort_by_date" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- ImageView for Date Icon -->
+        <ImageView
+            android:id="@+id/iconSortByDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="selected sort"
+            android:src="@drawable/ic_check"
+            app:tint="@color/rosybrown"
+            android:visibility="invisible" />
+
+        <!-- Button to Sort by Date -->
+        <Button
+            android:id="@+id/sortByDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/sort_by_date" />
+    </LinearLayout>
 
 </LinearLayout>

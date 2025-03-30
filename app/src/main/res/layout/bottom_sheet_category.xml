@@ -1,43 +1,182 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <Button
-        android:id="@+id/categoryBreakfast"
+    <!-- LinearLayout for Breakfast Icon and Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Breakfast" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/categoryAppetizer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Appetizer" />
+        <!-- ImageView for Breakfast Icon -->
+        <ImageView
+            android:id="@+id/iconBreakfast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/selected_category"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
 
-    <Button
-        android:id="@+id/categoryMainCourse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Main Course" />
+        <!-- Button to select Breakfast -->
+        <Button
+            android:id="@+id/categoryBreakfast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/breakfast" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/categorySnack"
+    <!-- LinearLayout for Appetizer Icon and Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Snack" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/categoryDessert"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Dessert" />
+        <!-- ImageView for Appetizer Icon -->
+        <ImageView
+            android:id="@+id/iconAppetizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/selected_category"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
 
-    <Button
-        android:id="@+id/categoryBaking"
+        <!-- Button to select Appetizer -->
+        <Button
+            android:id="@+id/categoryAppetizer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/appetizer" />
+    </LinearLayout>
+
+    <!-- LinearLayout for Main Course Icon and Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Baking" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- ImageView for Main Course Icon -->
+        <ImageView
+            android:id="@+id/iconMainCourse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/selected_category"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
+
+        <!-- Button to select Main Course -->
+        <Button
+            android:id="@+id/categoryMainCourse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/main_course" />
+    </LinearLayout>
+
+    <!-- LinearLayout for Snack Icon and Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- ImageView for Snack Icon -->
+        <ImageView
+            android:id="@+id/iconSnack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/selected_category"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
+
+        <!-- Button to select Snack -->
+        <Button
+            android:id="@+id/categorySnack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/snack" />
+    </LinearLayout>
+
+    <!-- LinearLayout for Dessert Icon and Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- ImageView for Dessert Icon -->
+        <ImageView
+            android:id="@+id/iconDessert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/selected_category"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
+
+        <!-- Button to select Dessert -->
+        <Button
+            android:id="@+id/categoryDessert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/dessert" />
+    </LinearLayout>
+
+    <!-- LinearLayout for Baking Icon and Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- ImageView for Baking Icon -->
+        <ImageView
+            android:id="@+id/iconBaking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/selected_category"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            app:tint="@color/rosybrown" />
+
+        <!-- Button to select Baking -->
+        <Button
+            android:id="@+id/categoryBaking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/baking" />
+    </LinearLayout>
+
 </LinearLayout>
