@@ -140,7 +140,7 @@ class SearchFragment : Fragment() {
                 binding.recipeCardContainer.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.loadMoreButton.visibility = View.GONE
-                searchViewModel.searchByQuery(query ?: "", tagNames)
+                searchViewModel.searchByQuery(query ?: "", tagNames, currentSortType)
                 return true
             }
 
@@ -149,7 +149,7 @@ class SearchFragment : Fragment() {
                 binding.recipeCardContainer.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.loadMoreButton.visibility = View.GONE
-                searchViewModel.searchByQuery(newText ?: "", tagNames)
+                searchViewModel.searchByQuery(newText ?: "", tagNames, currentSortType)
                 return true
             }
         })
@@ -171,7 +171,7 @@ class SearchFragment : Fragment() {
                 }
                 // Convert selectedTags (Set<RecipeTag>) to Set<String> before passing it
                 val tagNames = selectedTags.map { it.name }.toSet()
-                searchViewModel.searchByQuery(binding.searchDashboard.query.toString(), tagNames)
+                searchViewModel.searchByQuery(binding.searchDashboard.query.toString(), tagNames, currentSortType)
             }
             chipGroup.addView(chip)
         }
@@ -228,9 +228,10 @@ class SearchFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.GONE
                 binding.loadMoreButton.visibility = View.GONE
+                binding.textDashboard.visibility = View.VISIBLE
 
             } else {
-                binding.textDashboard.text = ""
+                binding.textDashboard.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 binding.loadMoreButton.visibility = View.GONE

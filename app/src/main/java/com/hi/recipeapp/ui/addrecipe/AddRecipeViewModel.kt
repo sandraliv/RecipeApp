@@ -24,10 +24,11 @@ class AddRecipeViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    fun uploadRecipe(userId: Int, recipe: UserFullRecipe) {
+    fun uploadRecipe(recipe: UserFullRecipe) {
         viewModelScope.launch {
             try {
-                val success = recipeService.uploadUserRecipe(userId, recipe) // Passar við API-ið
+                val userId = sessionManager.getUserId()
+                val success = recipeService.uploadUserRecipe(userId, recipe)
                 if (success) {
                     _newRecipeSuccess.postValue(true)
                 } else {
@@ -38,6 +39,7 @@ class AddRecipeViewModel @Inject constructor(
             }
         }
     }
+
 
 }
 
