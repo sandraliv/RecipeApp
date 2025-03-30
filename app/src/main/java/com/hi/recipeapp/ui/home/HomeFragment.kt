@@ -37,9 +37,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        // Initially hide the "Load More" button
-        binding.loadMoreButton.visibility = View.GONE
-//      Initialize the adapter with the click listener and favorite click handler
 
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
@@ -61,13 +58,11 @@ class HomeFragment : Fragment() {
                 Log.d("HomeFragment", "Loading data...")
                 binding.progressBar.visibility = View.VISIBLE // Show progress bar
                 binding.recipeRecyclerView.visibility = View.GONE
-                binding.loadMoreButton.isEnabled = false   // Disable the Load More button while loading
-                binding.loadMoreButton.visibility = View.GONE
             } else {
                 Log.d("HomeFragment", "Loading complete.")
                 binding.progressBar.visibility = View.GONE // Hide progress bar
                 binding.recipeRecyclerView.visibility = View.VISIBLE
-                binding.loadMoreButton.isEnabled = true    // Enable the Load More button once loading is complete
+
             }
         }
 
@@ -112,25 +107,17 @@ class HomeFragment : Fragment() {
 
 
         // Observe the "No More Recipes Available" state
-        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner, Observer { noMoreRecipes ->
+        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
             if (noMoreRecipes) {
-                // Show the "No More Recipes Available" message
+                // Show the "No More Recipes Available" message using textHome
                 binding.textHome.text = getString(R.string.no_more_recipes_available)
                 binding.textHome.visibility = View.VISIBLE
-                binding.loadMoreButton.visibility = View.GONE
             } else {
-                // Hide the "No Recipes Available" message
+                // Hide the "No More Recipes Available" message if there are more recipes to load
                 binding.textHome.visibility = View.GONE
-                binding.loadMoreButton.visibility = View.VISIBLE
             }
-        })
-
-
-        // Handle Load More button click
-        binding.loadMoreButton.setOnClickListener {
-            homeViewModel.loadMoreRecipes()
-            binding.loadMoreButton.visibility = View.GONE
         }
+
 
         // Detect if the user has scrolled to the bottom of the RecyclerView
         binding.recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -141,17 +128,14 @@ class HomeFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-                // If the user has scrolled to the bottom, show the "Load More" button
+                // If the user has scrolled to the bottom and not currently loading, load more data
                 if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
                     if (!homeViewModel.isLoading.value!! && !homeViewModel.noMoreRecipes.value!!) {
-                        binding.loadMoreButton.visibility = View.VISIBLE
+                        homeViewModel.loadMoreRecipes()  // Trigger the loading of more recipes
                     }
-                } else {
-                    binding.loadMoreButton.visibility = View.GONE
                 }
             }
         })
-
 
         return binding.root
     }
