@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.SortType
 import com.hi.recipeapp.databinding.FragmentHomeBinding
@@ -26,18 +28,18 @@ class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
-
-    private var currentSortType: SortType = SortType.RATING // Declare currentSortType
-
-    // Define star size and space between stars
-    private val starSize = 30  // Example size for stars
-    private val spaceBetweenStars = 3  // Example space between stars
+    private var currentSortType: SortType = SortType.RATING
+    private val starSize = 30
+    private val spaceBetweenStars = 3
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+        // Initially hide the "Load More" button
+        binding.loadMoreButton.visibility = View.GONE
+//      Initialize the adapter with the click listener and favorite click handler
 
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
@@ -53,15 +55,29 @@ class HomeFragment : Fragment() {
             spaceBetweenStars = spaceBetweenStars // Pass spaceBetweenStars
         )
 
+        // Observe the loading state
+        homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                Log.d("HomeFragment", "Loading data...")
+                binding.progressBar.visibility = View.VISIBLE // Show progress bar
+                binding.recipeRecyclerView.visibility = View.GONE
+                binding.loadMoreButton.isEnabled = false   // Disable the Load More button while loading
+                binding.loadMoreButton.visibility = View.GONE
+            } else {
+                Log.d("HomeFragment", "Loading complete.")
+                binding.progressBar.visibility = View.GONE // Hide progress bar
+                binding.recipeRecyclerView.visibility = View.VISIBLE
+                binding.loadMoreButton.isEnabled = true    // Enable the Load More button once loading is complete
+            }
+        }
 
         // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
 
-        // Set up Category Button to open BottomSheet
-        setupCategoryButton()
 
+        setupCategoryButton()
         setupSortButton()
 
         // Observe the recipes LiveData
@@ -86,21 +102,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Observe the loading state
-        homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) {
-                Log.d("HomeFragment", "Loading data...")
-                binding.progressBar.visibility = View.VISIBLE // Show progress bar
-                binding.recipeRecyclerView.visibility = View.GONE
-                binding.loadMoreButton.isEnabled = false   // Disable the Load More button while loading
-            } else {
-                Log.d("HomeFragment", "Loading complete.")
-                binding.progressBar.visibility = View.GONE // Hide progress bar
-                binding.recipeRecyclerView.visibility = View.VISIBLE
-                binding.loadMoreButton.isEnabled = true    // Enable the Load More button once loading is complete
-            }
-        }
-
 
         // Observe the favorite action message LiveData
         homeViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
@@ -108,6 +109,22 @@ class HomeFragment : Fragment() {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }
+
+
+        // Observe the "No More Recipes Available" state
+        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner, Observer { noMoreRecipes ->
+            if (noMoreRecipes) {
+                // Show the "No More Recipes Available" message
+                binding.textHome.text = getString(R.string.no_more_recipes_available)
+                binding.textHome.visibility = View.VISIBLE
+                binding.loadMoreButton.visibility = View.GONE
+            } else {
+                // Hide the "No Recipes Available" message
+                binding.textHome.visibility = View.GONE
+                binding.loadMoreButton.visibility = View.VISIBLE
+            }
+        })
+
 
         // Handle Load More button click
         binding.loadMoreButton.setOnClickListener {
@@ -125,8 +142,8 @@ class HomeFragment : Fragment() {
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
                 // If the user has scrolled to the bottom, show the "Load More" button
-                if (totalItemCount <= lastVisibleItemPosition + 2) {  // 5 is just an offset to trigger early
-                    if (!homeViewModel.isLoading.value!!) {
+                if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
+                    if (!homeViewModel.isLoading.value!! && !homeViewModel.noMoreRecipes.value!!) {
                         binding.loadMoreButton.visibility = View.VISIBLE
                     }
                 } else {
@@ -139,41 +156,37 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-
-    // Setup Sort Button with vector icon
     private fun setupSortButton() {
         val sortButton = binding.sortByButton
         sortButton.setOnClickListener {
-            // Open the BottomSheetDialogFragment when the button is clicked
             val bottomSheetFragment = SortBottomSheetFragment()
+            bottomSheetFragment.setCurrentSortType(currentSortType)
 
-            // Pass the callback to handle the sorting selection
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
+                // Change the current sort type
                 currentSortType = sortType
-                homeViewModel.fetchRecipesSortedBy(currentSortType)
+                homeViewModel.updateSortType(currentSortType)
+
+                // Manually scroll to the top of the RecyclerView
+                binding.recipeRecyclerView.scrollToPosition(0)
             }
 
-            // Show the Bottom Sheet
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
     }
+
 
     // Setup Category Button
     private fun setupCategoryButton() {
 
         val categoryButton = binding.categoryButton
-
         categoryButton.setOnClickListener {
-            // Open the Category BottomSheetDialogFragment when the button is clicked
             val bottomSheetFragment = CategoryBottomSheetFragment()
 
-            // Pass the callback to handle the category selection
             bottomSheetFragment.setOnCategorySelectedListener { category ->
-                // Navigate to the Category Fragment when a category is selected
                 navigateToCategoryFragment(category)
             }
 
-            // Show the Bottom Sheet
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
     }

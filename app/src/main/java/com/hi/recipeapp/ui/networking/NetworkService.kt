@@ -38,7 +38,10 @@ interface NetworkService {
     @GET("recipes")
     fun getRecipesByQueryAndTags(
         @Query("query") query: String?,
-        @Query("tags") tags: Set<String>?
+        @Query("tags") tags: Set<String>?,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String = "RATING"
     ): Call<List<RecipeCard>>
 
     @GET("users")
@@ -47,6 +50,7 @@ interface NetworkService {
 
     @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
+
 
 
     @GET("recipes/all")

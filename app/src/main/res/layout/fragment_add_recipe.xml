@@ -138,6 +138,17 @@
         app:layout_constraintTop_toBottomOf="@id/addRecipeButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+    <!-- TextView to display number of selected images -->
+    <TextView
+        android:id="@+id/selectedImagesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No images selected"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toBottomOf="@id/uploadPhotoButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

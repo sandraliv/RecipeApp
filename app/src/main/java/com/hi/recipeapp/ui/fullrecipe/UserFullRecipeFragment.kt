@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -66,12 +68,13 @@ class UserFullRecipeFragment : Fragment() {
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
 
-        // Load the image using Glide with placeholder and error image
+        // Handle the main image (first image in the list of image URLs)
+        val mainImageUrl = recipe.imageUrls?.firstOrNull() // First image
         Glide.with(binding.root.context)
-            .load(recipe.imageUrl)
-            .placeholder(R.drawable.placeholder)  // Placeholder image
-            .error(R.drawable.error_image)        // Error image
-            .into(binding.imageView)
+            .load(mainImageUrl)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.error_image)
+            .into(binding.userRecipeImage)
 
         recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
             val formattedIngredientName = ingredientName.replace("_", " ") // Replace underscores with spaces
@@ -130,7 +133,32 @@ class UserFullRecipeFragment : Fragment() {
         }
 
         binding.instructionsTextView.text = formattedInstructions.toString()
+        // Handle additional images inside the HorizontalScrollView
+        loadImagesIntoHorizontalScrollView(recipe.imageUrls?.drop(1)) // All images except the first one
 
+    }
+
+    private fun loadImagesIntoHorizontalScrollView(imageUrls: List<String>?) {
+        val imageLayout = binding.imageLayout  // LinearLayout inside HorizontalScrollView
+        imageLayout.removeAllViews()  // Clear any existing images
+
+        // If imageUrls is not null or empty, load images
+        imageUrls?.forEach { url ->
+            val imageView = ImageView(binding.root.context)
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            imageView.layoutParams = layoutParams
+
+            Glide.with(binding.root.context)
+                .load(url)
+                .placeholder(R.drawable.placeholder)  // Optional placeholder
+                .error(R.drawable.error_image)  // Optional error image
+                .into(imageView)
+
+            imageLayout.addView(imageView)  // Add the ImageView to the layout
+        }
     }
 
 }

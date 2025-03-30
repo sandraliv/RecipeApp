@@ -66,6 +66,7 @@ dependencies {
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -75,8 +76,10 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.activity)
-
-    // Retrofit og OKHTTP
+    implementation(libs.androidx.navigation.fragment)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.converter.scalars)
@@ -101,6 +104,9 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
 
+    testImplementation(libs.hilt.android.testing)
+    implementation ("androidx.core:core-ktx:1.9.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.x.x")  // Replace with the latest version
 
 
 }
