@@ -41,6 +41,7 @@ class FullRecipeViewModel @Inject constructor(
         // Fetch the recipe by ID
         recipeService.fetchRecipeById(id) { result, error ->
             if (result != null) {
+                _isLoading.value = true
                 // Log the fetched recipe for debugging
                 Log.d("FullRecipeViewModel", "Fetched recipe: $result")
 

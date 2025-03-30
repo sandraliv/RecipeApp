@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
+import com.hi.recipeapp.classes.SortType
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,15 +35,21 @@ class CategoryViewModel @Inject constructor(
 
     private val _favoriteActionMessage = MutableLiveData<String?>()
     val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
+    // Pagination variables
+    private var pageNumber = 1 // Track the current page number for pagination
+    private val pageSize = 20 // Number of items per page
 
-    fun getRecipesByCategory(category: Category) {
+    private var currentSort = "rating" // Default sort
+
+    fun getRecipesByCategory(category: Category, sort: String = "rating") {
+        currentSort = sort // Store the current sort type
+
         _errorMessage.value = null
         _isLoading.value = true
-        Log.d("CATEGORY_QUERY", "Category: $category")
-
+        Log.d("CATEGORY_QUERY", "Category: $category, Sort: $sort")
 
         // Call the RecipeService to get recipes by category
-        recipeService.getRecipesByCategory(category) { recipes, error ->
+        recipeService.getRecipesByCategory(category, sort) { recipes, error ->
             _isLoading.value = false
 
             // Ensure that recipes is not null before assigning it
@@ -76,6 +83,34 @@ class CategoryViewModel @Inject constructor(
             }
         }
     }
+    fun loadMoreRecipes(category: Category, sort: String = "rating") {
+        pageNumber++ // Increment the page number to load the next page
+        _isLoading.value = true
+
+        recipeService.getRecipesByCategory(category, sort) { newRecipes, error ->
+            _isLoading.value = false
+
+            val nonNullRecipes = newRecipes ?: emptyList()
+
+            if (nonNullRecipes.isNotEmpty()) {
+                // Append new recipes to the existing list
+                val updatedList = _recipesByCategory.value?.toMutableList() ?: mutableListOf()
+                updatedList.addAll(nonNullRecipes)
+
+                // Update the LiveData with the new list
+                _recipesByCategory.value = updatedList
+            }
+
+            if (nonNullRecipes.size < pageSize) {
+                // If fewer items are returned than the page size, we assume it's the last page
+                // Optionally, disable the "load more" button or update UI accordingly
+            }
+
+            if (error != null) {
+                _errorMessage.value = error
+            }
+        }
+    }
 
 
 
@@ -105,4 +140,16 @@ class CategoryViewModel @Inject constructor(
             }
         }
     }
+    fun updateSortType(category: Category, newSortType: String) {
+        // Optional: Check if the recipes are already loaded
+        if (_recipesByCategory.value?.isNotEmpty() == true) {
+            // If recipes are already loaded, fetch them again with the new sort type
+            getRecipesByCategory(category, newSortType)
+        } else {
+            // If no recipes are currently loaded, fetch with the new sort type
+            getRecipesByCategory(category, newSortType)
+        }
+    }
+
+
 }

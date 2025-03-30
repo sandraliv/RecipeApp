@@ -48,6 +48,14 @@
                 android:name="recipeId"
                 app:argType="integer" />
         </action>
+        <!-- Action to navigate to FullRecipeFragment from CategoryFragment -->
+        <action
+            android:id="@+id/action_categoryFragment_to_categoryFragment"
+            app:destination="@id/categoryFragment">
+            <argument
+                android:name="categoryName"
+                app:argType="string" />
+        </action>
     </fragment>
 
 

@@ -10,24 +10,30 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-       >
+        android:orientation="vertical">
 
-        <!-- FrameLayout to overlay heart buttons over the recipe image -->
+        <!-- FrameLayout to overlay heart buttons over the recipe images -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Recipe image -->
-            <ImageView
-                android:id="@+id/recipe_image"
+            <ImageSwitcher
+                android:id="@+id/imageSwitcher"
                 android:layout_width="match_parent"
-                android:layout_height="125dp"
-                android:layout_marginBottom="4dp"
-                android:contentDescription="@string/recipe_image"
-                android:scaleType="centerCrop" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:inAnimation="@android:anim/slide_in_left"
+                android:outAnimation="@android:anim/slide_out_right">
 
-            <!-- Heart Buttons: Empty heart and Filled heart -->
+                <ImageView
+                    android:id="@+id/switcherImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp"
+                    android:contentDescription="@string/recipe_image"
+                    android:src="@drawable/placeholder"
+                    android:scaleType="centerCrop" />
+            </ImageSwitcher>
+            <!-- Heart Buttons: Empty heart and Filled heart, positioned at the top of images -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,45 +46,44 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/add_to_favorites"
-                    android:src="@drawable/ic_heart_empty"
-                    android:scaleType="center"
-                    android:layout_gravity="end|top"
+                    android:contentDescription="Add to Favorites"
                     android:elevation="2dp"
-                    />
+                    android:scaleType="center"
+                    android:src="@drawable/ic_heart_empty" />
 
+                <!-- Filled Heart Button (Remove from Favorites) -->
                 <ImageButton
                     android:id="@+id/filledHeartButton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/remove_from_favorites"
-                    android:src="@drawable/ic_heart_filled"
+                    android:contentDescription="Remove from Favorites"
                     android:scaleType="center"
-                    android:layout_gravity="end|top" />
+                    android:src="@drawable/ic_heart_filled" />
             </LinearLayout>
+
         </FrameLayout>
 
-        <!-- Recipe name -->
+        <!-- Recipe Name -->
         <TextView
             android:id="@+id/recipe_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
-            android:text="@string/recipe_name"
+            android:text="Recipe Name"
+            android:fontFamily="@font/playfair_display"
             android:textSize="13sp"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold" />
 
         <!-- Recipe description -->
         <TextView
             android:id="@+id/recipe_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:text="@string/recipe_description"
             android:textColor="@android:color/darker_gray"
@@ -89,8 +94,8 @@
             android:id="@+id/recipe_rating_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:gravity="end|bottom"

@@ -122,21 +122,22 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         return sharedPreferences.getBoolean(key, false)
     }
 
-
-    fun logout() {
-        clearSession()
-        // Perform other logout-related actions if needed
-    }
-
+    // Save the favorite recipe IDs in SharedPreferences
     fun saveFavoriteRecipeIds(favoriteRecipeIds: Set<Int>) {
         val editor = sharedPreferences.edit()
         editor.putStringSet("FAVORITE_RECIPES", favoriteRecipeIds.map { it.toString() }.toSet()) // Save as Set of Strings
         editor.apply()
     }
 
+    // Get the favorite recipe IDs from SharedPreferences
     fun getFavoriteRecipeIds(): Set<Int> {
         val favorites = sharedPreferences.getStringSet("FAVORITE_RECIPES", emptySet())
         return favorites?.map { it.toInt() }?.toSet() ?: emptySet()
+    }
+
+    fun logout() {
+        clearSession()
+        // Perform other logout-related actions if needed
     }
 
     fun isDarkModeEnabled(): Boolean {

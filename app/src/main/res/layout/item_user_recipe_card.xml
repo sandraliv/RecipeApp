@@ -5,22 +5,37 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
-    android:layout_margin="8dp">
+    android:layout_margin="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Recipe image -->
-        <ImageView
-            android:id="@+id/recipe_image"
+        <!-- FrameLayout to hold ImageSwitcher -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:contentDescription="@string/recipe_image"
-            android:layout_marginBottom="8dp"
-            android:scaleType="centerCrop" />
+            android:layout_height="wrap_content">
+
+            <!-- ImageSwitcher to show recipe images -->
+            <ImageSwitcher
+                android:id="@+id/imageSwitcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:inAnimation="@android:anim/slide_in_left"
+                android:outAnimation="@android:anim/slide_out_right">
+
+                <ImageView
+                    android:id="@+id/switcherImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp"
+                    android:contentDescription="@string/recipe_image"
+                    android:src="@drawable/placeholder"
+                    android:scaleType="centerCrop" />
+            </ImageSwitcher>
+
+        </FrameLayout>
 
         <!-- Recipe name -->
         <TextView
@@ -43,4 +58,3 @@
             android:layout_marginTop="4dp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
-

@@ -68,6 +68,17 @@
         <item name="strokeColor">@color/Medium_grey</item>
     </style>
 
+    <!-- Text Button load more , -->
+    <style name="MyTextButton2" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/Medium_grey</item>
+        <item name="cornerRadius">2dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:elevation">5dp</item>
+        <item name="strokeWidth">0.5dp</item>
+        <item name="strokeColor">@color/Medium_grey</item>
+    </style>
+
 
     <!-- Headers-->
     <style name="Header" parent="Widget.MaterialComponents.TextView">
@@ -76,6 +87,13 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textColor">@color/Light_grey</item>
+    </style>
+
+
+    <!-- bottomSheets -->
+    <style name="bottomsSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="iconTint">@color/Light_grey</item>
+        <item name="android:titleTextColor">@color/Light_grey</item>
     </style>
 
     <!-- bottom navigation-->

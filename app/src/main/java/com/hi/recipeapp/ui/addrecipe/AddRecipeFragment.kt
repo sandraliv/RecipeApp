@@ -1,16 +1,18 @@
 
 package com.hi.recipeapp.ui.addrecipe
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentAddRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,9 +24,19 @@ class AddRecipeFragment : Fragment() {
     private lateinit var binding: FragmentAddRecipeBinding
     private var ingredientCount = 1
     private var instructionCount = 1
-    private lateinit var sessionManager: SessionManager
+    private var selectedImageUri: Uri? = null
 
+    private val imageUris = mutableListOf<Uri>() // To store the selected image URIs
 
+    private val selectImagesLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            if (uris != null) {
+                imageUris.clear()
+                imageUris.addAll(uris)
+                // Update UI with the number of images selected
+                binding.selectedImagesText.text = "${imageUris.size} images selected"
+            }
+        }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -32,7 +44,14 @@ class AddRecipeFragment : Fragment() {
 
         binding = FragmentAddRecipeBinding.inflate(inflater, container, false)
 
-        sessionManager = SessionManager(requireContext())
+
+        @Suppress("DEPRECATION")
+        setFragmentResultListener("photoResult") { _, bundle ->
+            selectedImageUri = bundle.getParcelable("selectedImageUri")
+            binding.uploadPhotoButton.text = "Photo Selected ✔️"
+        }
+
+
 
         // Event listeners
         binding.addIngredientButton.setOnClickListener { addIngredientRow() }
@@ -41,6 +60,9 @@ class AddRecipeFragment : Fragment() {
         binding.addRecipeButton.setOnClickListener { submitRecipe() }
 
         return binding.root
+    }
+    private fun selectImages() {
+        selectImagesLauncher.launch(arrayOf("image/*"))
     }
 
     // Adds a new ingredient row with checkboxes
@@ -113,7 +135,6 @@ class AddRecipeFragment : Fragment() {
             return
         }
 
-        val userId = sessionManager.getUserId() // Get UserId
 
         // Retrieves the ingredient names and quantities from input fields and puts them into Map
         val ingredientsMap = mutableMapOf<String, String>()
@@ -144,11 +165,17 @@ class AddRecipeFragment : Fragment() {
             description = description,
             ingredients = ingredientsMap,
             instructions = instructionsList.joinToString(". "),
-            imageUrl = "default"
+<<<<<<< HEAD
+            imageUrl = selectedImageUri?.toString() ?: "default"
+=======
+            imageUrls = imageUris.map { it.toString() } // Convert URIs to strings
+>>>>>>> 208eb4db0da3756e6ff51ae8db56b6c8aec59efd
         )
 
 
-        viewModel.uploadRecipe(userId, recipe)
+
+        viewModel.uploadRecipe(recipe)
+
 
         // Lets user know that recipe is sent
         Toast.makeText(requireContext(), "Recipe sent!", Toast.LENGTH_SHORT).show()
