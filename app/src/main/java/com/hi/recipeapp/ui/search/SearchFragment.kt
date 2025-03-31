@@ -54,14 +54,13 @@ class SearchFragment : Fragment() {
                 Log.d("SearchFragment", "Loading data...")
                 binding.progressBar.visibility = View.VISIBLE // Show progress bar
                 binding.recipeCardContainer.visibility = View.GONE // Hide the recipe list
-                binding.loadMoreButton.isEnabled = false // Disable Load More button while loading
-                binding.loadMoreButton.visibility = View.GONE
+
+
             } else {
                 Log.d("SearchFragment", "Loading complete.")
                 binding.progressBar.visibility = View.GONE // Hide progress bar
                 binding.recipeCardContainer.visibility = View.VISIBLE // Show recipe list
-                binding.loadMoreButton.isEnabled = true // Enable Load More button once loading is complete
-                binding.loadMoreButton.visibility = View.GONE
+
             }
         }
 
@@ -85,25 +84,16 @@ class SearchFragment : Fragment() {
         // Observe "No More Recipes Available"
         searchViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
             if (noMoreRecipes) {
-                binding.textDashboard.text = getString(R.string.no_more_recipes_available)
-                binding.textDashboard.visibility = View.VISIBLE
-                binding.loadMoreButton.visibility = View.GONE
+                binding.textLoadmore.text = getString(R.string.no_more_recipes_available)
+                binding.textLoadmore.visibility = View.VISIBLE
+
             } else {
-                binding.textDashboard.visibility = View.GONE
-                binding.loadMoreButton.visibility = View.VISIBLE
+                binding.textLoadmore.visibility = View.GONE
+
             }
         }
 
-        // Handle Load More button click
-        binding.loadMoreButton.setOnClickListener {
-            // Pass the current query and selected tags to load more recipes
-            val query = binding.searchDashboard.query.toString()
-            val tagNames = selectedTags.map { it.name }.toSet()
 
-            // Pass the parameters to load more recipes
-            searchViewModel.loadMoreRecipes(query, tagNames)
-            binding.loadMoreButton.visibility = View.GONE
-        }
 
         return binding.root
     }
@@ -139,7 +129,6 @@ class SearchFragment : Fragment() {
                 val tagNames = selectedTags.map { it.name }.toSet()
                 binding.recipeCardContainer.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
-                binding.loadMoreButton.visibility = View.GONE
                 searchViewModel.searchByQuery(query ?: "", tagNames, currentSortType)
                 return true
             }
@@ -148,7 +137,6 @@ class SearchFragment : Fragment() {
                 val tagNames = selectedTags.map { it.name }.toSet()
                 binding.recipeCardContainer.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
-                binding.loadMoreButton.visibility = View.GONE
                 searchViewModel.searchByQuery(newText ?: "", tagNames, currentSortType)
                 return true
             }
@@ -207,13 +195,14 @@ class SearchFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-                // If the user has scrolled to the bottom, show the "Load More" button
+                // If the user has scrolled to the bottom, automatically load more recipes
                 if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
                     if (!searchViewModel.isLoading.value!! && !searchViewModel.noMoreRecipes.value!!) {
-                        binding.loadMoreButton.visibility = View.VISIBLE
+                        searchViewModel.loadMoreRecipes(
+                            binding.searchDashboard.query.toString(),
+                            selectedTags.map { it.name }.toSet()
+                        )
                     }
-                } else {
-                    binding.loadMoreButton.visibility = View.GONE
                 }
             }
         })
@@ -227,14 +216,12 @@ class SearchFragment : Fragment() {
                 binding.textDashboard.text = "No recipes found."
                 binding.progressBar.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.GONE
-                binding.loadMoreButton.visibility = View.GONE
                 binding.textDashboard.visibility = View.VISIBLE
 
             } else {
                 binding.textDashboard.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
-                binding.loadMoreButton.visibility = View.GONE
                 recipeAdapter.submitList(results)
                 Log.d("SEARCH_RESULTS", "Submitted list to adapter: $results")
             }

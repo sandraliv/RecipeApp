@@ -140,6 +140,7 @@ class SearchViewModel @Inject constructor(
             } else {
                 _noMoreRecipes.value = true  // No more recipes to load
             }
+            _isLoading.value = false
         }
     }
 

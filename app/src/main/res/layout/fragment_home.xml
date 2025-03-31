@@ -5,8 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
-    android:paddingBottom="35dp"
-    android:layout_marginBottom="30dp">
+    android:layout_marginTop="20dp"
+    android:paddingBottom="20dp"
+    android:layout_marginBottom="20dp">
+
+    <!-- TextView above the button container -->
+    <TextView
+        android:id="@+id/plass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toTopOf="@id/recipe_recycler_view"
+        android:fontFamily="@font/playfair_display"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- TextView above the button container -->
     <TextView
@@ -77,9 +92,7 @@
         android:id="@+id/recipe_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="10dp"
-        android:paddingBottom="20dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -94,6 +107,7 @@
         android:text="@string/no_recipes_available"
         android:textAlignment="center"
         android:textSize="20sp"
+        android:layout_marginBottom="20dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/recipe_recycler_view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -108,6 +122,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/recipe_recycler_view"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

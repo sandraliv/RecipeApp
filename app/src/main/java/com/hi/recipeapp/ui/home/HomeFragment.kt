@@ -1,14 +1,18 @@
 package com.hi.recipeapp.ui.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,15 +32,26 @@ class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
+    private var isAnimationInProgress = false
     private var currentSortType: SortType = SortType.RATING
+    private lateinit var toolbar: Toolbar
+    private var isUserDragging = false
+    private lateinit var titleTextView: TextView
     private val starSize = 30
     private val spaceBetweenStars = 3
+    private var isScrollingUp = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        // Access the toolbar from the activity
+        toolbar = requireActivity().findViewById(R.id.toolbar)
+
+        // Find the custom TextView inside the Toolbar
+        titleTextView = toolbar.findViewById(R.id.titleTextView)
 
         // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
@@ -71,7 +86,6 @@ class HomeFragment : Fragment() {
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
 
-
         setupCategoryButton()
         setupSortButton()
 
@@ -97,7 +111,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         // Observe the favorite action message LiveData
         homeViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
@@ -105,11 +118,10 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         // Observe the "No More Recipes Available" state
         homeViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
             if (noMoreRecipes) {
-                // Show the "No More Recipes Available" message using textHome
+                // Show the "No More Recipes Available" message using textLoadMore
                 binding.textHome.text = getString(R.string.no_more_recipes_available)
                 binding.textHome.visibility = View.VISIBLE
             } else {
@@ -117,28 +129,122 @@ class HomeFragment : Fragment() {
                 binding.textHome.visibility = View.GONE
             }
         }
+        // Add scroll listener
+        addScrollListenerToRecyclerView()
+        return binding.root
+    }
 
-
-        // Detect if the user has scrolled to the bottom of the RecyclerView
+    private fun addScrollListenerToRecyclerView() {
         binding.recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                val layoutManager = recyclerView.layoutManager as GridLayoutManager
-                val totalItemCount = layoutManager.itemCount
-                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                if (isAnimationInProgress) return // Prevent triggering animations if they're already in progress
 
-                // If the user has scrolled to the bottom and not currently loading, load more data
-                if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
-                    if (!homeViewModel.isLoading.value!! && !homeViewModel.noMoreRecipes.value!!) {
-                        homeViewModel.loadMoreRecipes()  // Trigger the loading of more recipes
+                // Handle the header visibility based on scroll direction
+                if (dy > 0) {
+                    // User is scrolling down (further down)
+                    if (!isScrollingUp) {
+                        isAnimationInProgress = true
+
+                        // Animate the hiding of the header and buttons
+                        binding.homeHeader.animate()
+                            .alpha(0f)
+                            .translationY(-binding.homeHeader.height.toFloat())
+                            .setDuration(300)
+                            .withEndAction {
+                                binding.homeHeader.visibility = View.GONE
+                                binding.buttonContainer.visibility = View.GONE
+                                binding.plass.visibility = View.VISIBLE
+                                titleTextView.visibility = View.VISIBLE
+                                titleTextView.text = "Recipes"
+                                binding.plass.visibility = View.VISIBLE
+                                isScrollingUp = true
+                                isAnimationInProgress = false
+                            }
+                            .start()
+
+                        // Animate the button container
+                        binding.buttonContainer.animate()
+                            .alpha(0f)
+                            .translationY(-binding.buttonContainer.height.toFloat())
+                            .setDuration(300)
+                            .withEndAction {
+                                binding.buttonContainer.visibility = View.GONE
+                            }
+                            .start()
+
+                        // Animate the toolbar (mini-header)
+                        toolbar.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(300)
+                            .start()
+                    }
+                } else if (dy < 0) {
+                    // User is scrolling up (viewing further up)
+                    if (isScrollingUp) {
+                        isAnimationInProgress = true
+
+                        // Animate the showing of the header and buttons
+                        binding.homeHeader.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(300)
+                            .withEndAction {
+                                binding.homeHeader.visibility = View.VISIBLE
+                                binding.buttonContainer.visibility = View.VISIBLE
+                                binding.plass.visibility = View.GONE
+                                titleTextView.text = ""
+                                titleTextView.visibility = View.GONE
+                                binding.plass.visibility = View.GONE
+                                isScrollingUp = false
+                                isAnimationInProgress = false
+                            }
+                            .start()
+
+                        // Animate the button container
+                        binding.buttonContainer.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(300)
+                            .withEndAction {
+                                binding.buttonContainer.visibility = View.VISIBLE
+                            }
+                            .start()
+
+                        // Animate the toolbar (mini-header)
+                        toolbar.animate()
+                            .alpha(0f)
+                            .translationY(-toolbar.height.toFloat())
+                            .setDuration(300)
+                            .start()
                     }
                 }
             }
-        })
 
-        return binding.root
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    isUserDragging = true
+                } else if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    isUserDragging = false
+                }
+            }
+        })
     }
+
+    override fun onResume() {
+        super.onResume()
+        // Ensure Toolbar and views are correctly displayed when returning to the fragment
+        toolbar.animate().alpha(1f).translationY(0f).setDuration(300).start()
+        binding.homeHeader.visibility = View.VISIBLE
+        binding.buttonContainer.visibility = View.VISIBLE
+        binding.plass.visibility = View.GONE
+        titleTextView.visibility = View.GONE
+    }
+
+
 
     private fun setupSortButton() {
         val sortButton = binding.sortByButton
@@ -147,11 +253,9 @@ class HomeFragment : Fragment() {
             bottomSheetFragment.setCurrentSortType(currentSortType)
 
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
-                // Change the current sort type
                 currentSortType = sortType
                 homeViewModel.updateSortType(currentSortType)
 
-                // Manually scroll to the top of the RecyclerView
                 binding.recipeRecyclerView.scrollToPosition(0)
             }
 
@@ -166,16 +270,12 @@ class HomeFragment : Fragment() {
         val categoryButton = binding.categoryButton
         categoryButton.setOnClickListener {
             val bottomSheetFragment = CategoryBottomSheetFragment()
-
             bottomSheetFragment.setOnCategorySelectedListener { category ->
                 navigateToCategoryFragment(category)
             }
-
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
     }
-
-
 
     private fun navigateToCategoryFragment(category: Category) {
         val action = HomeFragmentDirections.actionHomeFragmentToCategoryFragment(category.name)  // Pass category name
