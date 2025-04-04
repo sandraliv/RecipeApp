@@ -100,7 +100,6 @@ class FullRecipeFragment : Fragment() {
         return binding.root
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestureDetector() {
         val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.OnGestureListener {
@@ -156,10 +155,9 @@ class FullRecipeFragment : Fragment() {
         }
     }
 
-
-
-
     private fun bindRecipeData(recipe: FullRecipe) {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.contentLayout.visibility = View.GONE
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
         setRatingStars(recipe.averageRating)
@@ -237,8 +235,6 @@ class FullRecipeFragment : Fragment() {
                 }
             }
 
-
-
             tableRow.addView(ingredientCheckBox)
             tableRow.addView(measurementTextView)
             tableRow.addView(ingredientNameTextView)
@@ -258,9 +254,7 @@ class FullRecipeFragment : Fragment() {
             }
         }
 
-
         binding.instructionsTextView.text = formattedInstructions.toString()
-
 
         binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.getDisplayName() }
 
