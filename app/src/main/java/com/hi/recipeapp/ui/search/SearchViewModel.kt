@@ -34,6 +34,9 @@ class SearchViewModel @Inject constructor(
     private val _favoriteResult = MutableLiveData<Result<String>>()
     val favoriteResult: LiveData<Result<String>> get() = _favoriteResult
 
+    private val _isLoadingMore = MutableLiveData<Boolean>(false)
+    val isLoadingMore: LiveData<Boolean> get() = _isLoadingMore
+
     private val _favoriteActionMessage = MutableLiveData<String?>()
     val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
@@ -106,10 +109,15 @@ class SearchViewModel @Inject constructor(
 
 
     fun loadMoreRecipes(query: String, tags: Set<String>?) {
-        if (_isLoading.value == true) return  // Prevent multiple simultaneous loads
+        // Prevent multiple load requests if no more recipes are available
+        if (_noMoreRecipes.value == true || _isLoadingMore.value == true) {
+            return // Exit early if there are no more recipes or it's already loading
+        }
 
-        _isLoading.value = true
-        pageNumber++ // Increment the page number to load the next page
+        pageNumber++
+        _isLoadingMore.value = true  // Set isLoadingMore to true when loading more recipes
+        _isLoading.value =
+            false    // Set isLoading to false since we're loading more, not initial recipes
 
         recipeService.searchRecipes(query, tags, pageNumber, pageSize, sortType.name.lowercase()) { newRecipes, error ->
             _isLoading.value = false
@@ -140,7 +148,7 @@ class SearchViewModel @Inject constructor(
             } else {
                 _noMoreRecipes.value = true  // No more recipes to load
             }
-            _isLoading.value = false
+            _isLoadingMore.value = false
         }
     }
 

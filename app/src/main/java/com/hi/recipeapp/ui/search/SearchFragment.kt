@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,17 +33,29 @@ class SearchFragment : Fragment() {
     private val searchViewModel: SearchViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
     private val selectedTags = mutableSetOf<RecipeTag>() // Only tags now
-
+    private lateinit var toolbar: Toolbar
+    private lateinit var titleTextView: TextView
     private val starSize = 30
     private val spaceBetweenStars = 3
     private val gridColumnCount = 2
     private var currentSortType: SortType = SortType.RATING
+    private var isScrollingUp = false
+    private var isAnimationInProgress = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
+
+        // Access the toolbar from the activity
+        toolbar = requireActivity().findViewById(R.id.toolbar)
+
+        // Find the custom TextView inside the Toolbar
+        titleTextView = toolbar.findViewById(R.id.titleTextView)
+
+        titleTextView.text = ""
+
         setupRecyclerView()
         setupSearchView()
         setupTagSelection()
@@ -64,7 +78,6 @@ class SearchFragment : Fragment() {
             }
         }
 
-
         // Observe the result of adding recipe to favorites
         searchViewModel.favoriteResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { successMessage ->
@@ -81,6 +94,18 @@ class SearchFragment : Fragment() {
             }
         }
 
+        // Observe the loading state for "Load More"
+        searchViewModel.isLoadingMore.observe(viewLifecycleOwner) { isLoadingMore ->
+            if (isLoadingMore) {
+                // Show a loading more indicator (You can use a different loading indicator or text)
+                binding.progressBarBottom.visibility = View.VISIBLE
+            } else {
+                // Hide the loading more indicator
+                binding.progressBarBottom.visibility = View.GONE
+            }
+        }
+
+
         // Observe "No More Recipes Available"
         searchViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
             if (noMoreRecipes) {
@@ -92,8 +117,6 @@ class SearchFragment : Fragment() {
 
             }
         }
-
-
 
         return binding.root
     }
@@ -107,21 +130,36 @@ class SearchFragment : Fragment() {
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
                 currentSortType = sortType
                 searchViewModel.updateSortType(currentSortType)
+                // Show loading UI immediately
+                binding.progressBar.visibility = View.VISIBLE
+                binding.recipeCardContainer.visibility = View.GONE
+                binding.textDashboard.visibility = View.GONE // Hide "No Recipes" message while loading
+
+                // Clear the current list of recipes
+                recipeAdapter.submitList(emptyList())
                 // Manually scroll to the top of the RecyclerView
+
                 binding.recipeCardContainer.scrollToPosition(0)
             }
-
 
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
     }
 
+
     private fun setupSearchView() {
         val searchView: SearchView = binding.searchDashboard
         searchView.isIconified = false
-        searchView.setSuggestionsAdapter(null)
-        searchView.clearFocus()
         searchView.queryHint = "Search for recipes..."
+
+        // Detect when the user clicks on the search bar
+        searchView.setOnClickListener {
+            Log.d("SearchView", "Search bar clicked!")
+
+            // Ensure tags and buttons are shown, even if they're hidden due to scrolling
+            showSortAndTags()
+        }
+
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -186,17 +224,69 @@ class SearchFragment : Fragment() {
             adapter = recipeAdapter
         }
 
-        // Detect if the user has scrolled to the bottom of the RecyclerView
         binding.recipeCardContainer.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
+                if (isAnimationInProgress) return // Prevent triggering animations if they're already in progress
+
+                if (dy > 0) {
+                    // Scrolling down
+                    if (!isScrollingUp) {
+                        isAnimationInProgress = true
+
+
+
+                        // Animate hiding the ChipGroup and Sort button
+                        binding.chipGroupTags.animate()
+                            .alpha(0f)
+                            .translationY(-binding.chipGroupTags.height.toFloat())
+                            .setDuration(300)
+                            .start()
+
+                        binding.buttonContainer.animate()
+                            .alpha(0f)
+                            .translationY(-binding.buttonContainer.height.toFloat())
+                            .setDuration(300)
+                            .withEndAction {
+                                binding.chipGroupTags.visibility = View.GONE
+                                binding.buttonContainer.visibility = View.GONE
+                                isScrollingUp = true
+                                isAnimationInProgress = false
+                            }
+                            .start()
+                    }
+                } else if (dy < 0) {
+                    // Scrolling up
+                    if (isScrollingUp) {
+                        isAnimationInProgress = true
+
+                        // Animate showing the ChipGroup and Sort button
+                        binding.chipGroupTags.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(300)
+                            .start()
+
+                        binding.buttonContainer.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(300)
+                            .withEndAction {
+                                binding.chipGroupTags.visibility = View.VISIBLE
+                                binding.buttonContainer.visibility = View.VISIBLE
+                                isScrollingUp = false
+                                isAnimationInProgress = false
+                            }
+                            .start()
+                    }
+                }
+
+                // Handle infinite scrolling (load more recipes)
                 val layoutManager = recyclerView.layoutManager as GridLayoutManager
                 val totalItemCount = layoutManager.itemCount
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-
-                // If the user has scrolled to the bottom, automatically load more recipes
-                if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
+                if (totalItemCount <= lastVisibleItemPosition + 2) {
                     if (!searchViewModel.isLoading.value!! && !searchViewModel.noMoreRecipes.value!!) {
                         searchViewModel.loadMoreRecipes(
                             binding.searchDashboard.query.toString(),
@@ -206,18 +296,17 @@ class SearchFragment : Fragment() {
                 }
             }
         })
+
     }
 
 
     private fun observeViewModel() {
-        // Observe search results from the ViewModel and update RecyclerView
         searchViewModel.searchResults.observe(viewLifecycleOwner) { results ->
             if (results.isNullOrEmpty()) {
                 binding.textDashboard.text = "No recipes found."
                 binding.progressBar.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.GONE
                 binding.textDashboard.visibility = View.VISIBLE
-
             } else {
                 binding.textDashboard.visibility = View.GONE
                 binding.recipeCardContainer.visibility = View.VISIBLE
@@ -227,15 +316,37 @@ class SearchFragment : Fragment() {
             }
         }
 
-        // Observe any error messages
         searchViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             if (error != null) {
                 binding.textDashboard.text = error
                 binding.recipeCardContainer.visibility = View.GONE
             }
         }
-
     }
+
+    private fun showSortAndTags() {
+        // Ensure tags and sort buttons are shown, even when they are hidden due to scrolling
+        if (binding.chipGroupTags.visibility != View.VISIBLE) {
+            binding.chipGroupTags.visibility = View.VISIBLE
+            binding.buttonContainer.visibility = View.VISIBLE
+
+            // Animate them back into place if necessary
+            binding.chipGroupTags.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(300)
+                .start()
+
+            binding.buttonContainer.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(300)
+                .start()
+        }
+    }
+
+
+
 
     fun resetSearchState() {
         binding.textDashboard.text = ""

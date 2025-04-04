@@ -37,6 +37,7 @@ class HomeFragment : Fragment() {
     private lateinit var toolbar: Toolbar
     private var isUserDragging = false
     private lateinit var titleTextView: TextView
+    private var isLoadingMore = false
     private val starSize = 30
     private val spaceBetweenStars = 3
     private var isScrollingUp = false
@@ -53,7 +54,6 @@ class HomeFragment : Fragment() {
         // Find the custom TextView inside the Toolbar
         titleTextView = toolbar.findViewById(R.id.titleTextView)
 
-        // Initialize the adapter with the click listener and favorite click handler
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
                 val recipeId = recipe.id
@@ -67,19 +67,16 @@ class HomeFragment : Fragment() {
             spaceBetweenStars = spaceBetweenStars // Pass spaceBetweenStars
         )
 
-        // Observe the loading state
-        homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+        homeViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             if (isLoading) {
-                Log.d("HomeFragment", "Loading data...")
-                binding.progressBar.visibility = View.VISIBLE // Show progress bar
                 binding.recipeRecyclerView.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
             } else {
-                Log.d("HomeFragment", "Loading complete.")
-                binding.progressBar.visibility = View.GONE // Hide progress bar
                 binding.recipeRecyclerView.visibility = View.VISIBLE
-
+                binding.progressBar.visibility = View.GONE
             }
-        }
+        })
+
 
         // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
@@ -104,6 +101,18 @@ class HomeFragment : Fragment() {
             }
         }
 
+        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
+            if (noMoreRecipes) {
+                // Prevent further load attempts until the page is refreshed
+                binding.textNoRecipeResults.text = getString(R.string.no_more_recipes_available)
+                binding.textNoRecipeResults.visibility = View.VISIBLE
+            } else {
+                // Reset the message and hide the bottom container
+                binding.textNoRecipeResults.visibility = View.GONE
+
+            }
+        }
+
         // Observe the error message LiveData
         homeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
@@ -118,17 +127,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Observe the "No More Recipes Available" state
-        homeViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
-            if (noMoreRecipes) {
-                // Show the "No More Recipes Available" message using textLoadMore
-                binding.textHome.text = getString(R.string.no_more_recipes_available)
-                binding.textHome.visibility = View.VISIBLE
-            } else {
-                // Hide the "No More Recipes Available" message if there are more recipes to load
-                binding.textHome.visibility = View.GONE
-            }
-        }
+
         // Add scroll listener
         addScrollListenerToRecyclerView()
         return binding.root
@@ -140,6 +139,9 @@ class HomeFragment : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
 
                 if (isAnimationInProgress) return // Prevent triggering animations if they're already in progress
+                // If already loading or no more recipes, do nothing
+                if (isLoadingMore || homeViewModel.noMoreRecipes.value == true) return
+
 
                 // Handle the header visibility based on scroll direction
                 if (dy > 0) {
@@ -180,6 +182,16 @@ class HomeFragment : Fragment() {
                             .translationY(0f)
                             .setDuration(300)
                             .start()
+                    }
+                    // Check if we are at the bottom of the list
+                    val layoutManager = recyclerView.layoutManager as GridLayoutManager
+                    val totalItemCount = layoutManager.itemCount
+                    val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                    val isAtBottom = totalItemCount <= lastVisibleItemPosition + 4 // Check if we're close to the bottom
+                    if (isAtBottom) {
+                        loadMoreRecipes()
+
                     }
                 } else if (dy < 0) {
                     // User is scrolling up (viewing further up)
@@ -233,6 +245,43 @@ class HomeFragment : Fragment() {
             }
         })
     }
+    private fun loadMoreRecipes() {
+        // Prevent multiple load requests if already loading or no more recipes
+        if (isLoadingMore || homeViewModel.noMoreRecipes.value == true) return
+
+        // Mark as loading more recipes
+        isLoadingMore = true
+        binding.progressBarBottom.visibility = View.VISIBLE
+
+        // Pass the current sort type to the ViewModel so that it loads recipes accordingly
+        homeViewModel.loadMoreRecipes(currentSortType)
+
+        // Observe the loading state (whether we are still loading)
+        homeViewModel.isLoadingMore.observe(viewLifecycleOwner, Observer { isLoading ->
+            if (!isLoading) {
+                // Once loading is finished, reset isLoadingMore flag
+                isLoadingMore = false
+
+                // Handle the loaded recipes
+                homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
+                    recipeAdapter.submitList(recipes)
+                }
+
+                // Hide the progress bar and bottom container after loading
+                binding.progressBarBottom.visibility = View.GONE
+                if (homeViewModel.noMoreRecipes.value == true) {
+                    // If no more recipes are available, show the no more recipes message
+                    binding.textNoRecipeResults.text = getString(R.string.no_more_recipes_available)
+                    binding.textNoRecipeResults.visibility = View.VISIBLE
+                    binding.progressBarBottom.visibility = View.GONE
+                } else {
+                    // If there are more recipes, hide the "no more" message
+                    binding.textNoRecipeResults.visibility = View.GONE
+                }
+            }
+        })
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -243,9 +292,6 @@ class HomeFragment : Fragment() {
         binding.plass.visibility = View.GONE
         titleTextView.visibility = View.GONE
     }
-
-
-
     private fun setupSortButton() {
         val sortButton = binding.sortByButton
         sortButton.setOnClickListener {
@@ -253,15 +299,48 @@ class HomeFragment : Fragment() {
             bottomSheetFragment.setCurrentSortType(currentSortType)
 
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
+                // Set the new sort type
                 currentSortType = sortType
+
+                // Update the sort type in the ViewModel
                 homeViewModel.updateSortType(currentSortType)
 
-                binding.recipeRecyclerView.scrollToPosition(0)
+                // Show loading UI immediately
+                binding.progressBar.visibility = View.VISIBLE
+                binding.recipeRecyclerView.visibility = View.GONE
+                binding.textHome.visibility = View.GONE // Hide "No Recipes" message while loading
+
+                // Clear the current list of recipes
+                recipeAdapter.submitList(emptyList())
+
+                // Observe the recipes LiveData to ensure data is updated
+                homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
+                    if (recipes != null) {
+                        // Submit the new list of recipes
+                        recipeAdapter.submitList(recipes)
+
+                        // Handle the case where the list is empty
+                        if (recipes.isEmpty()) {
+                            binding.textHome.text = getString(R.string.no_more_recipes_available)
+                            binding.textHome.visibility = View.VISIBLE
+                            binding.recipeRecyclerView.visibility = View.GONE
+                        } else {
+                            binding.progressBar.visibility = View.GONE
+                            binding.recipeRecyclerView.visibility = View.VISIBLE
+                            binding.textHome.visibility = View.GONE // Hide "No Recipes" message
+
+                            // Scroll to the top after sorting
+                            binding.recipeRecyclerView.scrollToPosition(0)
+                        }
+                    }
+                }
             }
 
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
     }
+
+
 
 
     // Setup Category Button
