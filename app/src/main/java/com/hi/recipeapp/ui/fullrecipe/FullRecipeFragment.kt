@@ -51,6 +51,7 @@ class FullRecipeFragment : Fragment() {
 
 
         // Initial visibility settings
+        binding.nestedScrollView.visibility = View.GONE
         binding.contentLayout.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
 
@@ -62,9 +63,11 @@ class FullRecipeFragment : Fragment() {
             if (isLoading) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.contentLayout.visibility = View.GONE
+                binding.nestedScrollView.visibility = View.GONE
             } else {
                 binding.progressBar.visibility = View.GONE
                 binding.contentLayout.visibility = View.VISIBLE
+                binding.nestedScrollView.visibility = View.VISIBLE
             }
         }
 
@@ -74,6 +77,7 @@ class FullRecipeFragment : Fragment() {
                 bindRecipeData(it)
                 // Once data is fetched, show content and hide ProgressBar
                 binding.progressBar.visibility = View.GONE
+                binding.nestedScrollView.visibility = View.VISIBLE
                 binding.contentLayout.visibility = View.VISIBLE
             }
         }
@@ -158,6 +162,8 @@ class FullRecipeFragment : Fragment() {
     private fun bindRecipeData(recipe: FullRecipe) {
         binding.progressBar.visibility = View.VISIBLE
         binding.contentLayout.visibility = View.GONE
+        binding.nestedScrollView.visibility = View.GONE
+
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
         setRatingStars(recipe.averageRating)
@@ -382,6 +388,11 @@ class FullRecipeFragment : Fragment() {
             }
 
             binding.ratingStarsLayout.addView(star)
+        }
+
+        // After showing the rating stars, scroll the ScrollView to the bottom
+        binding.nestedScrollView.post {
+            binding.nestedScrollView.smoothScrollTo(0, binding.nestedScrollView.height)
         }
     }
 
