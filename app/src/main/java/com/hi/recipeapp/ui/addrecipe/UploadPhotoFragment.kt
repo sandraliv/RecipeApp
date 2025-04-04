@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import com.hi.recipeapp.databinding.FragmentUploadPhotoBinding
 import java.io.File
 
@@ -28,6 +29,7 @@ class UploadPhotoFragment : Fragment() {
             if (success) {
                 // If success == true, the full-res image is in photoUri
                 binding.imageView.setImageURI(photoUri)
+                returnImageToPreviousFragment(photoUri)
                 // TODO: If you need to upload:
                 // - Convert photoUri to a File or byte[] and upload to your API
                 // - Láttu view model sjá um að gera það og view modelið kallar á user-service
@@ -41,6 +43,7 @@ class UploadPhotoFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
                 binding.imageView.setImageURI(it)
+                returnImageToPreviousFragment(it)
                 // If you need to upload this to an API, same approach: open an input stream, read the bytes, etc.
             }
         }
@@ -89,8 +92,22 @@ class UploadPhotoFragment : Fragment() {
         takePhotoLauncher.launch(photoUri)
     }
 
+    private fun returnImageToPreviousFragment(uri: Uri) {
+        val bundle = Bundle().apply {
+            putParcelable("selectedImageUri", uri)
+        }
+        setFragmentResult("photoResult", bundle)
+        parentFragmentManager.popBackStack() // Fer aftur í AddRecipeFragment
+    }
+
+
+
+
     private fun openGallery() {
         // "image/*" filters only images from the gallery
         galleryLauncher.launch("image/*")
     }
 }
+
+
+

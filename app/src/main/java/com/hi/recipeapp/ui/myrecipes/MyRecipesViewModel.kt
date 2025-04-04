@@ -5,12 +5,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import com.hi.recipeapp.classes.UserRecipeCard
+import com.hi.recipeapp.data.local.Recipe
+import com.hi.recipeapp.data.local.RecipeDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,7 +23,8 @@ import javax.inject.Inject
 class MyRecipesViewModel @Inject constructor(
     private val userService: UserService,
     private val recipeService: RecipeService,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val recipeDao: RecipeDao
 ) : ViewModel() {
 
     private val _favoriteRecipes = MutableLiveData<List<RecipeCard>?>()
@@ -55,15 +61,58 @@ class MyRecipesViewModel @Inject constructor(
         _isLoading.value = true
         viewModelScope.launch {
             try {
+                val localFavorites = recipeDao.getAll().first()
+                if (localFavorites.isNotEmpty()) {
+                    _favoriteRecipes.value = localFavorites
+                    _isLoading.value = false
+                    Log.d("RECIPES TESTING", "I AM TAKING FROM DATABASE HELLO")
+                    getNewestFavouriteRecipes()
+                } else {
+                    fetchMyFavoriteRecipes()
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Database load failed: ${e.message}"
+                Log.d("DATABASE ERROR", "${e.message}")
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun getNewestFavouriteRecipes() {
+        viewModelScope.launch {
+            try {
+                fetchMyFavoriteRecipes() // just call the same suspend method
+            } catch (e: Exception) {
+                // If refresh fails, we still have the cached data
+                Log.e("FavoriteVM", "Refresh failed: ${e.message}")
+            }
+        }
+    }
+
+    private fun fetchMyFavoriteRecipes() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
                 val userId = sessionManager.getUserId()
                 if (userId != -1) {
+
                     val result = userService.getUserFavorites(userId)
                     result.onSuccess { favoriteRecipes ->
-                        favoriteRecipes.forEach { recipe ->
-                            recipe.isFavoritedByUser = true
-                        }
-                        _favoriteRecipes.value = favoriteRecipes
+
+                        Log.d("TEST", "EKKI VILLA Í VM")
                         _isLoading.value = false
+                        favoriteRecipes.forEach { it.isFavoritedByUser = true }
+                        favoriteRecipes.forEach { recipe ->
+                            Log.d("Recipe", recipe.title)
+                        }
+
+                        _favoriteRecipes.value = favoriteRecipes
+
+                        val recipeEntities = favoriteRecipes.map { it.toEntity() }
+                        recipeDao.insertAll(recipeEntities)
+
+                        Log.d("HALLOHEIMUR", "ÉG ER Í DABASE")
+
                     }
                     result.onFailure { error ->
                         _errorMessage.value = error.localizedMessage ?: "Failed to fetch favorite recipes"
@@ -104,4 +153,18 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
+
+    private fun RecipeCard.toEntity(): Recipe {
+        return Recipe(
+            id = id,
+            title = title,
+            description = description,
+            imageUrls = imageUrls,
+            averageRating = averageRating,
+            ratingCount = ratingCount,
+            tags = tags,
+            isFavoritedByUser = isFavoritedByUser
+        )
+    }
+
 }

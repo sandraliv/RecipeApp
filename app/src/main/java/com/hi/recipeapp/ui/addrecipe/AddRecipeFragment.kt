@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentAddRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +23,7 @@ class AddRecipeFragment : Fragment() {
     private lateinit var binding: FragmentAddRecipeBinding
     private var ingredientCount = 1
     private var instructionCount = 1
-    private lateinit var sessionManager: SessionManager
+
 
     private val imageUris = mutableListOf<Uri>() // To store the selected image URIs
 
@@ -44,7 +43,6 @@ class AddRecipeFragment : Fragment() {
 
         binding = FragmentAddRecipeBinding.inflate(inflater, container, false)
 
-        sessionManager = SessionManager(requireContext())
 
         // Event listeners
         binding.addIngredientButton.setOnClickListener { addIngredientRow() }
@@ -128,7 +126,8 @@ class AddRecipeFragment : Fragment() {
             return
         }
 
-        val userId = sessionManager.getUserId() // Get UserId
+
+        // Get UserId
 
         // Retrieves the ingredient names and quantities from input fields and puts them into Map
         val ingredientsMap = mutableMapOf<String, String>()
@@ -162,8 +161,9 @@ class AddRecipeFragment : Fragment() {
             imageUrls = imageUris.map { it.toString() } // Convert URIs to strings
         )
 
+        viewModel.uploadRecipe(recipe)
 
-        viewModel.uploadRecipe(userId, recipe)
+
 
         // Lets user know that recipe is sent
         Toast.makeText(requireContext(), "Recipe sent!", Toast.LENGTH_SHORT).show()

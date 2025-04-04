@@ -11,7 +11,7 @@ buildscript {
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.hilt.android) apply false // ✅ Ensure this is present
-    kotlin("kapt") version "2.1.10" // ✅ kapt plugin applied here
-
+    // The KSP plugin (matching your Kotlin version)
+    alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.hilt.android) apply false
 }

@@ -108,7 +108,7 @@ class MyRecipesFragment : Fragment() {
             // Show the user recipes and hide the favorite recipes
             binding.favoriteRecipeRecyclerView.visibility = View.GONE
             binding.userRecipesRecyclerView.visibility = View.VISIBLE
-            myRecipesViewModel.fetchUserRecipes(0, 10)
+            myRecipesViewModel.fetchUserRecipes()
         }
     }
 

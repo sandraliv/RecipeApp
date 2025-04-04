@@ -4,29 +4,22 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.hi.recipeapp.MainActivity
 import com.hi.recipeapp.R
 import com.hi.recipeapp.WelcomePageActivity
 import com.hi.recipeapp.databinding.FragmentSettingsBinding
-import com.hi.recipeapp.ui.home.HomeViewModel
 import com.hi.recipeapp.ui.theme.ThemeViewModel
-import com.hi.recipeapp.ui.welcomepage.LoginFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+
 import java.io.File
 
 @AndroidEntryPoint
@@ -42,14 +35,14 @@ class SettingsFragment : Fragment() {
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             binding.profilePic.setImageURI(photoUri)
-            // TODO: If you need to upload:
+            uploadPhoto(photoUri)
         }
     }
 
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             binding.profilePic.setImageURI(it)
-            // TODO: If you need to upload:
+            uploadPhoto(it)
         }
     }
 
@@ -90,6 +83,12 @@ class SettingsFragment : Fragment() {
             navigateToPasswordChange()
         }
 
+        settingsViewModel.uploadPPErrorMessage.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         // Photo dialog when you click on add icon
         binding.editProfilePicButton.setOnClickListener {
             showPhotoDialog()
@@ -121,6 +120,20 @@ class SettingsFragment : Fragment() {
 
 
     }
+
+    private fun uploadPhoto(photoUri: Uri) {
+        // Get an InputStream from the Uri
+        val contentResolver = requireContext().contentResolver
+        val inputStream = contentResolver.openInputStream(photoUri) ?: return
+
+        // Read the entire stream into a ByteArray
+        val photoBytes = inputStream.readBytes()
+        inputStream.close()
+
+        settingsViewModel.uploadPhotoBytes(photoBytes)
+
+    }
+
 
     private fun showThemePopup(anchor: View) {
         val popup = android.widget.PopupMenu(requireContext(), anchor)

@@ -52,7 +52,6 @@ interface NetworkService {
     suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
 
 
-
     @GET("recipes/all")
     fun getAllRecipes(
         @Query("page") page: Int,       // The page number to fetch
@@ -60,6 +59,12 @@ interface NetworkService {
         @Query("sort") sort: String     // The sorting criteria, either "rating" or "date"
     ): Call<List<RecipeCard>>
 
+    @Multipart
+    @POST("users/{id}/add_profile_pic")
+    suspend fun postProfilePic(
+        @Path("id") userId: Int,
+        @Part file: MultipartBody.Part
+    ): Response<Map<String, String>>
 
     @GET("/recipes/byCategory")
     fun getRecipesByCategory(
