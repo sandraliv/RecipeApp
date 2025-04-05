@@ -51,6 +51,8 @@ interface NetworkService {
     @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
 
+    @DELETE("recipes/{id}")
+    suspend fun deleteRecipe(@Path("id") id: Int): Response<Unit>
 
     @GET("recipes/all")
     fun getAllRecipes(

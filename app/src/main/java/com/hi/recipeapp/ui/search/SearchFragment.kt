@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
@@ -189,7 +188,10 @@ class SearchFragment : Fragment() {
                 searchViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,
-            spaceBetweenStars = spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars,
+            isAdmin = false,
+            onDeleteClick = { }
+
         )
         // Use GridLayoutManager with the defined number of columns
         val gridLayoutManager = GridLayoutManager(context, gridColumnCount)

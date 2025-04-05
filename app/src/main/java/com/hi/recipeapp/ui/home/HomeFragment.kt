@@ -1,7 +1,6 @@
 package com.hi.recipeapp.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,6 @@ import com.hi.recipeapp.databinding.FragmentHomeBinding
 import com.hi.recipeapp.ui.bottomsheetdialog.CategoryBottomSheetFragment
 import com.hi.recipeapp.ui.bottomsheetdialog.SortBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -37,34 +35,33 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        // Initially hide the "Load More" button
         binding.loadMoreButton.visibility = View.GONE
-//      Initialize the adapter with the click listener and favorite click handler
+        recipeAdapter = homeViewModel.isAdmin.value?.let {
+            RecipeAdapter(
+                onClick = { recipe ->
+                    val recipeId = recipe.id
+                    val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
+                    findNavController().navigate(action)
+                },
+                onFavoriteClick = { recipe, isFavorited ->
+                    homeViewModel.updateFavoriteStatus(recipe, isFavorited)
+                },
+                starSize = starSize,
+                spaceBetweenStars = spaceBetweenStars,
+                isAdmin = it,
+                onDeleteClick = {recipeId -> homeViewModel.deleteRecipe(recipeId)}
 
-        // Initialize the adapter with the click listener and favorite click handler
-        recipeAdapter = RecipeAdapter(
-            onClick = { recipe ->
-                val recipeId = recipe.id
-                val action = HomeFragmentDirections.actionHomeFragmentToFullRecipeFragment(recipeId)
-                findNavController().navigate(action)
-            },
-            onFavoriteClick = { recipe, isFavorited ->
-                homeViewModel.updateFavoriteStatus(recipe, isFavorited)
-            },
-            starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars // Pass spaceBetweenStars
-        )
+            )
+        }!!
 
         // Observe the loading state
         homeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
-                Log.d("HomeFragment", "Loading data...")
                 binding.progressBar.visibility = View.VISIBLE // Show progress bar
                 binding.recipeRecyclerView.visibility = View.GONE
                 binding.loadMoreButton.isEnabled = false   // Disable the Load More button while loading
                 binding.loadMoreButton.visibility = View.GONE
             } else {
-                Log.d("HomeFragment", "Loading complete.")
                 binding.progressBar.visibility = View.GONE // Hide progress bar
                 binding.recipeRecyclerView.visibility = View.VISIBLE
                 binding.loadMoreButton.isEnabled = true    // Enable the Load More button once loading is complete

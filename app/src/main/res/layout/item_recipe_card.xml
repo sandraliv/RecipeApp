@@ -85,6 +85,8 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
+            android:minLines="4"
+            android:maxLines="4"
             android:text="@string/recipe_description"
             android:textColor="@android:color/darker_gray"
             android:textSize="11sp" />
@@ -93,7 +95,7 @@
         <LinearLayout
             android:id="@+id/recipe_rating_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
@@ -101,16 +103,21 @@
             android:gravity="end|bottom"
             android:orientation="horizontal">
 
-            <Button
+            <ImageButton
                 android:id="@+id/delete_recipe"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete_recipe"
-                android:textColor="@color/redd"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="@string/a_tiny_trash_can_icon"
                 android:visibility="gone"
+                android:src="@drawable/delete"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="80dp"
+                android:layout_gravity="bottom"
                 />
             <!-- Dynamically added Rating stars -->
             <LinearLayout
+                android:layout_gravity="bottom"
                 android:id="@+id/starRatingLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -120,10 +127,10 @@
 
             <!-- Rating count -->
             <TextView
+                android:layout_gravity="bottom"
                 android:id="@+id/recipe_rating_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:text="@string/_50"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="11sp" />

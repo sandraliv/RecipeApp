@@ -105,7 +105,21 @@ class RecipeService @Inject constructor(
     }
 
 
-
+    suspend fun deleteRecipe(recipeId: Int): Result<Unit> {
+        return try {
+            Log.d("RECIPES FAIL", "TRYING TO CALL NETWORK SERVICE")
+            val response = networkService.deleteRecipe(recipeId)
+            if (response.isSuccessful) {
+                Log.d("RECIPES FAIL", "RSP SUCC")
+                Result.success(Unit)
+            } else {
+                Log.d("RECIPES FAIL", "RSP FAIL")
+                Result.failure(Exception("Failed to delete: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     suspend fun addRecipeToFavorites(recipeId: Int): Result<String> {
         return try {

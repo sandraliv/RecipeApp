@@ -12,14 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.UserRecipeCard
 import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
-import com.hi.recipeapp.ui.home.HomeViewModel
 import com.hi.recipeapp.ui.home.RecipeAdapter
-import com.hi.recipeapp.ui.search.SearchFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,7 +50,10 @@ class MyRecipesFragment : Fragment() {
                 myRecipesViewModel.updateFavoriteStatus(recipe, isFavorited)
             },
             starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars
+            spaceBetweenStars = spaceBetweenStars,
+            isAdmin = false,
+            onDeleteClick = {}
+
         )
 
         userRecipeAdapter = UserRecipeAdapter { userRecipe ->

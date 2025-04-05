@@ -1,7 +1,6 @@
 package com.hi.recipeapp.ui.home
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -9,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +20,11 @@ import com.hi.recipeapp.classes.RecipeCard
 class RecipeAdapter(
     private val onClick: (RecipeCard) -> Unit,
     private val onFavoriteClick: (RecipeCard, Boolean) -> Unit,
+    private val onDeleteClick: (recipeId: Int) -> Unit,
     private val starSize: Int,  // Add starSize as a parameter
-    private val spaceBetweenStars: Int  // Add spaceBetweenStars as a parameter
+    private val spaceBetweenStars: Int,  // Add spaceBetweenStars as a parameter
+    private val isAdmin: Boolean
+
 ) : ListAdapter<RecipeCard, RecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -32,13 +35,28 @@ class RecipeAdapter(
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
         val recipe = getItem(position)
         holder.bind(recipe, starSize, spaceBetweenStars)
+
     }
 
     inner class RecipeViewHolder(private val binding: ItemRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
         private var currentIndex = 0  // Keep track of the current image index
 
         fun bind(recipe: RecipeCard, starSize: Int, spaceBetweenStars: Int) {
-            Log.d("RecipeViewHolder", "isFavoritedByUser: ${recipe.isFavoritedByUser}")
+            if(isAdmin) {
+                binding.deleteRecipe.visibility = View.VISIBLE
+            }
+
+            binding.deleteRecipe.setOnClickListener {
+                AlertDialog.Builder(binding.root.context)
+                    .setTitle("Delete Recipe")
+                    .setMessage("Are you sure you want to delete \"${recipe.title}\"?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        onDeleteClick(recipe.id)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+
 
             // Handle heart icon visibility based on whether the recipe is favorited
             updateHeartButtonVisibility(recipe)

@@ -36,9 +36,11 @@ class HomeViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    // Add this to your ViewModel
     private val _noMoreRecipes = MutableLiveData<Boolean>(false)
     val noMoreRecipes: LiveData<Boolean> = _noMoreRecipes
+
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> get() = _error
 
     private var pageNumber = 0  // Track the page number for pagination
     private val pageSize = 20    // Define how many items to load per page
@@ -147,7 +149,7 @@ class HomeViewModel @Inject constructor(
                 val userId = sessionManager.getUserId()
 
                 // Check if there are any new recipes
-                if (newRecipes != null && newRecipes.isNotEmpty()) {
+                if (!newRecipes.isNullOrEmpty()) {
                     // Use the sessionManager to mark the new recipes based on the stored favorited status
                     newRecipes.forEach { recipe ->
                         // Check if the user is logged in and then use sessionManager to get the favorited status
@@ -178,6 +180,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun deleteRecipe(recipeId: Int) {
+        viewModelScope.launch {
+            val result = recipeService.deleteRecipe(recipeId)
+            result
+                .onSuccess {
+                    fetchRecipesSortedBy(SortType.RATING)
+                    Log.d("RECIPES FAIL", "NOT FAIL")
+                }
+                .onFailure {
+                    Log.d("RECIPES FAIL", "FAIL")
+                    _error.value = "Failed to delete user: ${it.message}"
+                }
+        }
+    }
 
     fun updateSortType(newSortType: SortType) {
         // Optional: Check if the sort type has already been set to avoid unnecessary fetches
@@ -188,6 +204,8 @@ class HomeViewModel @Inject constructor(
             fetchRecipesSortedBy(newSortType)
         }
     }
+
+
 }
 
 

@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.databinding.FragmentBycategoryBinding
@@ -57,18 +56,22 @@ class CategoryFragment : Fragment() {
         categoryViewModel.getRecipesByCategory(category)
 
         // Initialize the adapter for displaying recipes
-        recipeAdapter = RecipeAdapter(
-            onClick = { recipe ->
-                val recipeId = recipe.id
-                val action = CategoryFragmentDirections.actionCategoryFragmentToFullRecipeFragment(recipeId)
-                findNavController().navigate(action)
-            },
-            onFavoriteClick = { recipe, isFavorited ->
-                categoryViewModel.updateFavoriteStatus(recipe, isFavorited)
-            },
-            starSize = starSize,  // Pass starSize
-            spaceBetweenStars = spaceBetweenStars,  // Pass spaceBetweenStars
-        )
+        recipeAdapter = homeViewModel.isAdmin.value?.let {
+            RecipeAdapter(
+                onClick = { recipe ->
+                    val recipeId = recipe.id
+                    val action = CategoryFragmentDirections.actionCategoryFragmentToFullRecipeFragment(recipeId)
+                    findNavController().navigate(action)
+                },
+                onFavoriteClick = { recipe, isFavorited ->
+                    categoryViewModel.updateFavoriteStatus(recipe, isFavorited)
+                },
+                starSize = starSize,  // Pass starSize
+                spaceBetweenStars = spaceBetweenStars,  // Pass spaceBetweenStars
+                isAdmin = it,
+                onDeleteClick = {}
+            )
+        }!!
 
         // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
