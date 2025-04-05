@@ -24,8 +24,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Force dark mode
-
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -33,13 +31,13 @@ class MainActivity : AppCompatActivity() {
         // Hide the ActionBar
         supportActionBar?.hide()
 
-        // Setup Toolbar (if you want to use a Toolbar)
+        // Setup Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Show the back arrow (up button)
+        // Show the back arrow
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false) // Hide title text
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         val navView: BottomNavigationView = binding.navView
 
@@ -77,10 +75,7 @@ class MainActivity : AppCompatActivity() {
                         if (navController.currentDestination?.id != R.id.navigation_search) {
                             navController.navigate(R.id.navigation_search)
                         } else {
-                            // If we are already on the Dashboard, reset it manually
-                            // Pop all fragments from the back stack, ensuring we're at the initial state
                             navController.popBackStack(R.id.navigation_search, false)
-                            // Optionally, reset any other states in the fragment
                             val searchFragment = supportFragmentManager.findFragmentById(R.id.navigation_search)
                             (searchFragment as? SearchFragment)?.resetSearchState()
                         }
@@ -115,9 +110,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivity", "NavHostFragment not found!")
         }
 
-
     }
-
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()

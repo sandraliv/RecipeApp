@@ -1,11 +1,11 @@
 <!-- res/drawable/ic_star_filled.xml -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
+    android:width="20dp"
+    android:height="20dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:strokeColor="#9c9d9f"
+        android:strokeColor="#f9c051"
         android:fillColor="#f9c051"
         android:strokeWidth="0.5"
         android:pathData="M12,17.27L18.18,21L16.54,13.97L22,9.24l-6.91-0.59L12,2l-3.09,6.65L2,9.24l5.46,4.73L5.82,21z"/>

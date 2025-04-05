@@ -77,7 +77,7 @@
         <item name="android:textSize">31sp</item>
         <item name="android:fontFamily">@font/playfair_display</item>
         <item name="android:gravity">center</item>
-        <item name="android:padding">10dp</item>
+        <item name="android:padding">5dp</item>
         <item name="android:textColor">@color/Dark_gray</item>
     </style>
 
@@ -123,14 +123,25 @@
     </style>
 
 
-    <!-- actionbar -->
-    <style name="actionBar" parent="Widget.MaterialComponents.Toolbar.Primary">
+    <style name="actionBar" parent="Widget.AppCompat.Toolbar">
         <item name="android:colorPrimary">@color/Dark_gray</item>
         <item name="iconTint">@color/rosybrown</item>
-        <item name="itemTextColor">@color/black</item>
-        <item name="android:title">1sp</item>
-        <item name="android:titleTextColor">@color/black</item>
+        <item name="itemTextColor">@color/Dark_gray</item>
         <item name="android:background">@color/rosybrown_50</item>
+
+        <!-- Set the title size and font -->
+        <item name="titleTextAppearance">@style/ToolbarTitle</item>
+        <item name="android:gravity">center</item>
     </style>
+
+    <!-- ToolbarTitle style for the title text appearance -->
+    <style name="ToolbarTitle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">@font/playfair_display</item>
+        <item name="android:textColor">@color/Dark_gray</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
 
 </resources>

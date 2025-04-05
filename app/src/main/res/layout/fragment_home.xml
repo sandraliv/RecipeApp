@@ -5,8 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
-    android:paddingBottom="35dp"
-    android:layout_marginBottom="30dp">
+    android:layout_marginTop="20dp"
+    android:paddingBottom="20dp"
+    android:layout_marginBottom="20dp">
+
+    <!-- TextView above the button container -->
+    <TextView
+        android:id="@+id/plass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toTopOf="@id/recipe_recycler_view"
+        android:fontFamily="@font/playfair_display"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- TextView above the button container -->
     <TextView
@@ -26,7 +41,8 @@
         android:layout_centerInParent="true"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/home_header"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toBottomOf="@id/button_container"
         app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Horizontal ConstraintLayout to hold Sort and Category buttons inline at the top -->
@@ -71,19 +87,15 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- RecyclerView for displaying recipes -->
-
-    <!-- Placeholder Text when no recipes are available -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recipe_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="10dp"
-        android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomContainer"
         app:layout_constraintTop_toBottomOf="@id/button_container"
         app:layout_constraintVertical_bias="0.0" />
 
@@ -94,27 +106,46 @@
         android:text="@string/no_recipes_available"
         android:textAlignment="center"
         android:textSize="20sp"
+        android:layout_marginBottom="20dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/recipe_recycler_view"
+        app:layout_constraintTop_toBottomOf="@id/recipe_recycler_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Load More Button -->
-    <Button
-        android:id="@+id/loadMoreButton"
-        android:layout_width="wrap_content"
+    <!-- LinearLayout to group the TextView and ProgressBar for bottom view -->
+    <LinearLayout
+        android:id="@+id/bottomContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/load_more"
-        android:visibility="gone"
-        android:backgroundTint="@color/white"
-        android:elevation="5dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="2dp"
-        android:textAllCaps="false"
+        android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/recipe_recycler_view"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Placeholder Text when no recipes are available -->
+        <TextView
+            android:id="@+id/text_no_recipe_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_recipes_available"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp"
+            android:visibility="gone" />
+
+        <!-- ProgressBar at bottom -->
+        <ProgressBar
+            android:id="@+id/progressBarBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:layout_marginBottom="40dp" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

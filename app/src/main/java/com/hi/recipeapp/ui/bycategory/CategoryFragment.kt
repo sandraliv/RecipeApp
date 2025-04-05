@@ -29,12 +29,10 @@ class CategoryFragment : Fragment() {
     private val categoryViewModel: CategoryViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var binding: FragmentBycategoryBinding
-    private lateinit var homeViewModel:HomeViewModel
 
     // Safe Args: Retrieve arguments passed to the fragment
     private val args: CategoryFragmentArgs by navArgs()
      private val categoryName: String get() = args.categoryName
-
     private var currentSortType: SortType = SortType.RATING
 
     // Define star size and space between stars
@@ -47,10 +45,9 @@ class CategoryFragment : Fragment() {
     ): View? {
         binding = FragmentBycategoryBinding.inflate(inflater, container, false)
 
-        // Convert the passed category name (string) back to the Category enum
         val category = Category.valueOf(categoryName)
 
-        binding.textCategoryName.text = category.getDisplayName() // Set the category title here
+        binding.textCategoryName.text = category.getDisplayName()
 
         // Fetch recipes based on category (only once)
         categoryViewModel.getRecipesByCategory(category)
@@ -77,10 +74,8 @@ class CategoryFragment : Fragment() {
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
-        // Set up Sort Button to open BottomSheet
-        setupSortButton()
 
-        // Set up Category Button to open BottomSheet
+        setupSortButton()
         setupCategoryButton()
 
         categoryViewModel.recipesByCategory.observe(viewLifecycleOwner) { recipes ->
@@ -106,7 +101,6 @@ class CategoryFragment : Fragment() {
         // Observe loading state and show progress bar while loading
         categoryViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
-                // Show the progress bar while loading
                 binding.progressBar.visibility = View.VISIBLE
                 binding.recipeRecyclerView.visibility = View.GONE
                 binding.textNoRecipeResults.visibility = View.GONE // Hide "No recipes available" while loading
@@ -119,11 +113,7 @@ class CategoryFragment : Fragment() {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }
-        // Handle Load More button click
-        binding.loadMoreButton.setOnClickListener {
-            categoryViewModel.loadMoreRecipes(category)
-            binding.loadMoreButton.visibility = View.GONE // Hide the button after clicking
-        }
+
 
         // Detect if the user has scrolled to the bottom of the RecyclerView
         binding.recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -134,13 +124,11 @@ class CategoryFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-                // If the user has scrolled to the bottom, show the "Load More" button
+                // If the user has scrolled to the bottom, load more recipes
                 if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
                     if (!categoryViewModel.isLoading.value!!) {
-                        binding.loadMoreButton.visibility = View.VISIBLE
+                        categoryViewModel.loadMoreRecipes(Category.valueOf(categoryName))
                     }
-                } else {
-                    binding.loadMoreButton.visibility = View.GONE
                 }
             }
         })
@@ -160,9 +148,7 @@ class CategoryFragment : Fragment() {
             // Pass the callback to handle the sorting selection
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
                 currentSortType = sortType
-
-                // Get the current category from the fragment (this could be a Category enum, e.g., Category.ALL)
-                val category = Category.valueOf(categoryName)  // Assuming `categoryName` comes from SafeArgs
+                val category = Category.valueOf(categoryName)
 
                 // Update the sort type in the view model along with the current category
                 categoryViewModel.updateSortType(category, currentSortType.name)
@@ -182,7 +168,7 @@ class CategoryFragment : Fragment() {
 
             // Pass the callback to handle the category selection
             bottomSheetFragment.setOnCategorySelectedListener { category ->
-                navigateToCategoryFragment(category)  // Navigate to the selected category
+                navigateToCategoryFragment(category)
             }
 
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)

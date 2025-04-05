@@ -92,18 +92,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-    <!-- Load More Button -->
-    <Button
-        android:id="@+id/loadMoreButton"
+    <!-- Load More  -->
+    <ProgressBar
+        android:id="@+id/progressBarBottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Load More"
+        android:layout_alignParentBottom="true"
         android:visibility="gone"
-        style="@style/MyTextButton"
-        android:layout_marginTop="2dp"
-        android:textAllCaps="false"
-        app:layout_constraintTop_toBottomOf="@id/recipe_recycler_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        app:layout_constraintBottom_toTopOf="@id/recipe_recycler_view"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
