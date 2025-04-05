@@ -21,6 +21,7 @@ class RecipeAdapter(
     private val onClick: (RecipeCard) -> Unit,
     private val onFavoriteClick: (RecipeCard, Boolean) -> Unit,
     private val onDeleteClick: (recipeId: Int) -> Unit,
+    private val onEditClick: (recipeId: Int) -> Unit,
     private val starSize: Int,  // Add starSize as a parameter
     private val spaceBetweenStars: Int,  // Add spaceBetweenStars as a parameter
     private val isAdmin: Boolean
@@ -44,8 +45,12 @@ class RecipeAdapter(
         fun bind(recipe: RecipeCard, starSize: Int, spaceBetweenStars: Int) {
             if(isAdmin) {
                 binding.deleteRecipe.visibility = View.VISIBLE
+                binding.editRecipe.visibility = View.VISIBLE
             }
 
+            binding.editRecipe.setOnClickListener {
+                onEditClick(recipe.id)
+            }
             binding.deleteRecipe.setOnClickListener {
                 AlertDialog.Builder(binding.root.context)
                     .setTitle("Delete Recipe")

@@ -67,7 +67,12 @@ class HomeFragment : Fragment() {
                 starSize = starSize,
                 spaceBetweenStars = spaceBetweenStars,
                 isAdmin = it,
-                onDeleteClick = {recipeId -> homeViewModel.deleteRecipe(recipeId)}
+                onDeleteClick = {recipeId -> homeViewModel.deleteRecipe(recipeId)},
+                onEditClick = { recipeId ->
+                    val action = HomeFragmentDirections.homeFragmentToEditRecipe(recipeId)
+                    findNavController().navigate(action)
+                }
+
 
             )
         }!!

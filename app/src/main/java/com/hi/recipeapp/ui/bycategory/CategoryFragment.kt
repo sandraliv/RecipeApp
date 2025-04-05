@@ -20,6 +20,7 @@ import com.hi.recipeapp.classes.SortType
 import com.hi.recipeapp.ui.bottomsheetdialog.CategoryBottomSheetFragment
 import com.hi.recipeapp.ui.bottomsheetdialog.SortBottomSheetFragment
 import com.hi.recipeapp.ui.home.HomeViewModel
+import com.hi.recipeapp.ui.search.SearchFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -53,7 +54,7 @@ class CategoryFragment : Fragment() {
         categoryViewModel.getRecipesByCategory(category)
 
         // Initialize the adapter for displaying recipes
-        recipeAdapter = homeViewModel.isAdmin.value?.let {
+        recipeAdapter =
             RecipeAdapter(
                 onClick = { recipe ->
                     val recipeId = recipe.id
@@ -65,10 +66,11 @@ class CategoryFragment : Fragment() {
                 },
                 starSize = starSize,  // Pass starSize
                 spaceBetweenStars = spaceBetweenStars,  // Pass spaceBetweenStars
-                isAdmin = it,
-                onDeleteClick = {}
+                isAdmin = false,
+                onDeleteClick = {},
+                onEditClick = {}
             )
-        }!!
+
 
         // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)

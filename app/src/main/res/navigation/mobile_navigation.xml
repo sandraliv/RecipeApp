@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
-    <!-- Recipe Navigation -->
 
-    <!-- Home Fragment -->
+    <!-- FrontPage Fragment -->
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.hi.recipeapp.ui.home.HomeFragment"
@@ -19,6 +18,14 @@
             <argument
                 android:name="categoryName"
                 app:argType="string"/>
+        </action>
+        <!-- Navigate to editRecipe Fragment -->
+        <action
+            android:id="@+id/homeFragment_to_editRecipe"
+            app:destination="@id/editRecipeFragment">
+            <argument
+                android:name="recipeId"
+                app:argType="integer"/>
         </action>
         <!-- Action to navigate to FullRecipeFragment from HomeFragment -->
         <action
@@ -75,6 +82,15 @@
         </action>
     </fragment>
 
+    <!-- Edit Recipe Fragment (admin) -->
+    <fragment
+        android:id="@+id/editRecipeFragment"
+        android:name="com.hi.recipeapp.ui.editRecipe.EditRecipeFragment"
+        tools:layout="@layout/fragment_admin_editrecipe" >
+        <argument
+            android:name="recipeId"
+            app:argType="integer" />
+    </fragment>
 
     <!-- Full Recipe Fragment -->
     <fragment
@@ -86,9 +102,6 @@
             android:name="recipeId"
             app:argType="integer" />
     </fragment>
-
-
-    <!-- My Recipes Navigation -->
 
     <!-- My Recipes Fragment -->
     <fragment

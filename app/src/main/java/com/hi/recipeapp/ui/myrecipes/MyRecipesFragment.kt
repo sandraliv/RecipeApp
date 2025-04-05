@@ -52,7 +52,8 @@ class MyRecipesFragment : Fragment() {
             starSize = starSize,  // Pass starSize
             spaceBetweenStars = spaceBetweenStars,
             isAdmin = false,
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onEditClick = {}
 
         )
 

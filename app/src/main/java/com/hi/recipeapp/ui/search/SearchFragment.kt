@@ -216,7 +216,8 @@ class SearchFragment : Fragment() {
             starSize = starSize,
             spaceBetweenStars = spaceBetweenStars,
             isAdmin = false,
-            onDeleteClick = { }
+            onDeleteClick = { },
+            onEditClick = {}
 
         )
         // Use GridLayoutManager with the defined number of columns

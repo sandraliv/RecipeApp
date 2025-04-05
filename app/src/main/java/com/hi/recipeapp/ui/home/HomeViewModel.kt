@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.SortType
@@ -18,7 +19,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val recipeService: RecipeService,
-    private val userService: UserService,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
@@ -46,6 +46,9 @@ class HomeViewModel @Inject constructor(
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
+
+    private val _editableRecipe = MutableLiveData<FullRecipe>()
+    val editableRecipe: LiveData<FullRecipe> = _editableRecipe
 
     private var pageNumber = 0  // Track the page number for pagination
     private val pageSize = 20    // Define how many items to load per page
@@ -225,6 +228,15 @@ class HomeViewModel @Inject constructor(
             // If no recipes are currently loaded, fetch with the new sort type
         }
     }
+
+    fun editRecipe(recipeId: Int) {
+        recipeService.fetchRecipeById(recipeId) { result, _ ->
+            result?.let {
+                _editableRecipe.postValue(it)
+            }
+        }
+    }
+
 
 
 }

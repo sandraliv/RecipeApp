@@ -182,9 +182,9 @@ class SettingsFragment : Fragment() {
     }
 
 
-
     private fun navigateToPasswordChange() {
-        findNavController().navigate(R.id.settingsFragment_to_passwordFragment)
+        val action = SettingsFragmentDirections.settingsFragmentToPasswordFragment()
+        findNavController().navigate(action)
     }
 
 
