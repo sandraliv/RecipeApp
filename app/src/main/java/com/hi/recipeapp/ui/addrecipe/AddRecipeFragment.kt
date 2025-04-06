@@ -43,11 +43,19 @@ class AddRecipeFragment : Fragment() {
 
         binding = FragmentAddRecipeBinding.inflate(inflater, container, false)
 
+        val toolbarTitle = requireActivity().findViewById<TextView>(R.id.titleTextView)
+        toolbarTitle.text = "Add Your Own Recipe"
+        toolbarTitle.visibility = View.VISIBLE
+
+
 
         // Event listeners
         binding.addIngredientButton.setOnClickListener { addIngredientRow() }
         binding.addInstructionButton.setOnClickListener { addInstructionRow() }
-        binding.uploadPhotoButton.setOnClickListener { findNavController().navigate(R.id.action_addRecipeFragment_to_uploadPhotoFragment) }
+        binding.uploadPhotoContainer.setOnClickListener {
+            findNavController().navigate(R.id.action_addRecipeFragment_to_uploadPhotoFragment)
+        }
+
         binding.addRecipeButton.setOnClickListener { submitRecipe() }
 
         return binding.root
@@ -169,6 +177,12 @@ class AddRecipeFragment : Fragment() {
         Toast.makeText(requireContext(), "Recipe sent!", Toast.LENGTH_SHORT).show()
 
     }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val toolbarTitle = requireActivity().findViewById<TextView>(R.id.titleTextView)
+        toolbarTitle.visibility = View.GONE
+    }
+
 
 
 }

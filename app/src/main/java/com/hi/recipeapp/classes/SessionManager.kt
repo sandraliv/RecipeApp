@@ -138,7 +138,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context, p
         return favorites?.map { it.toInt() }?.toSet() ?: emptySet()
     }
 
-    fun logout() {
+    suspend fun logout() {
         clearSession()
         // Perform other logout-related actions if needed
     }
