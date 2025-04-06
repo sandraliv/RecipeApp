@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -29,33 +32,117 @@ class EditRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val toolbarTitle = requireActivity().findViewById<TextView>(R.id.titleTextView)
+        toolbarTitle.text = "Edit Recipe"
+        toolbarTitle.visibility = View.VISIBLE
+
         _binding = FragmentAdminEditrecipeBinding.inflate(inflater, container, false)
         homeViewModel.editRecipe(recipeId)
 
-        // Step 2: Observe the recipe and populate the UI
+        binding.addIngredientButton.setOnClickListener {
+            val somth = binding.ingredientsContainer
+
+            val rowLayout = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = (8 * resources.displayMetrics.density).toInt()
+                }
+            }
+
+            val ingredientInput = EditText(requireContext()).apply {
+                hint = "Ingredient"
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+
+            val quantityInput = EditText(requireContext()).apply {
+                hint = "Quantity"
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+
+            val deleteButton = ImageButton(requireContext()).apply {
+                setImageResource(R.drawable.delete)
+                layoutParams = LinearLayout.LayoutParams(
+                    (48 * resources.displayMetrics.density).toInt(),  // width in px
+                    (48 * resources.displayMetrics.density).toInt()   // height in px
+                ).apply {
+                    marginStart = (8 * resources.displayMetrics.density).toInt()
+                }
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                background = null
+                contentDescription = "Delete ingredient"
+                setOnClickListener {
+                    somth.removeView(rowLayout)
+                }
+            }
+
+            rowLayout.addView(ingredientInput)
+            rowLayout.addView(quantityInput)
+            rowLayout.addView(deleteButton)
+            somth.addView(rowLayout)
+        }
+
+
+
         homeViewModel.editableRecipe.observe(viewLifecycleOwner) { recipe ->
             binding.editTitle.setText(recipe.title)
             binding.editDescription.setText(recipe.description)
             binding.editInstructions.setText(recipe.instructions)
-            Log.d("INGREDIENT", recipe.instructions)
+
+            val somth = binding.ingredientsContainer
+            somth.removeAllViews() // Clear any previous dynamic views
+
             recipe.ingredients.forEach { (ingredient, quantity) ->
-                Log.d("INGREDIENT", ingredient)
-                Log.d("INGREDIENT", quantity)
-                val editText = EditText(requireContext()).apply {
-                    val formattedText = getString(R.string.ingredient_format, ingredient, quantity)
-                    setText(formattedText)
+                val rowLayout = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.HORIZONTAL
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
                         bottomMargin = (8 * resources.displayMetrics.density).toInt()
-
                     }
                 }
-                binding.ingredientsContainer.addView(editText)
+
+                val ingredientInput = EditText(requireContext()).apply {
+                    hint = "Ingredient"
+                    setText(ingredient)
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                }
+
+                val quantityInput = EditText(requireContext()).apply {
+                    hint = "Quantity"
+                    setText(quantity)
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                }
+
+                val deleteButton = ImageButton(requireContext()).apply {
+                    setImageResource(R.drawable.delete)
+                    layoutParams = LinearLayout.LayoutParams(
+                        (48 * resources.displayMetrics.density).toInt(),  // width in dp
+                        (48 * resources.displayMetrics.density).toInt()   // height in dp
+                    ).apply {
+                        marginStart = (8 * resources.displayMetrics.density).toInt()
+                    }
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    background = null
+                    contentDescription = "Delete ingredient"
+                    setOnClickListener {
+                        somth.removeView(rowLayout)
+                    }
+                }
+
+                // Now add views to the row (order matters)
+                rowLayout.addView(ingredientInput)
+                rowLayout.addView(quantityInput)
+                rowLayout.addView(deleteButton)
+
+                // Finally, add the row to the container
+                somth.addView(rowLayout)
             }
 
-            // Add more fields like image, etc., if needed
+
         }
         return binding.root
 

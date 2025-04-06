@@ -7,13 +7,11 @@
     android:paddingTop="38dp">
 
     <androidx.appcompat.widget.Toolbar
+        android:layout_height="?attr/actionBarSize"
         android:id="@+id/toolbar"
         style="@style/actionBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:elevation="0dp"
-        android:gravity="center"
-        android:textAlignment="center"
         android:visibility="visible"
         app:contentInsetStart="72dp"
 
