@@ -1,157 +1,160 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.hi.recipeapp.ui.addrecipe.AddRecipeFragment">
+    android:layout_height="match_parent">
 
-
-    <!-- Recipe Title EditText -->
-    <EditText
-        android:id="@+id/recipeTitleEditText"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Title"
-        android:inputType="text"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:padding="16dp"
+        tools:context="com.hi.recipeapp.ui.addrecipe.AddRecipeFragment">
 
-    <!-- Recipe Description EditText -->
-    <EditText
-        android:id="@+id/recipeDescriptionEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Description"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/recipeTitleEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <!-- Recipe Title -->
+        <EditText
+            android:id="@+id/recipeTitleEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:inputType="text"
+            android:background="@drawable/edittext_rounded"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Ingredients Table -->
-    <TableLayout
-        android:id="@+id/ingredientsTableLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/recipeDescriptionEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        <!-- Description -->
+        <EditText
+            android:id="@+id/recipeDescriptionEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:background="@drawable/edittext_rounded"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/recipeTitleEditText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Ingredient Row (Name and Quantity) -->
-        <TableRow
-            android:id="@+id/ingredientRow0">
-            <!-- Ingredient Name EditText -->
-            <EditText
-                android:id="@+id/ingredientNameEditText0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="Ingredient Name"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp" />
+        <!-- Ingredients Label -->
+        <TextView
+            android:id="@+id/ingredientsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingredients"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/recipeDescriptionEditText"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- Ingredient Quantity EditText -->
-            <EditText
-                android:id="@+id/ingredientQuantityEditText0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="Quantity"
-                android:layout_weight="1" />
-        </TableRow>
-    </TableLayout>
+        <!-- Ingredients Table -->
+        <TableLayout
+            android:id="@+id/ingredientsTableLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/ingredientsLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Add Ingredient Row Button -->
-    <Button
-        android:id="@+id/addIngredientButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+ Add Ingredient"
-        style="@style/MyContainedButton"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/ingredientsTableLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <!-- Add Ingredient Button -->
+        <Button
+            android:id="@+id/addIngredientButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ Add Ingredient"
+            style="@style/MyContainedButton"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/ingredientsTableLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Recipe Instructions Table -->
-    <TableLayout
-        android:id="@+id/instructionsTableLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/addIngredientButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        <!-- Instructions Label -->
+        <TextView
+            android:id="@+id/instructionsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Instructions"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/addIngredientButton"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Instruction Row (Number and Text) -->
-        <TableRow
-            android:id="@+id/instructionRow0">
-            <!-- Instruction Number TextView -->
+        <!-- Instructions Table -->
+        <TableLayout
+            android:id="@+id/instructionsTableLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/instructionsLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <Button
+            android:id="@+id/addInstructionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ Add Instruction"
+            style="@style/MyContainedButton"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/instructionsTableLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/uploadPhotoContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/addInstructionButton"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/photoIcon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/add_camera"
+                android:contentDescription="Upload Photo"
+                />
+
             <TextView
-                android:id="@+id/instructionNumber0"
+                android:id="@+id/selectedImagesText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1."
-                android:layout_marginEnd="8dp" />
-
-            <!-- Instruction Text EditText -->
-            <EditText
-                android:id="@+id/instructionTextEditText0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="Instruction"
-                android:layout_weight="1" />
-        </TableRow>
-    </TableLayout>
-
-    <!-- Add Instruction Row Button -->
-    <Button
-        android:id="@+id/addInstructionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+ Add Instruction"
-        style="@style/MyContainedButton"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/instructionsTableLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Add Recipe Button -->
-    <Button
-        android:id="@+id/addRecipeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Recipe"
-        style="@style/MyContainedButton"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/addInstructionButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/uploadPhotoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Upload Photo"
-        style="@style/MyContainedButton"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/addRecipeButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-    <!-- TextView to display number of selected images -->
-    <TextView
-        android:id="@+id/selectedImagesText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No images selected"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintTop_toBottomOf="@id/uploadPhotoButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+                android:text="No images selected"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/addRecipeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ADD RECIPE"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/addrecipe_button"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintTop_toBottomOf="@id/uploadPhotoContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
 
 
