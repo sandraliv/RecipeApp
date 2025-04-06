@@ -55,8 +55,8 @@ object AppModule {
     // Add a provider for SessionManager
     @Provides
     @Singleton
-    fun provideSessionManager(application: Application): SessionManager {
-        return SessionManager(application) // Provide SessionManager instance
+    fun provideSessionManager(application: Application, recipeDao: RecipeDao): SessionManager {
+        return SessionManager(application,recipeDao) // Provide SessionManager instance
     }
 
 

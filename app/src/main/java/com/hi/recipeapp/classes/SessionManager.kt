@@ -3,13 +3,15 @@ package com.hi.recipeapp.classes
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.hi.recipeapp.data.local.RecipeDao
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SessionManager @Inject constructor(@ApplicationContext context: Context) {
+class SessionManager @Inject constructor(@ApplicationContext context: Context, private val recipeDao: RecipeDao) {
 
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+
 
     companion object {
         const val KEY_USER_ID = "user_id"
@@ -88,11 +90,12 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     }
 
     // Clear session (logout)
-    fun clearSession() {
+    suspend fun clearSession() {
         Log.d(TAG, "Clearing session")
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
+        recipeDao.removeAll()
         Log.d(TAG, "Session cleared successfully.")
     }
 
@@ -133,11 +136,6 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     fun getFavoriteRecipeIds(): Set<Int> {
         val favorites = sharedPreferences.getStringSet("FAVORITE_RECIPES", emptySet())
         return favorites?.map { it.toInt() }?.toSet() ?: emptySet()
-    }
-
-    fun logout() {
-        clearSession()
-        // Perform other logout-related actions if needed
     }
 
     fun isDarkModeEnabled(): Boolean {

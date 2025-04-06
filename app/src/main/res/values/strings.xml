@@ -1,4 +1,5 @@
 <resources>
+    <string name="ingredient_format">%1$s: %2$s</string>
     <string name="app_name">RecipeApp</string>
     <string name="title_home">Recipes</string>
     <string name="title_dashboard">Search</string>
@@ -55,4 +56,8 @@
     <string name="delete_recipe">Delete recipe</string>
     <string name="a_tiny_trash_can_icon">A tiny trash can icon</string>
     <string name="a_pencil">A pencil</string>
+    <string name="title">Title</string>
+    <string name="instructions">Instructions</string>
+    <string name="description">Description</string>
+    <string name="ingredients">Ingredients</string>
 </resources>
