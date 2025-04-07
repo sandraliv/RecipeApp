@@ -29,8 +29,13 @@ object CalendarUtils {
     }
 
     // Format a LocalDate to a human-readable string (e.g., 01 January 2025)
-    fun formattedDate(date: LocalDate): String {
+    fun formattedFullDate(date: LocalDate): String {
         val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+        return date.format(formatter)
+    }
+    // Format a LocalDate to a human-readable string (e.g., 01 January 2025)
+    fun formattedDate(date: LocalDate): String {
+        val formatter = DateTimeFormatter.ofPattern("dd MMMM")
         return date.format(formatter)
     }
 
@@ -51,17 +56,4 @@ object CalendarUtils {
         return listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     }
 
-    // Fetch recipes for the given month and year (this can be replaced with actual data fetching logic)
-    fun fetchRecipesForMonth(month: Int, year: Int): Map<String, List<String>> {
-        // Placeholder example: Replace with actual logic to fetch recipes for the month
-        return mapOf(
-            "1" to listOf("Scrambled Eggs"),
-            "2" to listOf("Pancakes"),
-            "3" to listOf("Salad"),
-            "4" to listOf("Spaghetti"),
-            "5" to listOf("Chicken Curry"),
-            "6" to listOf("Salmon"),
-            // Add more days here...
-        )
-    }
 }

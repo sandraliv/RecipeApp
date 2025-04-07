@@ -23,7 +23,10 @@ import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
 import com.hi.recipeapp.ui.home.RecipeAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDate
+import org.threeten.bp.Month
 import org.threeten.bp.YearMonth
+import java.util.Locale
+
 @AndroidEntryPoint
 class MyRecipesFragment : Fragment() {
 
@@ -38,6 +41,9 @@ class MyRecipesFragment : Fragment() {
 
     private val gridColumnCount = 2
     private val calendarGridColumnCount = 7
+
+    private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
+
 
     private var currentMonth: Int = LocalDate.now().monthValue
     private var currentYear: Int = LocalDate.now().year
@@ -87,6 +93,14 @@ class MyRecipesFragment : Fragment() {
         // Set the initial state
         setInitialState()
 
+        // Observe favorite action message
+        myRecipesViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                // Show the message using Snackbar
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
         return binding.root
     }
 
@@ -116,7 +130,6 @@ class MyRecipesFragment : Fragment() {
             layoutManager = GridLayoutManager(context, calendarGridColumnCount)  // Use calendarGridColumnCount for 7 columns
             adapter = calendarAdapter
         }
-
 
         // Set up GridLayoutManager for other sections (e.g., favorite recipes, user recipes)
         binding.favoriteRecipeRecyclerView.apply {
@@ -184,6 +197,8 @@ class MyRecipesFragment : Fragment() {
     }
 
     private fun setInitialState() {
+        val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
+
         binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
         binding.userRecipesRecyclerView.visibility = View.GONE
         binding.calendarRecyclerView.visibility = View.GONE
@@ -192,6 +207,41 @@ class MyRecipesFragment : Fragment() {
 
         setActiveButton(binding.favoritesButton)
         myRecipesViewModel.fetchFavoriteRecipes()
+        // Update the calendar's TextView with today's recipes
+        updateRecipeListTextViewForDay(today)
+
+        // Set today's date as the selected day in the calendar adapter
+        selectedDay = today
+    }
+
+    private fun updateRecipeListTextViewForDay(day: String) {
+        val recipeListTextView = binding.recipeListTextView
+
+        // Ensure both today and day are two-digit strings
+        val formattedDay = day.padStart(2, '0')
+
+        // Convert formattedDay to LocalDate and format it to a human-readable string (e.g., "01 January")
+        val dayOfMonth = LocalDate.of(currentYear, currentMonth, formattedDay.toInt())
+        val formattedDayString = CalendarUtils.formattedDate(dayOfMonth)
+
+        // Get recipes for this day
+        val recipesForToday: List<String> = myRecipesViewModel.mappedCalendarRecipes.value?.second?.get(formattedDay) ?: emptyList()
+
+        if (recipesForToday.isEmpty()) {
+            recipeListTextView.text = "No recipes for $formattedDayString"
+        } else {
+            recipeListTextView.text = "Recipes for $formattedDayString:\n" + recipesForToday.joinToString("\n")
+        }
+    }
+
+
+
+    private fun updateCalendarWithCurrentMonth() {
+        val monthName =
+            Month.of(currentMonth).name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }  // e.g., "April"
+        val year = currentYear.toString()
+
+        binding.monthTextView.text = "$monthName $year"  // Assuming you have a TextView to show the current month.
     }
 
     private fun setActiveButton(button: Button) {
@@ -275,21 +325,23 @@ class MyRecipesFragment : Fragment() {
     private fun initializeCalendarForCurrentMonth() {
         // Get the days in the current month
         val newDays = CalendarUtils.daysInMonthArray(LocalDate.of(currentYear, currentMonth, 1))
-            .map { it?.dayOfMonth?.toString()?.padStart(2, '0') ?: " " }  // If it's null, use a placeholder (space)
+            .map { it?.dayOfMonth?.toString()?.padStart(2, '0') ?: " " }
 
         // Fetch the calendar recipes from the ViewModel
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->
             val recipesByDay = mutableMapOf<String, List<String>>()
 
-            // Here, we're mapping the calendar data into a format for the calendar (days and recipes)
+            // Populate the recipesByDay map
             calendarRecipes?.forEach { calendar ->
-                val fullDate = calendar.savedCalendarDate // e.g., "2025-04-01"
+                val fullDate = calendar.savedCalendarDate  // Assuming this is the key to each calendar day
                 val recipeTitles = mutableListOf<String>()
 
+                // Add recipes from the 'recipe' property, if available
                 calendar.recipe?.let { recipe ->
                     recipeTitles.add(recipe.title)
                 }
 
+                // Add recipes from the 'userRecipe' property, if available
                 calendar.userRecipe?.let { userRecipe ->
                     recipeTitles.add(userRecipe.title)
                 }
@@ -300,7 +352,8 @@ class MyRecipesFragment : Fragment() {
 
             // Now, ensure we match the newDays with the recipes
             val updatedRecipesByDay = newDays.associateWith { day ->
-                val fullDate = "2025-${currentMonth.toString().padStart(2, '0')}-$day" // Example: "2025-04-01"
+                val fullDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-$day"  // Example: "2025-04-01"
+
 
                 // If the day is null or doesn't have a recipe, return an empty list
                 if (day == " " || recipesByDay[fullDate].isNullOrEmpty()) {
@@ -310,19 +363,39 @@ class MyRecipesFragment : Fragment() {
                 }
             }
 
-            // Now, update the calendar adapter with the actual data
+            // Bind the day names and recipes data to the adapter
             calendarAdapter.updateCalendarData(newDays, updatedRecipesByDay)
         }
-    }
 
+        // Update the month display
+        updateCalendarWithCurrentMonth()
+    }
 
     private fun observeViewModel() {
         myRecipesViewModel.favoriteRecipes.observe(viewLifecycleOwner) { recipes ->
-            recipes?.let { recipeAdapter.submitList(it) } ?: Toast.makeText(requireContext(), "No favorite recipes found.", Toast.LENGTH_SHORT).show()
+            if (recipes != null) {
+                recipeAdapter.submitList(recipes)
+            } else {
+                Toast.makeText(requireContext(), "No favorite recipes found.", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        myRecipesViewModel.userRecipes.observe(viewLifecycleOwner) { userRecipes ->
-            userRecipes?.let { userRecipeAdapter.submitList(it) } ?: Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
+        myRecipesViewModel.userRecipes.observe(viewLifecycleOwner) { userrecipes ->
+            if (userrecipes != null) {
+                userRecipeAdapter.submitList(userrecipes)
+            } else {
+                Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        myRecipesViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        myRecipesViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
         }
 
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->

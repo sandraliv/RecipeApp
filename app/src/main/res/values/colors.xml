@@ -24,12 +24,37 @@
     <color name="descriptionCard">#AAAAAA</color>
 
 
-
-
     <!-- In res/values/colors.xml -->
     <color name="button_selected_tint">#f2e9e9</color> <!-- Example color for selected state -->
     <color name="button_pressed_tint">#f2e9e9</color>
     <color name="button_default_tint">#f8f4f4</color> <!-- Example color for default state -->
+
+
+    <!-- Day Mode: Colors for selected and today -->
+    <color name="selected_night_text_color">#000000</color> <!-- Black text -->
+    <color name="selected_night_background_color">#ebdddd</color> <!-- Rosybrown 200 background -->
+
+    <color name="selected_today_night_text_color">#d7bcbc</color> <!-- Rosybrown 400 text color -->
+    <color name="selected_today_night_background_color">#d7bcbc</color> <!-- Rosybrown 400 background -->
+
+    <!-- Default text and background colors for regular days -->
+    <color name="night_text_color">#000000</color> <!-- Black text -->
+    <color name="night_background_color">#00000000</color> <!-- Transparent background -->
+
+
+
+    <!-- Day Mode: Colors for selected and today -->
+    <color name="selected_day_text_color">#000000</color> <!-- Black text -->
+    <color name="selected_day_background_color">#ebdddd</color> <!-- Rosybrown 200 background -->
+
+    <color name="selected_today_day_text_color">#d7bcbc</color> <!-- Rosybrown 400 text color -->
+    <color name="selected_today_day_background_color">#d7bcbc</color> <!-- Rosybrown 400 background -->
+
+    <!-- Default text and background colors for regular days -->
+    <color name="day_text_color">#000000</color> <!-- Black text -->
+    <color name="day_background_color">#00000000</color> <!-- Transparent background -->
+
+    <color name="transparent">#00000000</color> <!-- Transparent background -->
 
 
 </resources>

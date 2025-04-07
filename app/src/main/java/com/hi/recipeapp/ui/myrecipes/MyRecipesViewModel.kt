@@ -207,7 +207,7 @@ class MyRecipesViewModel @Inject constructor(
 
     private fun mapCalendarRecipesToDays(calendarRecipes: List<Calendar>) {
         val days = mutableListOf<String>()
-        val recipesByDay = mutableMapOf<String, MutableList<String>>()  // Map from date (yyyy-MM-dd) -> list of recipe titles
+        val recipesByDay = mutableMapOf<String, MutableList<String>>()  // Map from date -> list of recipe titles
 
         // Process each calendar entry
         calendarRecipes.forEach { calendarRecipe ->
@@ -244,6 +244,7 @@ class MyRecipesViewModel @Inject constructor(
         // Log for debugging
         Log.d("CalendarMapping", "Mapped calendar recipes: $recipesByDay")
     }
+
 
 
 

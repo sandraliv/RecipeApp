@@ -1,17 +1,14 @@
-import android.graphics.Color
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.classes.UserRecipeCard
-import com.hi.recipeapp.databinding.ItemCalendarBinding
 import org.threeten.bp.LocalDate
-import java.util.Locale
+import android.content.res.Configuration
 
 class CalendarAdapter(
     private val weekHeaders: List<String>,  // Weekdays like Mon, Tue, Wed
@@ -25,6 +22,10 @@ class CalendarAdapter(
     private val dayItemType = 1
     private val headerItemType = 2
 
+    // Variable to store the selected day, initialize to today's date
+    private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
+
+
     fun updateCalendarData(newDays: List<String>, newRecipesByDay: Map<String, List<String>>) {
         val updatedDays = mutableListOf<String>()
         val updatedRecipesByDay = mutableMapOf<String, List<String>>()
@@ -36,16 +37,25 @@ class CalendarAdapter(
         newDays.forEach { day ->
             updatedRecipesByDay[day] = newRecipesByDay[day] ?: emptyList()
         }
+
         // Log the new days and recipes
         Log.d("CalendarAdapter", "Updated days: $updatedDays")
         Log.d("CalendarAdapter", "Updated recipes by day: $updatedRecipesByDay")
-        // Update the data
+
+        // Mark 'today' and 'selected' day
+        val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')  // Today's date, formatted (e.g., "07")
+
+        // Log today for debugging
+        Log.d("CalendarAdapter", "Today's Date: $today")
+
+        // Update the data for the adapter
         this.days = updatedDays
         this.recipesByDay = updatedRecipesByDay
 
         // Notify the adapter that the data has changed
         notifyDataSetChanged()
     }
+
 
 
     override fun getItemViewType(position: Int): Int {
@@ -72,29 +82,36 @@ class CalendarAdapter(
                 holder.bind(header)
             }
             is DayViewHolder -> {
-                // Bind day data
-                val day = days[position - weekHeaders.size] // Subtract the header size to get the day
+                val day = days[position - weekHeaders.size]  // Subtract the header size to get the day
                 val recipes = recipesByDay[day] ?: emptyList()
-
-                // Check if the day is today's date
                 val isToday = isToday(day)
+                val isSelected = day == selectedDay
 
-                holder.bind(day, isToday)
+                // Log today's date and selected date
+                Log.d("CalendarAdapter", "Today's Date: ${LocalDate.now().dayOfMonth}")
+                Log.d("CalendarAdapter", "Initially Selected Day: $selectedDay")
 
-                // Set click listener to pass selected day and recipes to the fragment
+                // Log the selected day for debugging
+                Log.d("CalendarAdapter", "Day: $day, isToday: $isToday, isSelected: $isSelected")
+
+                holder.bind(day, isToday, isSelected)
                 holder.itemView.setOnClickListener {
+                    selectedDay = day
                     onDayClicked(day, recipes)
+
+                    // Log the selected day when clicked
+                    Log.d("CalendarAdapter", "Selected Day: $selectedDay")
+                    notifyDataSetChanged()  // Refresh the adapter to reflect the new selected day
                 }
             }
         }
     }
 
+
     override fun getItemCount(): Int {
-        // Return total count (week headers + days)
         return weekHeaders.size + days.size
     }
 
-    // ViewHolder for Week Header (Mon, Tue, Wed, ...)
     inner class WeekHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val weekHeaderTextView: TextView = itemView.findViewById(R.id.weekHeaderTextView)
 
@@ -103,23 +120,81 @@ class CalendarAdapter(
         }
     }
 
-    // ViewHolder for Day Item (1, 2, 3, ...)
     inner class DayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val dayTextView: TextView = itemView.findViewById(R.id.dayTextView)
 
-        fun bind(day: String, isToday: Boolean) {
+        fun bind(day: String, isToday: Boolean, isSelected: Boolean) {
             dayTextView.text = day
-            dayTextView.setBackgroundColor(
-                if (isToday) itemView.context.getColor(R.color.rosybrown_400) else Color.TRANSPARENT
-            )
+
+            // Determine if the app is in night mode or day mode
+            val isNightMode = (itemView.context.resources.configuration.uiMode and
+                    Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+            // Initialize color variables
+            var textColor: Int
+            var backgroundColor: Int
+
+            if (isNightMode) {
+                // Night Mode: Apply colors specific to night mode
+                if (isToday && isSelected) {
+                    // Today's date is selected in night mode, apply white text with dark background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.white)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.selected_today_night_background_color)
+
+                } else if (isSelected) {
+                    // Other selected date in night mode, apply white text with lighter dark background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.white)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.selected_night_background_color)
+
+                } else if (isToday) {
+                    // Today is not selected in night mode, apply light rosybrown text with transparent background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.selected_today_night_text_color)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.transparent)
+
+                } else {
+                    // Non-selected date in night mode, apply light gray text with transparent background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.selected_night_text_color)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.transparent)
+                }
+            } else {
+                // Day Mode: Apply colors specific to day mode
+                if (isToday && isSelected) {
+                    // Today's date is selected in day mode, apply black text with rosybrown 400 background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.selected_day_text_color)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.selected_today_day_background_color)
+
+                } else if (isSelected) {
+                    // Other selected date in day mode, apply black text with rosybrown 200 background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.selected_day_text_color)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.selected_day_background_color)
+
+                } else if (isToday) {
+                    // Today is not selected in day mode, apply rosýbrown 400 text color with transparent background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.rosybrown)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.transparent)
+
+                } else {
+                    // Non-selected date in day mode, apply black text with transparent background
+                    textColor = ContextCompat.getColor(itemView.context, R.color.black)
+                    backgroundColor = ContextCompat.getColor(itemView.context, R.color.transparent)
+                }
+            }
+
+            // Apply the text color and background color
+            dayTextView.setTextColor(textColor)
+            dayTextView.setBackgroundColor(backgroundColor)
+
+            // Log the color settings applied
+            Log.d("CalendarAdapter", "Text Color: $textColor, Background Color: $backgroundColor")
         }
+
     }
 
-    // Helper function to check if the day is today's date
     private fun isToday(day: String): Boolean {
         val currentDate = LocalDate.now()
         return try {
-            val dayOfMonth = day.toIntOrNull() ?: return false
+            // Ensure day is a two-digit string
+            val dayOfMonth = day.padStart(2, '0').toIntOrNull() ?: return false
             currentDate.dayOfMonth == dayOfMonth &&
                     currentDate.monthValue == currentMonth &&
                     currentDate.year == currentYear
@@ -127,4 +202,5 @@ class CalendarAdapter(
             false
         }
     }
+
 }

@@ -110,7 +110,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingHorizontal="16dp"
-            android:text="March 2025"
             android:textSize="18sp" />
 
         <!-- Next Month Button -->
@@ -118,7 +117,7 @@
             android:id="@+id/nextMonthButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Next" />
+            android:text="" />
 
     </LinearLayout>
 
@@ -160,7 +159,6 @@
         android:id="@+id/recipeListTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Recipes for the selected day will appear here"
         android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_marginTop="16dp" />
