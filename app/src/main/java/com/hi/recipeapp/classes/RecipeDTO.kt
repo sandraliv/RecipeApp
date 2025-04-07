@@ -11,8 +11,8 @@ data class RecipeCard(
     val id:Int,
     val tags: List<String>,
     var isFavoritedByUser: Boolean
-
 )
+
 
 data class FullRecipe(
     val imageUrls: List<String>?,
@@ -77,8 +77,6 @@ enum class RecipeTag {
     }
 }
 
-
-
 enum class Category{
     @SerializedName("BREAKFAST")
     BREAKFAST,
@@ -105,6 +103,7 @@ enum class Category{
         }
     }
 }
+
 enum class SortType{
     @SerializedName("RATING")
     RATING,
@@ -120,3 +119,16 @@ enum class SortType{
         }
     }
 }
+
+data class Calendar(
+    val id: Int,
+    val user: User,
+    val recipe: CalendarRecipeCard?,
+    val userRecipe: CalendarRecipeCard?,
+    val savedCalendarDate: String
+)
+
+data class CalendarRecipeCard(
+    val id : Int,
+    val title : String
+)

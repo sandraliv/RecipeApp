@@ -3,6 +3,7 @@ package com.hi.recipeapp.classes
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         const val KEY_USER_PROFILE_PIC = "user_pic"
         const val KEY_USER_PASSWORD = "user_pw"
         const val KEY_USER_ROLE = "user_role"
+        private const val KEY_CALENDAR_RECIPES = "calendar_recipes"
     }
 
     // Save user ID (if needed)
@@ -146,6 +148,24 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
 
     fun setDarkMode(enabled: Boolean) {
         sharedPreferences.edit().putBoolean("dark_mode", enabled).apply()
+    }
+
+    // Save calendar recipes to session
+    fun saveCalendarRecipes(recipes: List<Calendar>) {
+        val editor = sharedPreferences.edit()
+        val json = Gson().toJson(recipes) // Convert list to JSON
+        editor.putString(KEY_CALENDAR_RECIPES, json)
+        editor.apply()
+    }
+
+    // Retrieve saved calendar recipes
+    fun getSavedCalendarRecipes(): List<Calendar>? {
+        val json = sharedPreferences.getString(KEY_CALENDAR_RECIPES, null)
+        return if (json != null) {
+            Gson().fromJson(json, Array<Calendar>::class.java).toList()
+        } else {
+            null
+        }
     }
 
 }

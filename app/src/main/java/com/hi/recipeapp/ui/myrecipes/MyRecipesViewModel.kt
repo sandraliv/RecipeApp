@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hi.recipeapp.classes.Calendar
+import com.hi.recipeapp.classes.CalendarRecipeCard
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
@@ -26,9 +28,20 @@ class MyRecipesViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val recipeDao: RecipeDao
 ) : ViewModel() {
+    // Change to store recipes as List<String> (titles of recipes)
+    private val _mappedCalendarRecipes =
+        MutableLiveData<Pair<List<String>, Map<String, List<String>>>>()
+    val mappedCalendarRecipes: LiveData<Pair<List<String>, Map<String, List<String>>>> =
+        _mappedCalendarRecipes
+
 
     private val _favoriteRecipes = MutableLiveData<List<RecipeCard>?>()
     val favoriteRecipes: LiveData<List<RecipeCard>?> = _favoriteRecipes
+
+    // Add this to the existing LiveData declarations in MyRecipesViewModel
+    private val _calendarRecipes = MutableLiveData<List<Calendar>?>()
+    val calendarRecipes: LiveData<List<Calendar>?> = _calendarRecipes
+
 
     private val _userRecipes = MutableLiveData<List<UserRecipeCard>?>()
     val userRecipes: LiveData<List<UserRecipeCard>?> = _userRecipes
@@ -44,6 +57,7 @@ class MyRecipesViewModel @Inject constructor(
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
+
     // Function to load user recipes
     fun fetchUserRecipes(page: Int = 0, size: Int = 10) {
         viewModelScope.launch {
@@ -115,7 +129,8 @@ class MyRecipesViewModel @Inject constructor(
 
                     }
                     result.onFailure { error ->
-                        _errorMessage.value = error.localizedMessage ?: "Failed to fetch favorite recipes"
+                        _errorMessage.value =
+                            error.localizedMessage ?: "Failed to fetch favorite recipes"
                         _isLoading.value = false
                     }
                 } else {
@@ -153,6 +168,84 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
+
+    fun fetchAndDisplayCalendarRecipes() {
+        val userId = sessionManager.getUserId()
+
+        if (userId != -1) {
+            _isLoading.value = true
+            viewModelScope.launch {
+                try {
+                    val result = userService.getUserSavedToCalendarRecipes(userId)
+                    result.onSuccess { calendarRecipes ->
+                        // Log the fetched recipes
+                        Log.d("CalendarFetch", "Fetched calendar recipes: $calendarRecipes")
+                        // Save the fetched recipes to session
+                        sessionManager.saveCalendarRecipes(calendarRecipes)
+                        // Update the LiveData with the raw calendar recipes
+                        _calendarRecipes.postValue(calendarRecipes)
+                        // Map the calendar recipes and post to mapped LiveData
+                        mapCalendarRecipesToDays(calendarRecipes)
+                    }.onFailure { exception ->
+                        _errorMessage.postValue("Failed to fetch saved calendar recipes: ${exception.message}")
+                        Log.e("CalendarFetch", "Error fetching calendar recipes: ${exception.message}")
+                    }
+                } catch (exception: Exception) {
+                    _errorMessage.postValue("An error occurred: ${exception.message}")
+                    Log.e("CalendarFetch", "Exception occurred: ${exception.message}")
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.postValue("User is not logged in.")
+            Log.e("CalendarFetch", "User not logged in")
+            _isLoading.value = false
+        }
+    }
+
+
+    private fun mapCalendarRecipesToDays(calendarRecipes: List<Calendar>) {
+        val days = mutableListOf<String>()
+        val recipesByDay = mutableMapOf<String, MutableList<String>>()  // Map from date (yyyy-MM-dd) -> list of recipe titles
+
+        // Process each calendar entry
+        calendarRecipes.forEach { calendarRecipe ->
+            val fullDate = calendarRecipe.savedCalendarDate // full date string "yyyy-MM-dd"
+
+            // Add the full date to the days list if it's not already added
+            if (!days.contains(fullDate)) {
+                days.add(fullDate)  // Adding full date in "yyyy-MM-dd" format
+            }
+
+            // Get the current list of recipe titles for the given day
+            val recipeTitles = recipesByDay.getOrPut(fullDate) { mutableListOf() }
+
+            // Add the recipe title (if present)
+            calendarRecipe.recipe?.let { recipe ->
+                recipeTitles.add(recipe.title)
+            }
+
+            // Add the user recipe title (if present)
+            calendarRecipe.userRecipe?.let { userRecipe ->
+                recipeTitles.add(userRecipe.title)
+            }
+
+            // Update the map with the current day's recipes
+            recipesByDay[fullDate] = recipeTitles
+        }
+
+        // Post the results to LiveData
+        _mappedCalendarRecipes.value = Pair(
+            days.toList(),  // List of days (as full dates "yyyy-MM-dd")
+            recipesByDay.toMap()  // Map of date -> list of recipe titles
+        )
+
+        // Log for debugging
+        Log.d("CalendarMapping", "Mapped calendar recipes: $recipesByDay")
+    }
+
+
 
     private fun RecipeCard.toEntity(): Recipe {
         return Recipe(

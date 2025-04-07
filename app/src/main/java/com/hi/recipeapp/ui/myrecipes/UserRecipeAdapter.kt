@@ -94,7 +94,7 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
                     }
                 })
 
-                binding.imageSwitcher.setOnTouchListener { v, event ->
+                binding.imageSwitcher.setOnTouchListener { _, event ->
                     gestureDetector.onTouchEvent(event)
                     true
                 }

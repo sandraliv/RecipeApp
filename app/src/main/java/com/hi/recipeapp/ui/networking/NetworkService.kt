@@ -1,5 +1,6 @@
 package com.hi.recipeapp.ui.networking
 
+import com.hi.recipeapp.classes.Calendar
 import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.FavoriteRecipesDTO
 import com.hi.recipeapp.classes.FullRecipe
@@ -153,7 +154,26 @@ interface NetworkService {
     }
 
 
+    @GET("/calendar/user/{userId}")
+    suspend fun getUserSavedToCalendarRecipes(
+        @Path("userId") userId: Int
+    ): Response<List<Calendar>>  // Wrapping in Response to handle errors and status codes
 
+    @POST("/calendar/saveToDate")
+    suspend fun saveRecipeToCalendar(
+        @Query("userId") userId: Int,
+        @Query("recipeId") recipeId: Int?,
+        @Query("userRecipeId") userRecipeId: Int?,
+        @Query("date") date: String
+    ): Response<Calendar>  // Wrapping saved Calendar in Response
+
+    @DELETE("/calendar/removeRecipeFromCalendar")
+    suspend fun removeRecipeFromCalendar(
+        @Query("userId") userId: Int,
+        @Query("recipeId") recipeId: Int?,
+        @Query("userRecipeId") userRecipeId: Int?,
+        @Query("dateEntry") date: String
+    ): Response<String>  // Wrapping status message in Response<String>
 
 }
 

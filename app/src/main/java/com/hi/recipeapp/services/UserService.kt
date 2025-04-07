@@ -1,6 +1,7 @@
 package com.hi.recipeapp.services
 
 import android.util.Log
+import com.hi.recipeapp.classes.Calendar
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
@@ -175,6 +176,25 @@ class UserService @Inject constructor(
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    // New method to fetch user saved calendar recipes
+    suspend fun getUserSavedToCalendarRecipes(userId: Int): Result<List<Calendar>> {
+        return try {
+            // Make the network call to fetch saved calendar recipes
+            val response = networkService.getUserSavedToCalendarRecipes(userId)
+
+            if (response.isSuccessful) {
+                // If the request was successful, return the body (which should be a list of Calendar items)
+                Result.success(response.body() ?: emptyList())
+            } else {
+                // Handle the case where the response is not successful
+                Result.failure(Exception("Failed to fetch saved calendar recipes"))
+            }
+        } catch (e: Exception) {
+            // In case of any network errors or exceptions, return a failure result
+            Result.failure(e)
         }
     }
 

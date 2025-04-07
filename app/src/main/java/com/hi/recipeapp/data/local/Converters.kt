@@ -5,6 +5,9 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.RecipeTag
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
+
 
 class Converters {
 
@@ -42,6 +45,20 @@ class Converters {
         if (data == null) return emptySet()
         val type = object : TypeToken<Set<RecipeTag>>() {}.type
         return gson.fromJson(data, type)
+    }
+
+    // Convert LocalDate to String (for database storage)
+    @TypeConverter
+    fun fromLocalDateToString(date: LocalDate?): String? {
+        return date?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    }
+
+    // Convert String (from database) to LocalDate
+    @TypeConverter
+    fun fromStringToLocalDate(dateString: String?): LocalDate? {
+        return dateString?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        }
     }
 
 }

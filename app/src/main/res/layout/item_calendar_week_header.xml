@@ -1,0 +1,23 @@
+<!-- item_calendar_week_header.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+    <!-- For Week Header (e.g., Mon, Tue, ...) -->
+    <TextView
+        android:id="@+id/weekHeaderTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp" />
+
+
+    <!-- Repeat for all week days: Mon, Tue, Wed, etc. -->
+    <!-- Add TextViews for "Tue", "Wed", etc. as needed -->
+</LinearLayout>

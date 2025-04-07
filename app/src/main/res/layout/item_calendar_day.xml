@@ -1,0 +1,20 @@
+<!-- item_calendar_day.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:gravity="center">
+
+    <!-- For Day (e.g., 1, 2, 3, ...) -->
+    <TextView
+        android:id="@+id/dayTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="6dp" />
+</LinearLayout>

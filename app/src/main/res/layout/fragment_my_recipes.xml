@@ -1,55 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- fragment_my_recipes.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="20dp"
     android:orientation="vertical"
     android:padding="16dp"
-    android:paddingBottom="20dp"
-    android:layout_marginBottom="20dp">
+    android:paddingBottom="20dp">
 
-    <!-- Button Bar (Favorites / My Recipes) -->
+    <!-- Button Bar (Favorites / Calendar / My Recipes) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="2dp"
-        android:weightSum="2.01">
+        android:weightSum="3">
 
+        <!-- Favorites Button -->
         <Button
             android:id="@+id/favoritesButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:text="Favorites"
-            android:textColor="@color/button_text_selector"
-            android:textSize="14sp"
+            android:layout_marginHorizontal="2dp"
+            android:layout_weight="1"
             android:elevation="0dp"
             android:gravity="center"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="2dp"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:text="Favorites"
+            android:textAllCaps="false"
+            android:textColor="@color/button_text_selector"
+            android:textSize="14sp" />
 
         <!-- Vertical Line -->
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/rosybrown"
+            android:layout_marginHorizontal="4dp"
             android:layout_weight="0"
-            android:layout_marginHorizontal="4dp"/>
+            android:background="@color/rosybrown" />
+
+        <!-- Calendar Button -->
+        <Button
+            android:id="@+id/calendarButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="2dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Calendar"
+            android:textAllCaps="false"
+            android:textColor="@color/button_text_selector"
+            android:textSize="14sp" />
+
+        <!-- Vertical Line -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="0"
+            android:background="@color/rosybrown" />
 
         <!-- My Recipes Button -->
         <Button
             android:id="@+id/myRecipesButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="My Recipes"
-            android:textColor="@color/button_text_selector"
-            android:textSize="14sp"
+            android:layout_marginHorizontal="2dp"
+            android:layout_weight="1"
             android:elevation="0dp"
             android:gravity="center"
             android:padding="10dp"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="2dp"
-            />
+            android:text="My Recipes"
+            android:textAllCaps="false"
+            android:textColor="@color/button_text_selector"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -57,17 +83,53 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/rosybrown"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:background="@color/rosybrown" />
+
+    <!-- Calendar Navigation (Previous, Current Month, Next) -->
+    <LinearLayout
+        android:id="@+id/calendarButtonsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <!-- Previous Month Button -->
+        <Button
+            android:id="@+id/previousMonthButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Previous" />
+
+        <!-- Current Month Label -->
+        <TextView
+            android:id="@+id/monthTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingHorizontal="16dp"
+            android:text="March 2025"
+            android:textSize="18sp" />
+
+        <!-- Next Month Button -->
+        <Button
+            android:id="@+id/nextMonthButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next" />
+
+    </LinearLayout>
 
     <!-- Progress Bar (Initially invisible) -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_gravity="center"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        android:visibility="gone" />
 
     <!-- RecyclerView to display the list of favorite recipes -->
     <androidx.recyclerview.widget.RecyclerView
@@ -81,6 +143,26 @@
         android:id="@+id/userRecipesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" /> <!-- Make RecyclerView take up available space -->
+        android:layout_weight="1"
+        android:visibility="gone" /> <!-- Make RecyclerView take up available space -->
+
+
+    <!-- RecyclerView for Events or Recipes related to calendar days -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/calendarRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="visible" />
+
+    <!-- New TextView for displaying list of recipes for the selected day -->
+    <TextView
+        android:id="@+id/recipeListTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recipes for the selected day will appear here"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>
