@@ -31,6 +31,10 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context, p
         Log.d(TAG, "User ID saved successfully.")
     }
 
+    fun removeRecipeFromFavourites(recipeId: Int) {
+        recipeDao.removeById(recipeId)
+    }
+
     // Retrieve user ID (if needed)
     fun getUserId(): Int {
         val userId = sharedPreferences.getInt(KEY_USER_ID, -1)

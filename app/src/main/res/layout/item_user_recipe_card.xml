@@ -36,31 +36,52 @@
             </ImageSwitcher>
 
         </FrameLayout>
-
-        <!-- Recipe name -->
-        <TextView
-            android:id="@+id/recipe_name"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/recipe_name"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/playfair_display"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp" />
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
-        <!-- Recipe description -->
-        <TextView
-            android:id="@+id/recipe_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/recipe_description"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="6dp"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="11sp" />
+            <!-- Vertical block for recipe name and description -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/recipe_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recipe_name"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/playfair_display"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/recipe_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recipe_description"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Delete icon -->
+            <ImageButton
+                android:id="@+id/delete_user_recipe"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="@string/a_tiny_trash_can_icon"
+                android:src="@drawable/delete"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:visibility="visible"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="center_vertical" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

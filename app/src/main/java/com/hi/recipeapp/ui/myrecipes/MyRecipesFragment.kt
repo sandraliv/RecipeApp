@@ -57,11 +57,17 @@ class MyRecipesFragment : Fragment() {
 
         )
 
-        userRecipeAdapter = UserRecipeAdapter { userRecipe ->
-            val recipeId = userRecipe.id
-            val action = MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
-            findNavController().navigate(action)
-        }
+        userRecipeAdapter = UserRecipeAdapter(
+            onClick = { userRecipe ->
+                val recipeId = userRecipe.id
+                val action =
+                    MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(
+                        recipeId
+                    )
+                findNavController().navigate(action)
+            },
+            onDeleteClick ={recipeId -> myRecipesViewModel.deleteRecipe(recipeId)},
+        )
 
 
         setupRecyclerView()
@@ -72,6 +78,12 @@ class MyRecipesFragment : Fragment() {
         myRecipesViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 // Show the message using Snackbar
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        myRecipesViewModel.recipeDeleted.observe(viewLifecycleOwner) { message ->
+            message?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }

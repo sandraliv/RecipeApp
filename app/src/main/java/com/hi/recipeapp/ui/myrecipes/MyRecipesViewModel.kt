@@ -30,6 +30,9 @@ class MyRecipesViewModel @Inject constructor(
     private val _favoriteRecipes = MutableLiveData<List<RecipeCard>?>()
     val favoriteRecipes: LiveData<List<RecipeCard>?> = _favoriteRecipes
 
+    private val _recipeDeleted = MutableLiveData<String>()
+    val recipeDeleted: LiveData<String> = _recipeDeleted
+
     private val _userRecipes = MutableLiveData<List<UserRecipeCard>?>()
     val userRecipes: LiveData<List<UserRecipeCard>?> = _userRecipes
 
@@ -166,5 +169,23 @@ class MyRecipesViewModel @Inject constructor(
             isFavoritedByUser = isFavoritedByUser
         )
     }
+
+    fun deleteRecipe(recipeId: Int) {
+        viewModelScope.launch {
+            try {
+                val result = recipeService.deleteUserRecipe(recipeId, sessionManager.getUserId())
+                if(result.isSuccessful) {
+                    _recipeDeleted.value = "Recipe deleted"
+                } else {
+                    _recipeDeleted.value = "There was an error, try again"
+                }
+            } catch (e: Exception) {
+                _recipeDeleted.value = "There was an error, try again"
+            }
+
+        }
+    }
+
+
 
 }

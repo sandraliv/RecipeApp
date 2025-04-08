@@ -8,6 +8,7 @@ import com.hi.recipeapp.classes.UserRecipeCard
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -15,7 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.hi.recipeapp.R
 import com.hi.recipeapp.databinding.ItemUserRecipeCardBinding
 
-class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAdapter<UserRecipeCard, UserRecipeAdapter.UserRecipeViewHolder>(UserRecipeDiffCallback()) {
+class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit, private val onDeleteClick: (recipeId: Int) -> Unit) : ListAdapter<UserRecipeCard, UserRecipeAdapter.UserRecipeViewHolder>(UserRecipeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserRecipeViewHolder {
         val binding = ItemUserRecipeCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -34,6 +35,7 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
 
         fun bind(userRecipe: UserRecipeCard) {
 
+
             binding.recipeName.text = userRecipe.title
             binding.recipeDescription.text = userRecipe.description
 
@@ -44,6 +46,17 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
             // Handle image click to navigate to recipe details (image click)
             binding.imageSwitcher.setOnClickListener {
                 onClick(userRecipe)
+            }
+
+            binding.deleteUserRecipe.setOnClickListener {
+                AlertDialog.Builder(binding.root.context)
+                    .setTitle("Delete Recipe")
+                    .setMessage("Are you sure you want to delete \"${userRecipe.title}\"?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        onDeleteClick(userRecipe.id)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
             }
 
             // Handle image switching using ImageSwitcher and gesture detector

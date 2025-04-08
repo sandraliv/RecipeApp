@@ -91,5 +91,18 @@
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"/>
 
+        <Button
+            android:id="@+id/saveRecipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_recipe"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/addrecipe_button"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"/>
+
     </LinearLayout>
 </ScrollView>

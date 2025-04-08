@@ -9,10 +9,12 @@ import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.SortType
+import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import java.util.Locale
 import javax.inject.Inject
 
@@ -115,6 +117,7 @@ class HomeViewModel @Inject constructor(
                         _favoriteActionMessage.value = "Recipe added to favorites"
                     } else {
                         recipeService.removeRecipeFromFavorites(recipe.id)
+                        sessionManager.removeRecipeFromFavourites(recipe.id)
                         _favoriteActionMessage.value = "Recipe removed from favorites"
                     }
 
@@ -237,6 +240,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    suspend fun patchRecipe(updatedRecipe: UserFullRecipe): Response<String> {
+        return recipeService.patchRecipe(updatedRecipe)
+    }
 
 
 }

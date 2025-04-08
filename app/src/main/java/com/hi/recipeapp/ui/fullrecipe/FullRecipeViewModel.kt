@@ -98,7 +98,6 @@ class FullRecipeViewModel @Inject constructor(
             try {
                 // Call the method to update the rating
                 val result = recipeService.addRecipeRating(recipeId, rating)
-
                 // Handle the Result
                 if (result.isSuccess) {
                     // Create a new FullRecipe object with updated rating and rating count

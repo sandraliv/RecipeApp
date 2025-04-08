@@ -54,6 +54,11 @@ interface NetworkService {
     @DELETE("recipes/{id}")
     suspend fun deleteRecipe(@Path("id") id: Int): Response<Unit>
 
+    @DELETE("user-recipes/{recipeId}")
+    suspend fun deleteUserRecipe(
+        @Path("recipeId") recipeId: Int,
+        @Query("userId") userId: Int
+    ): Response<Unit>
 
     @GET("recipes/all")
     fun getAllRecipes(
@@ -142,6 +147,12 @@ interface NetworkService {
         @Path("userId") userId: Int,
         @Body recipe: UserFullRecipe
     ): Response<UserFullRecipe>
+
+    @PATCH("recipes/{id}")
+    suspend fun patchRecipe(
+        @Path("id") id: Int,
+        @Body recipe: UserFullRecipe
+    ): Response<String>
 
 
     interface ImageUploadService {
