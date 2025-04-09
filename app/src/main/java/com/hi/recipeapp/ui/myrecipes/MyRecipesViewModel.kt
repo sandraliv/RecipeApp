@@ -105,16 +105,10 @@ class MyRecipesViewModel @Inject constructor(
                         Log.d("TEST", "EKKI VILLA Í VM")
                         _isLoading.value = false
                         favoriteRecipes.forEach { it.isFavoritedByUser = true }
-                        favoriteRecipes.forEach { recipe ->
-                            Log.d("Recipe", recipe.title)
-                        }
-
                         _favoriteRecipes.value = favoriteRecipes
 
                         val recipeEntities = favoriteRecipes.map { it.toEntity() }
                         recipeDao.insertAll(recipeEntities)
-
-                        Log.d("HALLOHEIMUR", "ÉG ER Í DABASE")
 
                     }
                     result.onFailure { error ->
@@ -164,9 +158,11 @@ class MyRecipesViewModel @Inject constructor(
             description = description,
             imageUrls = imageUrls,
             averageRating = averageRating,
+            instructions = instructions,
             ratingCount = ratingCount,
             tags = tags,
-            isFavoritedByUser = isFavoritedByUser
+            isFavoritedByUser = isFavoritedByUser,
+            ingredients = ingredients
         )
     }
 

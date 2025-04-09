@@ -19,7 +19,7 @@ interface RecipeDao {
     suspend fun removeAll()
 
     @Query("Select * FROM user_recipes WHERE id = :id")
-    fun findByPrimaryKey(id: Int): Recipe
+    suspend fun findByPrimaryKey(id: Int): Recipe?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(recipes: List<Recipe>)

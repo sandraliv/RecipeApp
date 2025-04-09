@@ -6,6 +6,8 @@ data class RecipeCard(
     val imageUrls: List<String>,
     val title: String,
     val description: String,
+    val instructions: String,
+    @SerializedName("ingredients") val ingredients: Map<String, String>,
     val averageRating: Double,
     val ratingCount: Int,
     val id:Int,
@@ -23,7 +25,7 @@ data class FullRecipe(
     val id:Int,
     val instructions: String,
     @SerializedName("ingredients") val ingredients: Map<String, String>,
-    @SerializedName("tags") val tags: Set<RecipeTag>,
+    @SerializedName("tags") val tags: List<String>,
     @SerializedName("categories") val categories: Set<Category>,
     var isFavoritedByUser: Boolean
 )
