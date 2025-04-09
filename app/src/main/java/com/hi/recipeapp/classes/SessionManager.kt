@@ -151,7 +151,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     }
 
     // Save calendar recipes to session
-    fun saveCalendarRecipes(recipes: List<Calendar>) {
+    fun saveCalendarRecipes(recipes: List<CalendarEntry>) {
         val editor = sharedPreferences.edit()
         val json = Gson().toJson(recipes) // Convert list to JSON
         editor.putString(KEY_CALENDAR_RECIPES, json)
@@ -159,10 +159,10 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     }
 
     // Retrieve saved calendar recipes
-    fun getSavedCalendarRecipes(): List<Calendar>? {
+    fun getSavedCalendarRecipes(): List<CalendarEntry>? {
         val json = sharedPreferences.getString(KEY_CALENDAR_RECIPES, null)
         return if (json != null) {
-            Gson().fromJson(json, Array<Calendar>::class.java).toList()
+            Gson().fromJson(json, Array<CalendarEntry>::class.java).toList()
         } else {
             null
         }

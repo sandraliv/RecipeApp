@@ -14,4 +14,5 @@ plugins {
     // The KSP plugin (matching your Kotlin version)
     alias(libs.plugins.kotlin.ksp) apply false
     alias(libs.plugins.hilt.android) apply false
+
 }

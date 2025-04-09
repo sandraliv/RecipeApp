@@ -9,14 +9,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hi.recipeapp.R
 import org.threeten.bp.LocalDate
 import android.content.res.Configuration
+import com.hi.recipeapp.classes.CalendarEntry
 
 class CalendarAdapter(
     private val weekHeaders: List<String>,  // Weekdays like Mon, Tue, Wed
     private var days: List<String>,         // Days of the month (1, 2, 3, etc.)
-    private var recipesByDay: Map<String, List<String>>,  // Recipes for each day
+    private var recipesByDay: Map<String, List<CalendarEntry>>,  // Recipes for each day
     private val currentMonth: Int,         // Current month for highlighting today's date
     private val currentYear: Int,          // Current year for checking if it's today's date
-    private val onDayClicked: (String, List<String>) -> Unit // Pass day and recipes to Fragment
+    private val onDayClicked: (String, List<CalendarEntry>) -> Unit // Pass day and recipes to Fragment
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val dayItemType = 1
@@ -26,9 +27,9 @@ class CalendarAdapter(
     private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
 
 
-    fun updateCalendarData(newDays: List<String>, newRecipesByDay: Map<String, List<String>>) {
+    fun updateCalendarData(newDays: List<String>, newRecipesByDay: Map<String, List<CalendarEntry>>) {
         val updatedDays = mutableListOf<String>()
-        val updatedRecipesByDay = mutableMapOf<String, List<String>>()
+        val updatedRecipesByDay = mutableMapOf<String, List<CalendarEntry>>()
 
         // Add all the new days (ensure no days are missing)
         updatedDays.addAll(newDays)
@@ -87,8 +88,6 @@ class CalendarAdapter(
                 val isToday = isToday(day)
                 val isSelected = day == selectedDay
 
-                // Log today's date and selected date
-                Log.d("CalendarAdapter", "Today's Date: ${LocalDate.now().dayOfMonth}")
                 Log.d("CalendarAdapter", "Initially Selected Day: $selectedDay")
 
                 // Log the selected day for debugging
@@ -184,8 +183,6 @@ class CalendarAdapter(
             dayTextView.setTextColor(textColor)
             dayTextView.setBackgroundColor(backgroundColor)
 
-            // Log the color settings applied
-            Log.d("CalendarAdapter", "Text Color: $textColor, Background Color: $backgroundColor")
         }
 
     }

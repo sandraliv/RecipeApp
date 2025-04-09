@@ -17,7 +17,4 @@
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="8dp" />
 
-
-    <!-- Repeat for all week days: Mon, Tue, Wed, etc. -->
-    <!-- Add TextViews for "Tue", "Wed", etc. as needed -->
 </LinearLayout>

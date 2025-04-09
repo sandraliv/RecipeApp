@@ -101,6 +101,7 @@
             android:id="@+id/previousMonthButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textAllCaps="false"
             android:text="Previous" />
 
         <!-- Current Month Label -->
@@ -110,6 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingHorizontal="16dp"
+            android:textAllCaps="false"
             android:textSize="18sp" />
 
         <!-- Next Month Button -->
@@ -117,7 +119,8 @@
             android:id="@+id/nextMonthButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:textAllCaps="false"
+            android:text="next" />
 
     </LinearLayout>
 
@@ -152,7 +155,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <!-- New TextView for displaying list of recipes for the selected day -->
     <TextView
@@ -162,5 +165,11 @@
         android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_marginTop="16dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/calendarRecipeRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
 
 </LinearLayout>

@@ -11,14 +11,15 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
-import com.hi.recipeapp.classes.Calendar
-import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.classes.UserRecipeCard
-import com.hi.recipeapp.data.local.Recipe
+import com.hi.recipeapp.classes.CalendarEntry
+import com.hi.recipeapp.classes.CalendarRecipeCard
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.databinding.FragmentMyRecipesBinding
 import com.hi.recipeapp.ui.home.RecipeAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,16 +36,14 @@ class MyRecipesFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var userRecipeAdapter: UserRecipeAdapter
     private lateinit var calendarAdapter: CalendarAdapter
+    private lateinit var sessionManager: SessionManager
+    private lateinit var calendarRecipeCardAdapter: CalendarRecipeCardAdapter
 
     private val starSize = 30
     private val spaceBetweenStars = 3
-
     private val gridColumnCount = 2
     private val calendarGridColumnCount = 7
-
     private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
-
-
     private var currentMonth: Int = LocalDate.now().monthValue
     private var currentYear: Int = LocalDate.now().year
 
@@ -53,7 +52,6 @@ class MyRecipesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
-
 
         // Initialize the adapters
         recipeAdapter = RecipeAdapter(
@@ -79,21 +77,55 @@ class MyRecipesFragment : Fragment() {
                 MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
             findNavController().navigate(action)
         }
+
+        calendarAdapter = CalendarAdapter(
+            weekHeaders = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+            days = listOf(), // Empty initially, we'll update this in updateCalendar()
+            recipesByDay = mutableMapOf(),  // Empty initially
+            currentMonth = currentMonth,
+            currentYear = currentYear,
+            onDayClicked = { selectedDay, recipes ->  // Correct parameter name
+                // Handle the day click
+                updateRecipeListForDay(selectedDay)
+            }
+        )
+
+        calendarRecipeCardAdapter = CalendarRecipeCardAdapter(
+            recipeList = emptyList(), // Start with an empty list
+            onRecipeClick = { clickedRecipe ->
+                // Handle recipe click, navigate accordingly
+                val recipeId = clickedRecipe.id
+
+                // Use NavDirections for navigation
+                val action = if (clickedRecipe.isUserRecipe) {
+                    // Navigate to the user recipe fragment
+                    MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
+                } else {
+                    // Navigate to the home recipe fragment
+                    MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
+                }
+
+                // Perform the navigation
+                findNavController().navigate(action)
+            }
+        )
+
+
+        // Set the adapter to your RecyclerView once
+        binding.calendarRecipeRecyclerView.adapter = calendarRecipeCardAdapter
+
+
         // Initializing the calendar view
         Log.d("CalendarFragment", "Initializing recycler view.")
         // Set up RecyclerView
         setupRecyclerView()
 
-        // Set up button listeners
         setupButtonListeners()
 
-        // Observe ViewModel
         observeViewModel()
 
-        // Set the initial state
         setInitialState()
 
-        // Observe favorite action message
         myRecipesViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 // Show the message using Snackbar
@@ -105,29 +137,21 @@ class MyRecipesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        // Set up the calendar adapter
-        calendarAdapter = CalendarAdapter(
-            weekHeaders = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
-            days = listOf(), // Empty initially, we'll update this in updateCalendar()
-            recipesByDay = mutableMapOf(),  // Empty initially
-            currentMonth = currentMonth,
-            currentYear = currentYear
-        ) { selectedDay, recipes ->
-            // Handle the day click
-            Log.d("Calendar", "Day clicked: $selectedDay")
 
-            // Update the TextView to display recipes for the selected day
-            val recipeListTextView = binding.recipeListTextView
-            if (recipes.isEmpty()) {
-                recipeListTextView.text = "No recipes for this day"
-            } else {
-                recipeListTextView.text = "Recipes for $selectedDay:\n" + recipes.joinToString("\n")
-            }
+        // Set up RecyclerView for the calendar recipe list
+        binding.calendarRecipeRecyclerView.apply {
+            layoutManager =
+                LinearLayoutManager(context) // Use LinearLayoutManager for displaying the recipes for a day
+            adapter =
+                calendarRecipeCardAdapter // This is the adapter for displaying the recipes of the selected day
         }
 
         // Ensure RecyclerView uses this adapter
         binding.calendarRecyclerView.apply {
-            layoutManager = GridLayoutManager(context, calendarGridColumnCount)  // Use calendarGridColumnCount for 7 columns
+            layoutManager = GridLayoutManager(
+                context,
+                calendarGridColumnCount
+            )  // Use calendarGridColumnCount for 7 columns
             adapter = calendarAdapter
         }
 
@@ -172,6 +196,7 @@ class MyRecipesFragment : Fragment() {
             } else {
                 currentMonth - 1
             }
+            updateCalendarWithCurrentMonth()
             updateCalendar()
         }
 
@@ -183,14 +208,21 @@ class MyRecipesFragment : Fragment() {
             } else {
                 currentMonth + 1
             }
+            updateCalendarWithCurrentMonth()
             updateCalendar()
         }
     }
 
-    private fun toggleVisibility(favVis: Int, userVis: Int, calendarVis: Int, calendarBtnsVis: Int) {
+    private fun toggleVisibility(
+        favVis: Int,
+        userVis: Int,
+        calendarVis: Int,
+        calendarBtnsVis: Int
+    ) {
         binding.favoriteRecipeRecyclerView.visibility = favVis
         binding.userRecipesRecyclerView.visibility = userVis
         binding.calendarRecyclerView.visibility = calendarVis
+        binding.calendarRecipeRecyclerView.visibility = calendarVis
         binding.previousMonthButton.visibility = calendarBtnsVis
         binding.nextMonthButton.visibility = calendarBtnsVis
         binding.calendarButtonsContainer.visibility = calendarBtnsVis
@@ -199,38 +231,61 @@ class MyRecipesFragment : Fragment() {
     private fun setInitialState() {
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
 
+
         binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
         binding.userRecipesRecyclerView.visibility = View.GONE
         binding.calendarRecyclerView.visibility = View.GONE
+        binding.calendarRecipeRecyclerView.visibility = View.GONE
         binding.previousMonthButton.visibility = View.GONE
         binding.nextMonthButton.visibility = View.GONE
 
         setActiveButton(binding.favoritesButton)
         myRecipesViewModel.fetchFavoriteRecipes()
-        // Update the calendar's TextView with today's recipes
-        updateRecipeListTextViewForDay(today)
-
-        // Set today's date as the selected day in the calendar adapter
+        updateRecipeListForDay(today)
         selectedDay = today
     }
 
-    private fun updateRecipeListTextViewForDay(day: String) {
+    private fun updateRecipeListForDay(day: String) {
+        val recipeRecyclerView = binding.calendarRecipeRecyclerView
         val recipeListTextView = binding.recipeListTextView
-
-        // Ensure both today and day are two-digit strings
         val formattedDay = day.padStart(2, '0')
 
         // Convert formattedDay to LocalDate and format it to a human-readable string (e.g., "01 January")
         val dayOfMonth = LocalDate.of(currentYear, currentMonth, formattedDay.toInt())
         val formattedDayString = CalendarUtils.formattedDate(dayOfMonth)
 
-        // Get recipes for this day
-        val recipesForToday: List<String> = myRecipesViewModel.mappedCalendarRecipes.value?.second?.get(formattedDay) ?: emptyList()
+        // Format the selected day to include the full date (Year-Month-Day)
+        val selectedDate = LocalDate.of(currentYear, currentMonth, formattedDay.toInt()).toString()  // "2025-04-01"
+        Log.d("MY RECIPES FRAGMENT", "Selected Date: $selectedDate")
+        // Get the recipes for the selected full date from your ViewModel (CalendarEntry list)
+        val calendarEntriesForToday: List<CalendarEntry> =
+            myRecipesViewModel.mappedCalendarRecipes.value?.second?.get(selectedDate) ?: emptyList()
+
+        Log.d("MY RECIPES FRAGMENT", "Found recipes for $selectedDate: ${calendarEntriesForToday.size}")  // Log the number of recipes found
+
+        // Convert CalendarEntry to CalendarRecipeCard
+        val recipesForToday: List<CalendarRecipeCard> =
+            calendarEntriesForToday.mapNotNull { calendarEntry ->
+                // Assuming each CalendarEntry contains either a recipe or a userRecipe that is a CalendarRecipeCard
+                calendarEntry.recipe ?: calendarEntry.userRecipe
+            }
+        Log.d("MY RECIPES FRAGMENT", "Mapped recipes to CalendarRecipeCard for $selectedDate: ${recipesForToday.size}")
+
+        // Now submit the new list to the adapter
+        val newRecipeList: List<CalendarRecipeCard> = recipesForToday // Get your new list of recipes
+        calendarRecipeCardAdapter.submitList(newRecipeList)  // Use submitList to update the data
 
         if (recipesForToday.isEmpty()) {
+            // If no recipes are available for the selected date, show a message and hide the RecyclerView
+            recipeRecyclerView.visibility = View.GONE
+            recipeListTextView.visibility = View.VISIBLE
             recipeListTextView.text = "No recipes for $formattedDayString"
+            Log.d("MY RECIPES FRAGMENT", "No recipes for $selectedDate, $formattedDayString")
         } else {
-            recipeListTextView.text = "Recipes for $formattedDayString:\n" + recipesForToday.joinToString("\n")
+            // Show the RecyclerView and hide the "No recipes" message
+            recipeRecyclerView.visibility = View.VISIBLE
+            recipeListTextView.visibility = View.GONE
+            Log.d("MY RECIPES FRAGMENT", "Submitting list of recipes to adapter for $selectedDate")
         }
     }
 
@@ -241,142 +296,158 @@ class MyRecipesFragment : Fragment() {
             Month.of(currentMonth).name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }  // e.g., "April"
         val year = currentYear.toString()
 
-        binding.monthTextView.text = "$monthName $year"  // Assuming you have a TextView to show the current month.
+        binding.monthTextView.text =
+            "$monthName $year"  // Assuming you have a TextView to show the current month.
     }
 
     private fun setActiveButton(button: Button) {
-        val selectedTint = ContextCompat.getColorStateList(requireContext(), R.color.button_selected_tint)
-        val defaultTint = ContextCompat.getColorStateList(requireContext(), R.color.button_default_tint)
+        val selectedTint =
+            ContextCompat.getColorStateList(requireContext(), R.color.button_selected_tint)
+        val defaultTint =
+            ContextCompat.getColorStateList(requireContext(), R.color.button_default_tint)
 
         binding.favoritesButton.isSelected = button == binding.favoritesButton
         binding.myRecipesButton.isSelected = button == binding.myRecipesButton
         binding.calendarButton.isSelected = button == binding.calendarButton
 
-        binding.favoritesButton.backgroundTintList = if (button == binding.favoritesButton) selectedTint else defaultTint
-        binding.myRecipesButton.backgroundTintList = if (button == binding.myRecipesButton) selectedTint else defaultTint
-        binding.calendarButton.backgroundTintList = if (button == binding.calendarButton) selectedTint else defaultTint
+        binding.favoritesButton.backgroundTintList =
+            if (button == binding.favoritesButton) selectedTint else defaultTint
+        binding.myRecipesButton.backgroundTintList =
+            if (button == binding.myRecipesButton) selectedTint else defaultTint
+        binding.calendarButton.backgroundTintList =
+            if (button == binding.calendarButton) selectedTint else defaultTint
 
-        binding.favoritesButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
-        binding.myRecipesButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
-        binding.calendarButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector))
+        binding.favoritesButton.setTextColor(
+            ContextCompat.getColorStateList(
+                requireContext(),
+                R.color.button_text_selector
+            )
+        )
+        binding.myRecipesButton.setTextColor(
+            ContextCompat.getColorStateList(
+                requireContext(),
+                R.color.button_text_selector
+            )
+        )
+        binding.calendarButton.setTextColor(
+            ContextCompat.getColorStateList(
+                requireContext(),
+                R.color.button_text_selector
+            )
+        )
     }
 
     private fun updateCalendar() {
-        // Get the first day of the month and the number of days in the month
         val firstDayOfMonth = YearMonth.of(currentYear, currentMonth).atDay(1).dayOfWeek.value
         val daysInMonth = YearMonth.of(currentYear, currentMonth).lengthOfMonth()
 
         val days = mutableListOf<String>()
-
-        // Add empty days before the first day of the month (ensure proper start)
         for (i in 1 until firstDayOfMonth) {
-            days.add("") // Empty day to fill the first row
+            days.add("")
         }
 
-        // Add actual days of the current month (1 to 31)
         for (i in 1..daysInMonth) {
-            days.add(i.toString())  // Add the actual day numbers to the grid
+            days.add(i.toString())
         }
 
-        // Add empty cells to complete the last row in the calendar grid
         val totalCells = days.size
-        val emptyCells = 7 - (totalCells % 7)  // Ensure full 7-column weeks
+        val emptyCells = 7 - (totalCells % 7)
         if (emptyCells != 7) {
             for (i in 1..emptyCells) {
-                days.add("")  // Add empty days at the end to fill the calendar
+                days.add("")
             }
         }
 
-        // Log the generated calendar days (for debugging)
-        Log.d("Calendar", "Generated days: $days")
-
-        // Observe the ViewModel to get recipes by day
+        // Now update the adapter with the new days for the selected month
         myRecipesViewModel.mappedCalendarRecipes.observe(viewLifecycleOwner) { (daysList, recipesByDay) ->
-            val recipesByDayMap = mutableMapOf<String, MutableList<String>>()
+            val recipesByDayMap = mutableMapOf<String, MutableList<CalendarEntry>>()
 
-            // Map each day to its corresponding recipes (by date)
             daysList.forEach { day ->
                 val recipes = recipesByDay[day] ?: listOf()
                 if (recipes.isNotEmpty()) {
-                    recipesByDayMap[day] = recipes.toMutableList()  // Store the recipes for each day
+                    val calendarEntries = recipes.mapNotNull { calendarEntry ->
+                        val calendarRecipeCard = calendarEntry.recipe ?: calendarEntry.userRecipe
+                        calendarRecipeCard?.let {
+                            CalendarEntry(
+                                id = it.id,
+                                userId = sessionManager.getUserId(),
+                                recipe = it,
+                                userRecipe = it,
+                                savedCalendarDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-${day}"
+                            )
+                        }
+                    }
+
+                    recipesByDayMap[day] = calendarEntries.toMutableList()
                 }
             }
 
-            // Log the mapped recipes (for debugging)
-            Log.d("Calendar", "Mapped calendar recipes: $recipesByDayMap")
+            val fullCalendarRecipes = mutableMapOf<String, List<CalendarEntry>>()
 
-            // Now match the full calendar days with the recipes
-            val fullCalendarRecipes = mutableMapOf<String, List<String>>()
-
-            // Fill all days with recipes or empty list if no recipes for that day
-            for (day in days) {
+            daysList.forEach { day ->
                 val recipesForDay = recipesByDayMap[day] ?: listOf()
                 fullCalendarRecipes[day] = recipesForDay
             }
 
-            // Log the final full calendar recipes (for debugging)
-            Log.d("Calendar", "Full calendar with recipes: $fullCalendarRecipes")
-
-            // Update the adapter with the complete calendar data
-            calendarAdapter.updateCalendarData(days, fullCalendarRecipes)
+            // Once the data is updated, make sure the adapter is also updated
+            calendarAdapter.updateCalendarData(daysList, fullCalendarRecipes)
         }
     }
 
+
     private fun initializeCalendarForCurrentMonth() {
-        // Get the days in the current month
+        // Get days of the current month and format them
         val newDays = CalendarUtils.daysInMonthArray(LocalDate.of(currentYear, currentMonth, 1))
             .map { it?.dayOfMonth?.toString()?.padStart(2, '0') ?: " " }
 
-        // Fetch the calendar recipes from the ViewModel
+        // Observe calendar recipes from ViewModel
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->
-            val recipesByDay = mutableMapOf<String, List<String>>()
+            val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>()
 
-            // Populate the recipesByDay map
+            // Loop through the calendar recipes and add them to recipesByDay
             calendarRecipes?.forEach { calendar ->
-                val fullDate = calendar.savedCalendarDate  // Assuming this is the key to each calendar day
-                val recipeTitles = mutableListOf<String>()
+                val fullDate = calendar.savedCalendarDate
 
-                // Add recipes from the 'recipe' property, if available
+                // Create a list of CalendarEntry objects
+                val calendarEntries = mutableListOf<CalendarEntry>()
+
+                // Add the recipe to the list if available
                 calendar.recipe?.let { recipe ->
-                    recipeTitles.add(recipe.title)
+                    calendarEntries.add(calendar)  // Add the current calendar entry
                 }
 
-                // Add recipes from the 'userRecipe' property, if available
+                // Add the user-created recipe if available
                 calendar.userRecipe?.let { userRecipe ->
-                    recipeTitles.add(userRecipe.title)
+                    calendarEntries.add(calendar)  // Add the user recipe
                 }
 
-                // Add the recipes to the map with the fullDate as the key
-                recipesByDay[fullDate] = recipeTitles
+                // Store recipes by full date key (the fullDate here is the "yyyy-MM-dd" format)
+                recipesByDay[fullDate] = calendarEntries
             }
 
-            // Now, ensure we match the newDays with the recipes
+            // Ensure we match the newDays with the recipes (fullDate format: YYYY-MM-DD)
             val updatedRecipesByDay = newDays.associateWith { day ->
-                val fullDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-$day"  // Example: "2025-04-01"
-
-
-                // If the day is null or doesn't have a recipe, return an empty list
-                if (day == " " || recipesByDay[fullDate].isNullOrEmpty()) {
-                    emptyList()  // Return an empty list if no recipes are found or the date is null
-                } else {
-                    recipesByDay[fullDate] ?: emptyList()  // Return an empty list if no recipes are found
-                }
+                val fullDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-$day"
+                // Return the recipes for that date, or empty list if no recipes
+                recipesByDay[fullDate] ?: emptyList()
             }
 
-            // Bind the day names and recipes data to the adapter
+            // Update the adapter with the new days and associated recipes
             calendarAdapter.updateCalendarData(newDays, updatedRecipesByDay)
         }
 
-        // Update the month display
+        // Ensure you update the calendar view with the current month
         updateCalendarWithCurrentMonth()
     }
+
 
     private fun observeViewModel() {
         myRecipesViewModel.favoriteRecipes.observe(viewLifecycleOwner) { recipes ->
             if (recipes != null) {
                 recipeAdapter.submitList(recipes)
             } else {
-                Toast.makeText(requireContext(), "No favorite recipes found.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No favorite recipes found.", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
@@ -401,7 +472,8 @@ class MyRecipesFragment : Fragment() {
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->
             calendarRecipes?.let { recipes ->
                 val days = mutableListOf<String>()
-                val recipesByDay = mutableMapOf<String, MutableList<String>>()
+                val recipesByDay =
+                    mutableMapOf<String, MutableList<CalendarEntry>>() // Use CalendarEntry instead of String
 
                 recipes.forEach { calendar ->
                     val day = calendar.savedCalendarDate
@@ -411,16 +483,24 @@ class MyRecipesFragment : Fragment() {
                         days.add(dayOfMonth)
                     }
 
+                    // Initialize the recipe list for the specific day
                     val recipeList = recipesByDay[dayOfMonth] ?: mutableListOf()
-                    calendar.recipe?.let { recipeList.add(it.title) }
-                    calendar.userRecipe?.let { recipeList.add(it.title) }
+
+                    // Add recipe and user recipe if available
+                    calendar.recipe?.let { recipeList.add(calendar) }
+                    calendar.userRecipe?.let { recipeList.add(calendar) }
+
+                    // Update the map with the list of CalendarEntry objects for that day
                     recipesByDay[dayOfMonth] = recipeList
                 }
 
                 // Call the method to update the calendar adapter
+                // Make sure to pass the updated data to the adapter
                 calendarAdapter.updateCalendarData(days, recipesByDay)
             }
         }
+
+
     }
 }
 

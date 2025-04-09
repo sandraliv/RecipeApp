@@ -5,7 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hi.recipeapp.classes.Calendar
+
+import com.hi.recipeapp.classes.CalendarEntry
 import com.hi.recipeapp.classes.CalendarRecipeCard
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeCard
@@ -19,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
+import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,19 +30,23 @@ class MyRecipesViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val recipeDao: RecipeDao
 ) : ViewModel() {
-    // Change to store recipes as List<String> (titles of recipes)
+    // LiveData for mapped calendar recipes with full recipe cards (not just titles)
     private val _mappedCalendarRecipes =
-        MutableLiveData<Pair<List<String>, Map<String, List<String>>>>()
-    val mappedCalendarRecipes: LiveData<Pair<List<String>, Map<String, List<String>>>> =
+        MutableLiveData<Pair<List<String>, Map<String, List<CalendarEntry>>>>()
+    val mappedCalendarRecipes: LiveData<Pair<List<String>, Map<String, List<CalendarEntry>>>> =
         _mappedCalendarRecipes
+
+    // LiveData for the list of recipe titles
+    private val _mappedCalendarRecipesTitles = MutableLiveData<List<CalendarRecipeCard>>()
+    val mappedCalendarRecipesTitles: LiveData<List<CalendarRecipeCard>> = _mappedCalendarRecipesTitles
 
 
     private val _favoriteRecipes = MutableLiveData<List<RecipeCard>?>()
     val favoriteRecipes: LiveData<List<RecipeCard>?> = _favoriteRecipes
 
     // Add this to the existing LiveData declarations in MyRecipesViewModel
-    private val _calendarRecipes = MutableLiveData<List<Calendar>?>()
-    val calendarRecipes: LiveData<List<Calendar>?> = _calendarRecipes
+    private val _calendarRecipes = MutableLiveData<List<CalendarEntry>?>()
+    val calendarRecipes: LiveData<List<CalendarEntry>?> = _calendarRecipes
 
 
     private val _userRecipes = MutableLiveData<List<UserRecipeCard>?>()
@@ -176,6 +182,10 @@ class MyRecipesViewModel @Inject constructor(
             _isLoading.value = true
             viewModelScope.launch {
                 try {
+
+                    // Fetch the user object (assuming we can fetch user by ID from the service)
+                    val currentUser = userService.getUserProfileById(userId)  // Or use sessionManager if the user is in session
+
                     val result = userService.getUserSavedToCalendarRecipes(userId)
                     result.onSuccess { calendarRecipes ->
                         // Log the fetched recipes
@@ -204,47 +214,76 @@ class MyRecipesViewModel @Inject constructor(
         }
     }
 
+    // Add this function inside the ViewModel class
+    fun processCalendarEntries(entries: List<CalendarEntry>): List<String> {
+        return entries.map { entry ->
+            // Safely access title from recipe or userRecipe
+            entry.recipe?.title ?: entry.userRecipe?.title ?: "Unknown Recipe"
+        }
+    }
 
-    private fun mapCalendarRecipesToDays(calendarRecipes: List<Calendar>) {
+
+    private fun mapCalendarRecipesToDays(calendarRecipes: List<CalendarEntry>) {
         val days = mutableListOf<String>()
-        val recipesByDay = mutableMapOf<String, MutableList<String>>()  // Map from date -> list of recipe titles
+        val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>() // Stores CalendarEntry for each day
+
+        // Get the current date dynamically (current year and month)
+        val currentDate = LocalDate.now()
+        val currentYear = currentDate.year
+        val currentMonth = currentDate.monthValue
 
         // Process each calendar entry
-        calendarRecipes.forEach { calendarRecipe ->
-            val fullDate = calendarRecipe.savedCalendarDate // full date string "yyyy-MM-dd"
+        calendarRecipes.forEach { calendarEntry ->
+            val savedDate = calendarEntry.savedCalendarDate  // Format: "yyyy-MM-dd"
 
-            // Add the full date to the days list if it's not already added
-            if (!days.contains(fullDate)) {
-                days.add(fullDate)  // Adding full date in "yyyy-MM-dd" format
+            // Extract year and month from the saved date for comparison
+            val savedYear = savedDate.substring(0, 4).toInt()
+            val savedMonth = savedDate.substring(5, 7).toInt()
+
+            // Only include recipes that match the current year and month
+            if (currentYear == savedYear && currentMonth == savedMonth) {
+                // Add the full date to the list of days if it's not already included
+                if (!days.contains(savedDate)) {
+                    days.add(savedDate)
+                }
+
+                // Get or create the list for the current day
+                val recipeCards = recipesByDay.getOrPut(savedDate) { mutableListOf() }
+
+                // Add recipe and userRecipe to the list for this day
+                calendarEntry.recipe?.let { recipe ->
+                    recipeCards.add(calendarEntry)  // Add to the day's list of recipes
+                }
+
+                calendarEntry.userRecipe?.let { userRecipe ->
+                    recipeCards.add(calendarEntry)  // Add user-created recipe if present
+                }
+
+                // Update the map with the day's recipes
+                recipesByDay[savedDate] = recipeCards
             }
+        }
 
-            // Get the current list of recipe titles for the given day
-            val recipeTitles = recipesByDay.getOrPut(fullDate) { mutableListOf() }
-
-            // Add the recipe title (if present)
-            calendarRecipe.recipe?.let { recipe ->
-                recipeTitles.add(recipe.title)
-            }
-
-            // Add the user recipe title (if present)
-            calendarRecipe.userRecipe?.let { userRecipe ->
-                recipeTitles.add(userRecipe.title)
-            }
-
-            // Update the map with the current day's recipes
-            recipesByDay[fullDate] = recipeTitles
+        // Process the titles for all calendar entries
+        val processedTitles = calendarRecipes.map { entry ->
+            CalendarRecipeCard(
+                id = entry.recipe?.id ?: entry.userRecipe?.id ?: 0,
+                title = entry.recipe?.title ?: entry.userRecipe?.title ?: "Unknown Recipe",
+                isUserRecipe = entry.userRecipe != null
+            )
         }
 
         // Post the results to LiveData
         _mappedCalendarRecipes.value = Pair(
-            days.toList(),  // List of days (as full dates "yyyy-MM-dd")
-            recipesByDay.toMap()  // Map of date -> list of recipe titles
+            days.toList(),  // List of days in "yyyy-MM-dd" format
+            recipesByDay.toMap()  // Map of each date to its list of recipes
         )
 
-        // Log for debugging
+        // Also post the titles to be used in the adapter
+        _mappedCalendarRecipesTitles.value = processedTitles
+        // Log the mapped data for debugging
         Log.d("CalendarMapping", "Mapped calendar recipes: $recipesByDay")
     }
-
 
 
 

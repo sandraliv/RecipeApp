@@ -120,15 +120,34 @@ enum class SortType{
     }
 }
 
-data class Calendar(
+data class CalendarEntry(
     val id: Int,
-    val user: User,
+    val userId: Int,
     val recipe: CalendarRecipeCard?,
     val userRecipe: CalendarRecipeCard?,
     val savedCalendarDate: String
 )
 
-data class CalendarRecipeCard(
+data class CalendarRecipeCard( // For both Recipe and UserRecipe
     val id : Int,
-    val title : String
+    val title : String,
+    val isUserRecipe: Boolean
 )
+
+
+sealed class CalendarRecipeItem {
+    data class Recipe(val recipe: Recipe) : CalendarRecipeItem()
+    data class UserRecipe(val userRecipe: UserRecipe) : CalendarRecipeItem()
+
+    // Custom constructor that enforces at least one of the items is not null
+    companion object {
+        fun create(recipe: Recipe?, userRecipe: UserRecipe?): CalendarRecipeItem {
+            return when {
+                recipe != null -> Recipe(recipe)
+                userRecipe != null -> UserRecipe(userRecipe)
+                else -> throw IllegalArgumentException("At least one of Recipe or UserRecipe must be non-null")
+            }
+        }
+    }
+}
+

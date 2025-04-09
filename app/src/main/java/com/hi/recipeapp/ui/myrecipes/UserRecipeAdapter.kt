@@ -15,10 +15,18 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.hi.recipeapp.R
 import com.hi.recipeapp.databinding.ItemUserRecipeCardBinding
 
-class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAdapter<UserRecipeCard, UserRecipeAdapter.UserRecipeViewHolder>(UserRecipeDiffCallback()) {
+class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) :
+    ListAdapter<UserRecipeCard, UserRecipeAdapter.UserRecipeViewHolder>(UserRecipeDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserRecipeViewHolder {
-        val binding = ItemUserRecipeCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): UserRecipeViewHolder {
+        val binding =
+            ItemUserRecipeCardBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false)
         return UserRecipeViewHolder(binding)
     }
 
@@ -49,6 +57,7 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
             // Handle image switching using ImageSwitcher and gesture detector
             loadImagesIntoImageSwitcher(userRecipe.imageUrls) // Load the images into ImageSwitcher
         }
+
         @SuppressLint("ClickableViewAccessibility")
         private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
 
@@ -57,42 +66,44 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
                 loadImage(imageUrls[currentIndex])  // Load the first image
 
                 // Setup Gesture Detector for swipe actions
-                val gestureDetector = GestureDetector(binding.root.context, object : GestureDetector.OnGestureListener {
-                    override fun onDown(e: MotionEvent): Boolean {
-                        return true
-                    }
+                val gestureDetector = GestureDetector(
+                    binding.root.context,
+                    object : GestureDetector.OnGestureListener {
+                        override fun onDown(e: MotionEvent): Boolean {
+                            return true
+                        }
 
-                    override fun onFling(
-                        e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
-                    ): Boolean {
-                        val SWIPE_THRESHOLD = 100
-                        val SWIPE_VELOCITY_THRESHOLD = 100
+                        override fun onFling(
+                            e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
+                        ): Boolean {
+                            val SWIPE_THRESHOLD = 100
+                            val SWIPE_VELOCITY_THRESHOLD = 100
 
-                        // Detecting horizontal swipe (left/right)
-                        if (e1 != null) {
-                            if (Math.abs(e1.y - e2.y) < SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                                if (e1.x - e2.x > SWIPE_THRESHOLD) { // Swiped left
-                                    showNextImage(imageUrls)
-                                } else if (e2.x - e1.x > SWIPE_THRESHOLD) { // Swiped right
-                                    showPreviousImage(imageUrls)
+                            // Detecting horizontal swipe (left/right)
+                            if (e1 != null) {
+                                if (Math.abs(e1.y - e2.y) < SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                                    if (e1.x - e2.x > SWIPE_THRESHOLD) { // Swiped left
+                                        showNextImage(imageUrls)
+                                    } else if (e2.x - e1.x > SWIPE_THRESHOLD) { // Swiped right
+                                        showPreviousImage(imageUrls)
+                                    }
                                 }
                             }
+                            return true
                         }
-                        return true
-                    }
 
-                    override fun onLongPress(e: MotionEvent) {}
-                    override fun onScroll(
-                        e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float
-                    ): Boolean {
-                        return true
-                    }
+                        override fun onLongPress(e: MotionEvent) {}
+                        override fun onScroll(
+                            e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float
+                        ): Boolean {
+                            return true
+                        }
 
-                    override fun onShowPress(e: MotionEvent) {}
-                    override fun onSingleTapUp(e: MotionEvent): Boolean {
-                        return true
-                    }
-                })
+                        override fun onShowPress(e: MotionEvent) {}
+                        override fun onSingleTapUp(e: MotionEvent): Boolean {
+                            return true
+                        }
+                    })
 
                 binding.imageSwitcher.setOnTouchListener { _, event ->
                     gestureDetector.onTouchEvent(event)
@@ -134,7 +145,6 @@ class UserRecipeAdapter(private val onClick: (UserRecipeCard) -> Unit) : ListAda
             loadImage(imageUrls[currentIndex])
         }
     }
-
 
 
     // DiffUtil callback to optimize list updates

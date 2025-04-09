@@ -8,6 +8,7 @@ plugins {
 
     // Safe Args (if you need it)
     id("androidx.navigation.safeargs")
+    id("kotlin-kapt")
 }
 
 android {
@@ -46,6 +47,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
 
 }

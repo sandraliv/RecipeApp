@@ -1,6 +1,7 @@
 package com.hi.recipeapp.ui.networking
 
-import com.hi.recipeapp.classes.Calendar
+
+import com.hi.recipeapp.classes.CalendarEntry
 import com.hi.recipeapp.classes.Category
 import com.hi.recipeapp.classes.FavoriteRecipesDTO
 import com.hi.recipeapp.classes.FullRecipe
@@ -144,6 +145,12 @@ interface NetworkService {
     ): Response<UserFullRecipe>
 
 
+    @GET("/{id}")
+    suspend fun getUserProfileById(
+        @Path("id") userId: Int
+    ): Response<User>
+
+
     interface ImageUploadService {
         @Multipart
         @POST("recipes/{recipeId}/upload")  // API Endpoint úr bakenda
@@ -157,7 +164,7 @@ interface NetworkService {
     @GET("/calendar/user/{userId}")
     suspend fun getUserSavedToCalendarRecipes(
         @Path("userId") userId: Int
-    ): Response<List<Calendar>>  // Wrapping in Response to handle errors and status codes
+    ): Response<List<CalendarEntry>>  // Wrapping in Response to handle errors and status codes
 
     @POST("/calendar/saveToDate")
     suspend fun saveRecipeToCalendar(
@@ -165,7 +172,7 @@ interface NetworkService {
         @Query("recipeId") recipeId: Int?,
         @Query("userRecipeId") userRecipeId: Int?,
         @Query("date") date: String
-    ): Response<Calendar>  // Wrapping saved Calendar in Response
+    ): Response<CalendarEntry>  // Wrapping saved Calendar in Response
 
     @DELETE("/calendar/removeRecipeFromCalendar")
     suspend fun removeRecipeFromCalendar(

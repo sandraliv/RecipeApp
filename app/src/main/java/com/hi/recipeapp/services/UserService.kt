@@ -1,7 +1,7 @@
 package com.hi.recipeapp.services
 
 import android.util.Log
-import com.hi.recipeapp.classes.Calendar
+import com.hi.recipeapp.classes.CalendarEntry
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
@@ -180,7 +180,7 @@ class UserService @Inject constructor(
     }
 
     // New method to fetch user saved calendar recipes
-    suspend fun getUserSavedToCalendarRecipes(userId: Int): Result<List<Calendar>> {
+    suspend fun getUserSavedToCalendarRecipes(userId: Int): Result<List<CalendarEntry>> {
         return try {
             // Make the network call to fetch saved calendar recipes
             val response = networkService.getUserSavedToCalendarRecipes(userId)
@@ -197,8 +197,19 @@ class UserService @Inject constructor(
             Result.failure(e)
         }
     }
-
-
+    // Function to fetch user profile by ID
+    suspend fun getUserProfileById(userId: Int): Result<User> {
+        return try {
+            val response = networkService.getUserProfileById(userId)
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: throw Exception("User not found"))
+            } else {
+                Result.failure(Exception("Failed to fetch user profile"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 
 
