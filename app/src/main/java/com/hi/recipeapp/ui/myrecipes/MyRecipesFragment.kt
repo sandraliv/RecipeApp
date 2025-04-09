@@ -216,6 +216,7 @@ class MyRecipesFragment : Fragment() {
                 binding.userRecipesRecyclerView.visibility = View.GONE
                 binding.calendarRecyclerView.visibility = View.GONE
                 binding.calendarRecipeRecyclerView.visibility = View.GONE
+                binding.calendarButtonsContainer.visibility = View.GONE
                 if (recipeAdapter.itemCount == 0) {  // Check if there are no favorite recipes
                     setNoRecipesMessage("favorites")
                 } else {
@@ -227,6 +228,7 @@ class MyRecipesFragment : Fragment() {
                 binding.userRecipesRecyclerView.visibility = View.VISIBLE
                 binding.calendarRecyclerView.visibility = View.GONE
                 binding.calendarRecipeRecyclerView.visibility = View.GONE
+                binding.calendarButtonsContainer.visibility = View.GONE
                 if (userRecipeAdapter.itemCount == 0) {  // Check if there are no user recipes
                     setNoRecipesMessage("user")
                 } else {
@@ -236,6 +238,7 @@ class MyRecipesFragment : Fragment() {
             "calendar" -> {
                 binding.favoriteRecipeRecyclerView.visibility = View.GONE
                 binding.userRecipesRecyclerView.visibility = View.GONE
+                binding.calendarButtonsContainer.visibility = View.VISIBLE
                 binding.calendarRecyclerView.visibility = View.VISIBLE
                 binding.calendarRecipeRecyclerView.visibility = View.VISIBLE
                 if (calendarRecipeCardAdapter.itemCount == 0) {  // Check if there are no calendar recipes
@@ -264,7 +267,6 @@ class MyRecipesFragment : Fragment() {
         recipeListTextView.visibility = View.VISIBLE
     }
 
-
     private fun setInitialState() {
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
 
@@ -272,8 +274,7 @@ class MyRecipesFragment : Fragment() {
         binding.userRecipesRecyclerView.visibility = View.GONE
         binding.calendarRecyclerView.visibility = View.GONE
         binding.calendarRecipeRecyclerView.visibility = View.GONE
-        binding.previousMonthButton.visibility = View.GONE
-        binding.nextMonthButton.visibility = View.GONE
+        binding.calendarButtonsContainer.visibility = View.GONE
 
         setActiveButton(binding.favoritesButton)
         myRecipesViewModel.fetchFavoriteRecipes()
@@ -334,7 +335,6 @@ class MyRecipesFragment : Fragment() {
 
         myRecipesViewModel.fetchAndDisplayCalendarRecipes()
     }
-
 
     private fun setActiveButton(button: Button) {
         val selectedTint =
@@ -479,7 +479,6 @@ class MyRecipesFragment : Fragment() {
         // Ensure you update the calendar view with the current month
         updateCalendarWithCurrentMonth()
     }
-
 
     private fun observeViewModel() {
 

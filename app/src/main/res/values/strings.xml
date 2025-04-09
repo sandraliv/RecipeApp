@@ -67,4 +67,6 @@
     <string name="save_recipe">Save recipe</string>
     <string name="manage_users">Manage Users</string>
     <string name="registered_users">Below is a list of all registered users.</string>
+    <string name="u003c_u003c"><![CDATA[<<]]></string>
+    <string name="u003e_u003e"><![CDATA[>>]]></string>
 </resources>
