@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:paddingBottom="20dp"
-    android:layout_marginBottom="20dp"
+    android:layout_marginBottom="60dp"
     android:clipToPadding="false">
 
     <!-- Button Bar (Favorites / Calendar / My Recipes) -->

@@ -19,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -28,6 +29,8 @@ import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.databinding.FragmentFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -47,9 +50,7 @@ class FullRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        fullRecipeViewModel.fetchRecipeById(recipeId)
         binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
-
 
         // Initial visibility settings
         binding.nestedScrollView.visibility = View.GONE
@@ -58,19 +59,6 @@ class FullRecipeFragment : Fragment() {
 
         // Setup gesture detector for image swipe
         setupGestureDetector()
-
-        // Observe the loading state
-        fullRecipeViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.contentLayout.visibility = View.GONE
-                binding.nestedScrollView.visibility = View.GONE
-            } else {
-                binding.progressBar.visibility = View.GONE
-                binding.contentLayout.visibility = View.VISIBLE
-                binding.nestedScrollView.visibility = View.VISIBLE
-            }
-        }
 
         fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
@@ -161,123 +149,105 @@ class FullRecipeFragment : Fragment() {
     }
 
     private fun bindRecipeData(recipe: FullRecipe) {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.contentLayout.visibility = View.GONE
-        binding.nestedScrollView.visibility = View.GONE
-
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
         setRatingStars(recipe.averageRating)
         binding.recipeRatingCount.text = "(${recipe.ratingCount})"
 
-        // Handle favorite status for heart button
         updateHeartButtonVisibility(recipe)
 
-        // Handle empty heart button click (add to favorites)
         binding.emptyHeartButton.setOnClickListener {
             recipe.isFavoritedByUser = true
             updateHeartButtonVisibility(recipe)
             fullRecipeViewModel.updateFavoriteStatus(recipe.id, true)
         }
 
-        // Handle filled heart button click (remove from favorites)
         binding.filledHeartButton.setOnClickListener {
             recipe.isFavoritedByUser = false
             updateHeartButtonVisibility(recipe)
             fullRecipeViewModel.updateFavoriteStatus(recipe.id, false)
         }
 
-        recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
-            val formattedIngredientName = ingredientName
-                .replace("_", " ")  // Replace underscores with spaces
-                .split(" ")  // Split the string into words by spaces
-                .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase(Locale.ROOT) } }
+        // Move long operations out of the UI thread
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(40) // Let the layout breathe before heavy UI updates
 
-            // Create a TableRow to hold the components for each ingredient
-            val tableRow = TableRow(requireContext()).apply {
-                gravity = Gravity.CENTER_VERTICAL
-                setPadding(0, 8, 0, 8)
-                layoutParams = TableRow.LayoutParams(
-                    TableRow.LayoutParams.MATCH_PARENT,
-                    TableRow.LayoutParams.WRAP_CONTENT
-                )
-            }
+            binding.ingredientsLayout.removeAllViews()
 
-            // Create the measurement TextView
-            val measurementTextView = TextView(requireContext()).apply {
-                text = ingredientQuantity
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                gravity = Gravity.CENTER
-                setPadding(16, 0, 16, 0)
-                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f) // Distribute space equally
-            }
+            recipe.ingredients.forEach { (ingredientName, quantity) ->
+                val formattedIngredientName = ingredientName
+                    .replace("_", " ")
+                    .split(" ")
+                    .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
 
-            // Create the ingredient name TextView
-            val ingredientNameTextView = TextView(requireContext()).apply {
-                text = formattedIngredientName
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                gravity = Gravity.START
-                setPadding(16, 0, 16, 0)
-                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f) // Ingredient takes more space
-                maxLines = 2  // Allows wrapping into 2 lines if needed
-                ellipsize = TextUtils.TruncateAt.END  // Handle overflow text gracefully
-            }
-
-            // Create the CheckBox for the ingredient
-            val ingredientCheckBox = CheckBox(requireContext()).apply {
-                setOnCheckedChangeListener { buttonView, isChecked ->
-                    // Apply strike-through effect to the entire row (checkbox, measurement, and name)
-                    val strikeThroughFlag = if (isChecked) Paint.STRIKE_THRU_TEXT_FLAG else 0
-                    measurementTextView.paintFlags = strikeThroughFlag
-                    ingredientNameTextView.paintFlags = strikeThroughFlag
+                val tableRow = TableRow(requireContext()).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(0, 8, 0, 8)
+                    layoutParams = TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT
+                    )
                 }
-                setPadding(16, 0, 16, 0)
 
-                // Use WRAP_CONTENT for CheckBox and avoid setting weight to 0f
-                layoutParams = TableRow.LayoutParams(
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    TableRow.LayoutParams.WRAP_CONTENT
-                ).apply {
+                val measurementTextView = TextView(requireContext()).apply {
+                    text = quantity
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                     gravity = Gravity.CENTER
+                    setPadding(16, 0, 16, 0)
+                    layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
                 }
-            }
 
-            tableRow.addView(ingredientCheckBox)
-            tableRow.addView(measurementTextView)
-            tableRow.addView(ingredientNameTextView)
-            binding.ingredientsLayout.addView(tableRow)
-        }
-
-        // Set instructions with numbering
-        val instructions = recipe.instructions.split(".")
-
-        val formattedInstructions = StringBuilder()
-        instructions.forEachIndexed { index, instruction ->
-            // Ignore empty strings caused by trailing periods or extra spaces
-            if (instruction.trim().isNotEmpty()) {
-
-                // Add number and instruction step
-                formattedInstructions.append("${index + 1}. ${instruction.trim()}. \n\n")
-            }
-        }
-
-        binding.instructionsTextView.text = formattedInstructions.toString()
-
-        if (recipe.tags.isNotEmpty()) {
-            binding.tagsTextView.text = recipe.tags.mapNotNull {
-                try {
-                    RecipeTag.valueOf(it).getDisplayName()
-                } catch (e: IllegalArgumentException) {
-                    null
+                val ingredientNameTextView = TextView(requireContext()).apply {
+                    text = formattedIngredientName
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                    gravity = Gravity.START
+                    setPadding(16, 0, 16, 0)
+                    layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f)
+                    maxLines = 2
+                    ellipsize = TextUtils.TruncateAt.END
                 }
-            }.joinToString(", ")
+
+                val checkBox = CheckBox(requireContext()).apply {
+                    setOnCheckedChangeListener { _, isChecked ->
+                        val flag = if (isChecked) Paint.STRIKE_THRU_TEXT_FLAG else 0
+                        measurementTextView.paintFlags = flag
+                        ingredientNameTextView.paintFlags = flag
+                    }
+                    setPadding(16, 0, 16, 0)
+                    layoutParams = TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT,
+                        TableRow.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        gravity = Gravity.CENTER
+                    }
+                }
+
+                tableRow.addView(checkBox)
+                tableRow.addView(measurementTextView)
+                tableRow.addView(ingredientNameTextView)
+                binding.ingredientsLayout.addView(tableRow)
+            }
         }
 
+        // Format instructions in ViewModel
+        fullRecipeViewModel.prepareInstructions(recipe.instructions)
+
+        // Observe formatted instructions here
+        fullRecipeViewModel.formattedInstructions.observe(viewLifecycleOwner) {
+            binding.instructionsTextView.text = it
+        }
+
+        // Format tags & categories
+        binding.tagsTextView.text = recipe.tags.mapNotNull {
+            try { RecipeTag.valueOf(it).getDisplayName() } catch (e: Exception) { null }
+        }.joinToString(", ")
 
         binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.getDisplayName() }
 
         loadImagesIntoImageSwitcher(recipe.imageUrls)
     }
+
+
 
     private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
         // Reference to the ImageSwitcher
@@ -443,5 +413,11 @@ class FullRecipeFragment : Fragment() {
 
         // Show a message to the user
         Toast.makeText(requireContext(), "You rated this recipe $selectedRating stars", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fullRecipeViewModel.fetchRecipeById(recipeId)
+
     }
 }

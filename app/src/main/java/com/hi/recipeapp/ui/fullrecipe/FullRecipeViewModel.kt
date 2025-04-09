@@ -24,6 +24,9 @@ class FullRecipeViewModel @Inject constructor(
 
 ) : ViewModel() {
 
+    private val _formattedInstructions = MutableLiveData<String>()
+    val formattedInstructions: LiveData<String> = _formattedInstructions
+
     private val _recipe = MutableLiveData<FullRecipe?>()
     val recipe: LiveData<FullRecipe?> = _recipe
 
@@ -155,6 +158,17 @@ class FullRecipeViewModel @Inject constructor(
                 // Handle any other errors
                 _errorMessage.value = "An error occurred: ${e.message}"
             }
+        }
+    }
+
+    fun prepareInstructions(raw: String) {
+        viewModelScope.launch {
+            val instructions = raw.split(".")
+                .mapNotNull { it.trim().takeIf { it.isNotEmpty() } }
+                .mapIndexed { index, step -> "${index + 1}. $step." }
+                .joinToString("\n\n")
+
+            _formattedInstructions.postValue(instructions)
         }
     }
 }
