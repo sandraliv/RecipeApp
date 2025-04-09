@@ -170,7 +170,7 @@ class RecipeService @Inject constructor(
                 Result.success("Rating added successfully")
             } else {
                 // Handle failure, maybe the response contains an error message
-                Result.failure(Exception("Failed to add rating"))
+                Result.failure(Exception("You have already rated this recipe"))
             }
         } catch (e: Exception) {
             // Catch any exception that may occur and return a failure result
@@ -230,6 +230,14 @@ class RecipeService @Inject constructor(
                 callback(null, "Network error: ${t.localizedMessage}") // Handle network failure
             }
         })
+    }
+
+    suspend fun patchRecipe(updatedRecipe: UserFullRecipe): Response<String> {
+        return networkService.patchRecipe(updatedRecipe.id, updatedRecipe)
+    }
+
+    suspend fun deleteUserRecipe(recipeId: Int, userId: Int): Response<Unit> {
+        return networkService.deleteUserRecipe(recipeId, userId)
     }
 }
 

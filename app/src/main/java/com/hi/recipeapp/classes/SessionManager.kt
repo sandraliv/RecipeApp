@@ -3,14 +3,16 @@ package com.hi.recipeapp.classes
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.hi.recipeapp.data.local.RecipeDao
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SessionManager @Inject constructor(@ApplicationContext context: Context) {
+class SessionManager @Inject constructor(@ApplicationContext context: Context, private val recipeDao: RecipeDao) {
 
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+
 
     companion object {
         const val KEY_USER_ID = "user_id"
@@ -31,6 +33,10 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         Log.d(TAG, "User ID saved successfully.")
     }
 
+    fun removeRecipeFromFavourites(recipeId: Int) {
+        recipeDao.removeById(recipeId)
+    }
+
     // Retrieve user ID (if needed)
     fun getUserId(): Int {
         val userId = sharedPreferences.getInt(KEY_USER_ID, -1)
@@ -45,9 +51,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
 
     fun getProfilePic(): String? {
         val profilePic = sharedPreferences.getString(KEY_USER_PROFILE_PIC, "")
-        Log.d(TAG,"Retreived profilepic url: $profilePic")
         if (profilePic == ""){
-            Log.e(TAG, "No profile pic for user")
             return ""
         }
         return profilePic
@@ -90,11 +94,12 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     }
 
     // Clear session (logout)
-    fun clearSession() {
+    suspend fun clearSession() {
         Log.d(TAG, "Clearing session")
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
+        recipeDao.removeAll()
         Log.d(TAG, "Session cleared successfully.")
     }
 
@@ -104,11 +109,9 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
     }
 
     fun saveProfilePic(profilePictureUrl: String?) {
-        Log.d(TAG, "Saving ProfilePIC URL: $profilePictureUrl")
         val editor = sharedPreferences.edit()
         editor.putString(KEY_USER_PROFILE_PIC, profilePictureUrl)
         editor.apply()
-        Log.d(TAG, "User Profile Pic saved successfully.")
     }
 
 
@@ -137,7 +140,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context) {
         return favorites?.map { it.toInt() }?.toSet() ?: emptySet()
     }
 
-    fun logout() {
+    suspend fun logout() {
         clearSession()
         // Perform other logout-related actions if needed
     }

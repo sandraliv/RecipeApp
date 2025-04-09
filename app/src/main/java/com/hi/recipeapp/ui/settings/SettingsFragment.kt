@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
@@ -23,12 +24,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
 @AndroidEntryPoint
-//This class extends Fragment(), meaning it represents a reusable UI component.
 class SettingsFragment : Fragment() {
 
-    // _binding holds the view binding reference for the fragment
+    private val binding get() = _binding!!
+    private val settingsViewModel: SettingsViewModel by viewModels() // Get ViewModel instance
     private var _binding: FragmentSettingsBinding? = null
-    private val themeViewModel: ThemeViewModel by viewModels()
 
     private lateinit var photoUri: Uri
 
@@ -42,17 +42,11 @@ class SettingsFragment : Fragment() {
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             binding.profilePic.setImageURI(it)
+            settingsViewModel.addPicToSessionManager(it)
             uploadPhoto(it)
         }
     }
 
-
-
-    // binding is a non-nullable property, ensuring safe access to UI elements within the fragment's lifecycle
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-    private val settingsViewModel: SettingsViewModel by viewModels() // Get ViewModel instance
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,10 +54,9 @@ class SettingsFragment : Fragment() {
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
-        // Changes theme when you click on dropdown button
-        binding.themeDropdownButton.setOnClickListener {
-            showThemePopup(it)
-        }
+        val toolbarTitle = requireActivity().findViewById<TextView>(R.id.titleTextView)
+        toolbarTitle.text = "Account"
+        toolbarTitle.visibility = View.VISIBLE
 
         return binding.root
     }
@@ -89,10 +82,6 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        // Photo dialog when you click on add icon
-        binding.editProfilePicButton.setOnClickListener {
-            showPhotoDialog()
-        }
         // Photo dialog when you click on profile pic
         binding.profilePic.setOnClickListener {
             showPhotoDialog()
@@ -102,11 +91,15 @@ class SettingsFragment : Fragment() {
         // Observe and update profile picture
         settingsViewModel.profilePic.observe(viewLifecycleOwner) { profilePicUrl ->
             if (!profilePicUrl.isNullOrEmpty()) {
+                binding.profilePicHint.visibility = View.GONE
                 Glide.with(this)
                     .load(profilePicUrl)
-                    .into(binding.profilePic) // Load into ImageView
+                    .into(binding.profilePic)
+            } else {
+                binding.profilePicHint.visibility = View.VISIBLE
             }
         }
+
 
         settingsViewModel.isAdmin.observe(viewLifecycleOwner) { isAdmin ->
             if (isAdmin) {
@@ -133,22 +126,6 @@ class SettingsFragment : Fragment() {
         settingsViewModel.uploadPhotoBytes(photoBytes)
 
     }
-
-
-    private fun showThemePopup(anchor: View) {
-        val popup = android.widget.PopupMenu(requireContext(), anchor)
-        val isDarkMode = themeViewModel.isDarkMode.value ?: false
-
-        val themeText = if (isDarkMode) "Change to light mode" else "Change to dark mode"
-
-        popup.menu.add(themeText).setOnMenuItemClickListener {
-            themeViewModel.toggleTheme()
-            true
-        }
-
-        popup.show()
-    }
-
 
     // Photo dialog with three options
     private fun showPhotoDialog() {
@@ -199,4 +176,5 @@ class SettingsFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

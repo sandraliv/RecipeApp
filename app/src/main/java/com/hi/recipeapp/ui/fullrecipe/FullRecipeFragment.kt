@@ -25,6 +25,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.FullRecipe
+import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.databinding.FragmentFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -262,7 +263,16 @@ class FullRecipeFragment : Fragment() {
 
         binding.instructionsTextView.text = formattedInstructions.toString()
 
-        binding.tagsTextView.text = recipe.tags.joinToString(", ") { it.getDisplayName() }
+        if (recipe.tags.isNotEmpty()) {
+            binding.tagsTextView.text = recipe.tags.mapNotNull {
+                try {
+                    RecipeTag.valueOf(it).getDisplayName()
+                } catch (e: IllegalArgumentException) {
+                    null
+                }
+            }.joinToString(", ")
+        }
+
 
         binding.categoriesTextView.text = recipe.categories.joinToString(", ") { it.getDisplayName() }
 

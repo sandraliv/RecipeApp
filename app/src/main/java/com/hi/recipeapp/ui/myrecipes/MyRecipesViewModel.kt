@@ -49,6 +49,9 @@ class MyRecipesViewModel @Inject constructor(
     val calendarRecipes: LiveData<List<CalendarEntry>?> = _calendarRecipes
 
 
+    private val _recipeDeleted = MutableLiveData<String>()
+    val recipeDeleted: LiveData<String> = _recipeDeleted
+
     private val _userRecipes = MutableLiveData<List<UserRecipeCard>?>()
     val userRecipes: LiveData<List<UserRecipeCard>?> = _userRecipes
 
@@ -63,7 +66,6 @@ class MyRecipesViewModel @Inject constructor(
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
-
     // Function to load user recipes
     fun fetchUserRecipes(page: Int = 0, size: Int = 10) {
         viewModelScope.launch {
@@ -122,16 +124,10 @@ class MyRecipesViewModel @Inject constructor(
                         Log.d("TEST", "EKKI VILLA Í VM")
                         _isLoading.value = false
                         favoriteRecipes.forEach { it.isFavoritedByUser = true }
-                        favoriteRecipes.forEach { recipe ->
-                            Log.d("Recipe", recipe.title)
-                        }
-
                         _favoriteRecipes.value = favoriteRecipes
 
                         val recipeEntities = favoriteRecipes.map { it.toEntity() }
                         recipeDao.insertAll(recipeEntities)
-
-                        Log.d("HALLOHEIMUR", "ÉG ER Í DABASE")
 
                     }
                     result.onFailure { error ->
@@ -294,10 +290,31 @@ class MyRecipesViewModel @Inject constructor(
             description = description,
             imageUrls = imageUrls,
             averageRating = averageRating,
+            instructions = instructions,
             ratingCount = ratingCount,
             tags = tags,
-            isFavoritedByUser = isFavoritedByUser
+            isFavoritedByUser = isFavoritedByUser,
+            ingredients = ingredients
         )
     }
+
+    fun deleteRecipe(recipeId: Int) {
+        viewModelScope.launch {
+            try {
+                val result = recipeService.deleteUserRecipe(recipeId, sessionManager.getUserId())
+                if(result.isSuccessful) {
+                    _recipeDeleted.value = "Recipe deleted"
+                    fetchUserRecipes()
+                } else {
+                    _recipeDeleted.value = "There was an error, try again"
+                }
+            } catch (e: Exception) {
+                _recipeDeleted.value = "There was an error, try again"
+            }
+
+        }
+    }
+
+
 
 }

@@ -14,5 +14,6 @@ data class Recipe(
     val ratingCount: Int,
     val tags: List<String>,
     var isFavoritedByUser: Boolean,
-
+    val instructions: String,
+    val ingredients: Map<String, String>
 )

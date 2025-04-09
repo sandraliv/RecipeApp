@@ -6,8 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.FullRecipe
-import com.hi.recipeapp.classes.RecipeCard
 import com.hi.recipeapp.classes.SessionManager
+import com.hi.recipeapp.data.local.Recipe
+import com.hi.recipeapp.data.local.RecipeDao
 import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,9 @@ import javax.inject.Inject
 class FullRecipeViewModel @Inject constructor(
     private val recipeService: RecipeService,
     private val sessionManager: SessionManager,
-    private val userService: UserService
+    private val userService: UserService,
+    private val recipeDao: RecipeDao
+
 ) : ViewModel() {
 
     private val _recipe = MutableLiveData<FullRecipe?>()
@@ -38,37 +41,73 @@ class FullRecipeViewModel @Inject constructor(
         val userId = sessionManager.getUserId()
         _isLoading.value = true
 
-        // Fetch the recipe by ID
-        recipeService.fetchRecipeById(id) { result, error ->
-            if (result != null) {
-                _isLoading.value = true
-                // Log the fetched recipe for debugging
-                Log.d("FullRecipeViewModel", "Fetched recipe: $result")
+        viewModelScope.launch {
+            try {
+                val localRecipe = recipeDao.findByPrimaryKey(id)
 
-                // Check if the user is logged in
-                if (userId != -1) {
-                    viewModelScope.launch {
-                        // Fetch the user's favorite recipes
-                        val userFavorites = userService.getUserFavorites(userId).getOrNull() ?: emptyList()
+                if (localRecipe != null) {
+                    Log.d("FullRecipeViewModel", "Loaded recipe from local DB: $localRecipe")
 
-                        // Mark the recipe as favorited if the user has favorited it
-                        result.isFavoritedByUser = userFavorites.any { it.id == result.id }
-
-                        // Set the recipe to LiveData
-                        _recipe.value = result
-                    }
-                } else {
-                    // If the user is not logged in, assume the recipe is not favorited
-                    result.isFavoritedByUser = false
-                    _recipe.value = result
+                    _recipe.value = localRecipe.toFullRecipe()
+                    _isLoading.value = false
+                    return@launch
                 }
+
+                // Fetch the recipe by ID
+                recipeService.fetchRecipeById(id) { result, error ->
+                    if (result != null) {
+                        _isLoading.value = true
+                        // Log the fetched recipe for debugging
+                        Log.d("FullRecipeViewModel", "Fetched recipe: $result")
+
+                        // Check if the user is logged in
+                        if (userId != -1) {
+                            viewModelScope.launch {
+                                // Fetch the user's favorite recipes
+                                val userFavorites = userService.getUserFavorites(userId).getOrNull() ?: emptyList()
+
+                                // Mark the recipe as favorited if the user has favorited it
+                                result.isFavoritedByUser = userFavorites.any { it.id == result.id }
+
+                                // Set the recipe to LiveData
+                                _recipe.value = result
+                            }
+                        } else {
+                            // If the user is not logged in, assume the recipe is not favorited
+                            result.isFavoritedByUser = false
+                            _recipe.value = result
+                        }
+                        _isLoading.value = false
+                    } else {
+                        Log.d("FullRecipeViewModel", "Error fetching recipe: $error")
+                        _errorMessage.value = error
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e("FullRecipeViewModel", "Exception: ${e.message}")
+                _errorMessage.value = "Error loading recipe: ${e.message}"
                 _isLoading.value = false
-            } else {
-                Log.d("FullRecipeViewModel", "Error fetching recipe: $error")
-                _errorMessage.value = error
             }
+
         }
     }
+
+    private fun Recipe.toFullRecipe(): FullRecipe {
+        return FullRecipe(
+            id = this.id,
+            title = this.title,
+            description = this.description,
+            instructions = this.instructions,
+            imageUrls = this.imageUrls.ifEmpty { emptyList() },
+            ingredients = this.ingredients,
+            isFavoritedByUser = this.isFavoritedByUser,
+            averageRating = this.averageRating,
+            ratingCount = this.ratingCount,
+            categories = emptySet(),
+            tags = this.tags)
+    }
+
 
 
     fun updateFavoriteStatus(recipeId: Int, isFavorited: Boolean) {
@@ -98,7 +137,6 @@ class FullRecipeViewModel @Inject constructor(
             try {
                 // Call the method to update the rating
                 val result = recipeService.addRecipeRating(recipeId, rating)
-
                 // Handle the Result
                 if (result.isSuccess) {
                     // Create a new FullRecipe object with updated rating and rating count

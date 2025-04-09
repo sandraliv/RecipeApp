@@ -75,12 +75,17 @@ class MyRecipesFragment : Fragment() {
             onEditClick = {}
         )
 
-        userRecipeAdapter = UserRecipeAdapter { userRecipe ->
-            val recipeId = userRecipe.id
-            val action =
-                MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
-            findNavController().navigate(action)
-        }
+        userRecipeAdapter = UserRecipeAdapter(
+            onClick = { userRecipe ->
+                val recipeId = userRecipe.id
+                val action =
+                    MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(
+                        recipeId
+                    )
+                findNavController().navigate(action)
+            },
+            onDeleteClick ={recipeId -> myRecipesViewModel.deleteRecipe(recipeId)},
+        )
 
         calendarAdapter = CalendarAdapter(
             weekHeaders = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
@@ -104,13 +109,9 @@ class MyRecipesFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        // Initializing the calendar view
-        Log.d("CalendarFragment", "Initializing recycler view.")
-        // Set up RecyclerView
+
         setupRecyclerView()
-
         setupButtonListeners()
-
         observeViewModel()
 
         setInitialState()
@@ -118,6 +119,12 @@ class MyRecipesFragment : Fragment() {
         myRecipesViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 // Show the message using Snackbar
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        myRecipesViewModel.recipeDeleted.observe(viewLifecycleOwner) { message ->
+            message?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }

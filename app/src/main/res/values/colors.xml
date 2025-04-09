@@ -22,6 +22,8 @@
     <color name="Light_grey">#CBCBCB</color>
     <color name="Dark_gray">#252427</color>
     <color name="descriptionCard">#AAAAAA</color>
+    <color name="rosybrown_dark">#A07272</color>
+
 
 
     <!-- In res/values/colors.xml -->
