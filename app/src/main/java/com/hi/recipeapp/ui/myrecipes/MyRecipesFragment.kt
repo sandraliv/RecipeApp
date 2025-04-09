@@ -90,25 +90,16 @@ class MyRecipesFragment : Fragment() {
             }
         )
 
-        calendarRecipeCardAdapter = CalendarRecipeCardAdapter(
-            recipeList = emptyList(), // Start with an empty list
-            onRecipeClick = { clickedRecipe ->
-                // Handle recipe click, navigate accordingly
-                val recipeId = clickedRecipe.id
-
-                // Use NavDirections for navigation
-                val action = if (clickedRecipe.isUserRecipe) {
-                    // Navigate to the user recipe fragment
-                    MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
-                } else {
-                    // Navigate to the home recipe fragment
-                    MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
-                }
-
-                // Perform the navigation
-                findNavController().navigate(action)
+        calendarRecipeCardAdapter = CalendarRecipeCardAdapter { clickedRecipe ->
+            val recipeId = clickedRecipe.id
+            val action = if (clickedRecipe.isUserRecipe) {
+                MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
+            } else {
+                MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
             }
-        )
+            findNavController().navigate(action)
+        }
+
 
 
         // Set the adapter to your RecyclerView once
@@ -274,6 +265,7 @@ class MyRecipesFragment : Fragment() {
         // Now submit the new list to the adapter
         val newRecipeList: List<CalendarRecipeCard> = recipesForToday // Get your new list of recipes
         calendarRecipeCardAdapter.submitList(newRecipeList)  // Use submitList to update the data
+        Log.d("CalendarRecipeCardAdapter", "Submitted ${newRecipeList.size} recipes")
 
         if (recipesForToday.isEmpty()) {
             // If no recipes are available for the selected date, show a message and hide the RecyclerView

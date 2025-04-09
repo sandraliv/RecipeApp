@@ -190,7 +190,7 @@ class UserService @Inject constructor(
                 Result.success(response.body() ?: emptyList())
             } else {
                 // Handle the case where the response is not successful
-                Result.failure(Exception("Failed to fetch saved calendar recipes"))
+                Result.failure(Exception("Auli - Failed to fetch saved calendar recipes"))
             }
         } catch (e: Exception) {
             // In case of any network errors or exceptions, return a failure result
