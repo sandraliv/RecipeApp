@@ -37,6 +37,7 @@ class CalendarAdapter(
         // Add recipes for each day, default to empty list if no recipes exist for a day
         newDays.forEach { day ->
             updatedRecipesByDay[day] = newRecipesByDay[day] ?: emptyList()
+            Log.d("CalendarAdapter", "Day: $day, Recipes: ${updatedRecipesByDay[day]}")
         }
 
         // Log the new days and recipes
@@ -45,8 +46,6 @@ class CalendarAdapter(
 
         // Mark 'today' and 'selected' day
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')  // Today's date, formatted (e.g., "07")
-
-        // Log today for debugging
         Log.d("CalendarAdapter", "Today's Date: $today")
 
         // Update the data for the adapter
@@ -54,9 +53,8 @@ class CalendarAdapter(
         this.recipesByDay = updatedRecipesByDay
 
         // Notify the adapter that the data has changed
-        notifyDataSetChanged()
+        notifyDataSetChanged()  // Ensure the adapter is notified about the data update
     }
-
 
 
     override fun getItemViewType(position: Int): Int {

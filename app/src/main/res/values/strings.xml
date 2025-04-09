@@ -55,4 +55,7 @@
     <string name="delete_recipe">Delete recipe</string>
     <string name="a_tiny_trash_can_icon">A tiny trash can icon</string>
     <string name="a_pencil">A pencil</string>
+    <string name="calendar">Calendar</string>
+    <string name="button_name_favorites">Favorites</string>
+    <string name="button_name_my_recipes">My Recipes</string>
 </resources>

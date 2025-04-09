@@ -26,7 +26,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month
 import org.threeten.bp.YearMonth
+import org.threeten.bp.format.TextStyle
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyRecipesFragment : Fragment() {
@@ -36,8 +38,10 @@ class MyRecipesFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var userRecipeAdapter: UserRecipeAdapter
     private lateinit var calendarAdapter: CalendarAdapter
-    private lateinit var sessionManager: SessionManager
     private lateinit var calendarRecipeCardAdapter: CalendarRecipeCardAdapter
+
+    @Inject
+    lateinit var sessionManager: SessionManager
 
     private val starSize = 30
     private val spaceBetweenStars = 3
@@ -99,12 +103,6 @@ class MyRecipesFragment : Fragment() {
             }
             findNavController().navigate(action)
         }
-
-
-
-        // Set the adapter to your RecyclerView once
-        binding.calendarRecipeRecyclerView.adapter = calendarRecipeCardAdapter
-
 
         // Initializing the calendar view
         Log.d("CalendarFragment", "Initializing recycler view.")
@@ -182,26 +180,25 @@ class MyRecipesFragment : Fragment() {
         binding.previousMonthButton.setOnClickListener {
             currentMonth = if (currentMonth == 1) {
                 currentMonth = 12
-                currentYear -= 1
+                currentYear -= 1  // Go to the previous year if it's January
                 12
             } else {
                 currentMonth - 1
             }
-            updateCalendarWithCurrentMonth()
-            updateCalendar()
+            updateCalendarWithCurrentMonth()  // Update month and year display
         }
 
         binding.nextMonthButton.setOnClickListener {
             currentMonth = if (currentMonth == 12) {
                 currentMonth = 1
-                currentYear += 1
+                currentYear += 1  // Go to the next year if it's December
                 1
             } else {
                 currentMonth + 1
             }
-            updateCalendarWithCurrentMonth()
-            updateCalendar()
+            updateCalendarWithCurrentMonth()  // Update month and year display
         }
+
     }
 
     private fun toggleVisibility(
@@ -221,7 +218,6 @@ class MyRecipesFragment : Fragment() {
 
     private fun setInitialState() {
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
-
 
         binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
         binding.userRecipesRecyclerView.visibility = View.GONE
@@ -281,16 +277,22 @@ class MyRecipesFragment : Fragment() {
         }
     }
 
-
-
     private fun updateCalendarWithCurrentMonth() {
         val monthName =
-            Month.of(currentMonth).name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }  // e.g., "April"
+            Month.of(currentMonth).name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+
         val year = currentYear.toString()
 
-        binding.monthTextView.text =
-            "$monthName $year"  // Assuming you have a TextView to show the current month.
+        // Set the TextView that shows the month and year
+        binding.monthTextView.text = "$monthName $year"  // Assuming this is the TextView for month/year display
+
+        // Update the grid (i.e., the calendar days) after updating the month display
+        updateCalendar()  // Update the calendar grid with the new month and year
+
+        // Re-fetch the calendar recipes for the new month
+        myRecipesViewModel.fetchAndDisplayCalendarRecipes() // Make sure this method is correctly triggering data reload
     }
+
 
     private fun setActiveButton(button: Button) {
         val selectedTint =
@@ -335,18 +337,18 @@ class MyRecipesFragment : Fragment() {
 
         val days = mutableListOf<String>()
         for (i in 1 until firstDayOfMonth) {
-            days.add("")
+            days.add("")  // Empty cells before the first day
         }
 
         for (i in 1..daysInMonth) {
-            days.add(i.toString())
+            days.add(i.toString())  // Add all the days of the month
         }
 
         val totalCells = days.size
         val emptyCells = 7 - (totalCells % 7)
         if (emptyCells != 7) {
             for (i in 1..emptyCells) {
-                days.add("")
+                days.add("")  // Add empty cells to complete the grid
             }
         }
 
@@ -369,11 +371,9 @@ class MyRecipesFragment : Fragment() {
                             )
                         }
                     }
-
                     recipesByDayMap[day] = calendarEntries.toMutableList()
                 }
             }
-
             val fullCalendarRecipes = mutableMapOf<String, List<CalendarEntry>>()
 
             daysList.forEach { day ->
@@ -386,8 +386,8 @@ class MyRecipesFragment : Fragment() {
         }
     }
 
-
     private fun initializeCalendarForCurrentMonth() {
+
         // Get days of the current month and format them
         val newDays = CalendarUtils.daysInMonthArray(LocalDate.of(currentYear, currentMonth, 1))
             .map { it?.dayOfMonth?.toString()?.padStart(2, '0') ?: " " }
@@ -419,9 +419,15 @@ class MyRecipesFragment : Fragment() {
 
             // Ensure we match the newDays with the recipes (fullDate format: YYYY-MM-DD)
             val updatedRecipesByDay = newDays.associateWith { day ->
-                val fullDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-$day"
-                // Return the recipes for that date, or empty list if no recipes
-                recipesByDay[fullDate] ?: emptyList()
+                val fullDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-$day"  // Example: "2025-04-01"
+
+
+                // If the day is null or doesn't have a recipe, return an empty list
+                if (day == " " || recipesByDay[fullDate].isNullOrEmpty()) {
+                    emptyList()  // Return an empty list if no recipes are found or the date is null
+                } else {
+                    recipesByDay[fullDate] ?: emptyList()  // Return an empty list if no recipes are found
+                }
             }
 
             // Update the adapter with the new days and associated recipes
@@ -486,12 +492,9 @@ class MyRecipesFragment : Fragment() {
                     recipesByDay[dayOfMonth] = recipeList
                 }
 
-                // Call the method to update the calendar adapter
-                // Make sure to pass the updated data to the adapter
                 calendarAdapter.updateCalendarData(days, recipesByDay)
             }
         }
-
 
     }
 }
