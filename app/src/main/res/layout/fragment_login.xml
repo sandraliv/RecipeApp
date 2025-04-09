@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_background"
+    android:background="@color/rosybrown"
     android:gravity="center"
     android:padding="16dp"
     tools:context=".ui.welcomepage.LoginFragment">
@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Login"
-            android:backgroundTint="#F48FB1"
+            android:backgroundTint="@color/rosybrown_dark"
             android:textColor="@color/white"
             android:padding="18dp"
             android:layout_marginTop="20sp"/>

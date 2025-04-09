@@ -5,7 +5,9 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:paddingBottom="20dp"
-    android:layout_marginBottom="20dp">
+    android:layout_marginBottom="20dp"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true">
 
     <!-- Button Bar (Favorites / My Recipes) -->
     <LinearLayout
@@ -48,8 +50,7 @@
             android:gravity="center"
             android:padding="10dp"
             android:layout_weight="1"
-            android:layout_marginHorizontal="2dp"
-            />
+            android:layout_marginHorizontal="2dp" />
 
     </LinearLayout>
 
@@ -74,13 +75,17 @@
         android:id="@+id/favoriteRecipeRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" /> <!-- Make RecyclerView take up available space -->
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="40dp" />
 
     <!-- RecyclerView to display the list of "My Recipes" -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/userRecipesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" /> <!-- Make RecyclerView take up available space -->
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="40dp" />
 
 </LinearLayout>
