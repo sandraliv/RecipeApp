@@ -49,9 +49,7 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context, p
 
     fun getProfilePic(): String? {
         val profilePic = sharedPreferences.getString(KEY_USER_PROFILE_PIC, "")
-        Log.d(TAG,"Retreived profilepic url: $profilePic")
         if (profilePic == ""){
-            Log.e(TAG, "No profile pic for user")
             return ""
         }
         return profilePic
@@ -109,11 +107,9 @@ class SessionManager @Inject constructor(@ApplicationContext context: Context, p
     }
 
     fun saveProfilePic(profilePictureUrl: String?) {
-        Log.d(TAG, "Saving ProfilePIC URL: $profilePictureUrl")
         val editor = sharedPreferences.edit()
         editor.putString(KEY_USER_PROFILE_PIC, profilePictureUrl)
         editor.apply()
-        Log.d(TAG, "User Profile Pic saved successfully.")
     }
 
 

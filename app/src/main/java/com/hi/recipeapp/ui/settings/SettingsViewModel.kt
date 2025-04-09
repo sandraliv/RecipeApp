@@ -1,5 +1,6 @@
 package com.hi.recipeapp.ui.settings
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import javax.inject.Inject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.URI
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -46,6 +48,10 @@ class SettingsViewModel @Inject constructor(
         // Assume you have a session manager or user info
         val user = sessionManager.isAdmin()
         _isAdmin.value = user == true
+    }
+
+    fun addPicToSessionManager(uri: Uri) {
+        sessionManager.saveProfilePic(uri.toString())
     }
 
     fun uploadPhotoBytes(photoBytes: ByteArray) {

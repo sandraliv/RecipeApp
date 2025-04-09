@@ -24,12 +24,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
 @AndroidEntryPoint
-//This class extends Fragment(), meaning it represents a reusable UI component.
 class SettingsFragment : Fragment() {
 
-    // _binding holds the view binding reference for the fragment
+    private val binding get() = _binding!!
+    private val settingsViewModel: SettingsViewModel by viewModels() // Get ViewModel instance
     private var _binding: FragmentSettingsBinding? = null
-    private val themeViewModel: ThemeViewModel by viewModels()
 
     private lateinit var photoUri: Uri
 
@@ -43,17 +42,11 @@ class SettingsFragment : Fragment() {
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             binding.profilePic.setImageURI(it)
+            settingsViewModel.addPicToSessionManager(it)
             uploadPhoto(it)
         }
     }
 
-
-
-    // binding is a non-nullable property, ensuring safe access to UI elements within the fragment's lifecycle
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-    private val settingsViewModel: SettingsViewModel by viewModels() // Get ViewModel instance
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,9 +55,8 @@ class SettingsFragment : Fragment() {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
         val toolbarTitle = requireActivity().findViewById<TextView>(R.id.titleTextView)
-        toolbarTitle.text = "Profile settings"
+        toolbarTitle.text = "Account"
         toolbarTitle.visibility = View.VISIBLE
-
 
         return binding.root
     }
@@ -135,22 +127,6 @@ class SettingsFragment : Fragment() {
 
     }
 
-
-    private fun showThemePopup(anchor: View) {
-        val popup = android.widget.PopupMenu(requireContext(), anchor)
-        val isDarkMode = themeViewModel.isDarkMode.value ?: false
-
-        val themeText = if (isDarkMode) "Change to light mode" else "Change to dark mode"
-
-        popup.menu.add(themeText).setOnMenuItemClickListener {
-            themeViewModel.toggleTheme()
-            true
-        }
-
-        popup.show()
-    }
-
-
     // Photo dialog with three options
     private fun showPhotoDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
@@ -198,8 +174,6 @@ class SettingsFragment : Fragment() {
     //If an Android Fragment, memory leaks can occur if the fragments holds references to UI elemnts (like TextView, Buttons, etc) AFTER the view is destroyed.
     override fun onDestroyView() {
         super.onDestroyView()
-        val toolbarTitle = requireActivity().findViewById<TextView>(R.id.titleTextView)
-        toolbarTitle.visibility = View.GONE
         _binding = null
     }
 
