@@ -62,4 +62,6 @@
     <string name="ingredients">Ingredients</string>
     <string name="add_ingredient">Add Ingredient</string>
     <string name="save_recipe">Save recipe</string>
+    <string name="manage_users">Manage Users</string>
+    <string name="registered_users">Below is a list of all registered users.</string>
 </resources>

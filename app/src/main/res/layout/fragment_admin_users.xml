@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:padding="16dp">
 
     <!-- Title -->
@@ -12,7 +11,8 @@
         android:id="@+id/manageUsersTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Manage Users"
+        android:text="@string/manage_users"
+        android:gravity="center"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="@color/rosybrown"
@@ -25,7 +25,8 @@
         android:id="@+id/manageUsersSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Below is a list of all registered users."
+        android:gravity="center"
+        android:text="@string/registered_users"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
         android:layout_marginTop="4dp"

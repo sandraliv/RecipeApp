@@ -172,6 +172,7 @@ class MyRecipesViewModel @Inject constructor(
                 val result = recipeService.deleteUserRecipe(recipeId, sessionManager.getUserId())
                 if(result.isSuccessful) {
                     _recipeDeleted.value = "Recipe deleted"
+                    fetchUserRecipes()
                 } else {
                     _recipeDeleted.value = "There was an error, try again"
                 }
