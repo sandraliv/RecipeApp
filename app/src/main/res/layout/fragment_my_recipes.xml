@@ -125,8 +125,6 @@
             android:textAllCaps="false"
             android:textSize="16sp"
             android:text="\u003E\u003E" />
-
-
     </LinearLayout>
 
     <!-- Progress Bar (Initially invisible) -->
@@ -164,6 +162,7 @@
         android:layout_marginTop="16dp"
         android:visibility="gone" />
 
+
     <!-- New TextView for displaying list of recipes for the selected day -->
     <TextView
         android:id="@+id/recipeListTextView"
@@ -173,6 +172,7 @@
         android:textColor="@color/black"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
+        android:visibility="gone"
         android:clipToPadding="false"
         android:paddingBottom="40dp"/>
 
@@ -181,7 +181,8 @@
         android:layout_width="match_parent"
         android:layout_weight="1"
         android:visibility="gone"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp"
+        android:paddingBottom="40dp"/>
 
 
 </LinearLayout>

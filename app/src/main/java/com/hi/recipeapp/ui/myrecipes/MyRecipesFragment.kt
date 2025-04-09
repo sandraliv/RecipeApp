@@ -47,6 +47,7 @@ class MyRecipesFragment : Fragment() {
     private val spaceBetweenStars = 3
     private val gridColumnCount = 2
     private val calendarGridColumnCount = 7
+    private var isCalendarCategoryActive = false
     private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
     private var currentMonth: Int = LocalDate.now().monthValue
     private var currentYear: Int = LocalDate.now().year
@@ -166,21 +167,21 @@ class MyRecipesFragment : Fragment() {
     private fun setupButtonListeners() {
         binding.favoritesButton.setOnClickListener {
             setActiveButton(binding.favoritesButton)
-            toggleVisibility(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+            toggleVisibility("favorites")
             myRecipesViewModel.fetchFavoriteRecipes()
         }
 
         binding.myRecipesButton.setOnClickListener {
             setActiveButton(binding.myRecipesButton)
-            toggleVisibility(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+            toggleVisibility("user")
             myRecipesViewModel.fetchUserRecipes()
         }
 
         binding.calendarButton.setOnClickListener {
             setActiveButton(binding.calendarButton)
-            toggleVisibility(View.GONE, View.GONE, View.VISIBLE, View.VISIBLE)
+            toggleVisibility("calendar")
+            isCalendarCategoryActive = true
             myRecipesViewModel.fetchAndDisplayCalendarRecipes()
-            // Call a function to initialize the calendar for the current month
             initializeCalendarForCurrentMonth()
         }
 
@@ -208,20 +209,61 @@ class MyRecipesFragment : Fragment() {
 
     }
 
-    private fun toggleVisibility(
-        favVis: Int,
-        userVis: Int,
-        calendarVis: Int,
-        calendarBtnsVis: Int
-    ) {
-        binding.favoriteRecipeRecyclerView.visibility = favVis
-        binding.userRecipesRecyclerView.visibility = userVis
-        binding.calendarRecyclerView.visibility = calendarVis
-        binding.calendarRecipeRecyclerView.visibility = calendarVis
-        binding.previousMonthButton.visibility = calendarBtnsVis
-        binding.nextMonthButton.visibility = calendarBtnsVis
-        binding.calendarButtonsContainer.visibility = calendarBtnsVis
+    private fun toggleVisibility(category: String) {
+        when (category) {
+            "favorites" -> {
+                binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
+                binding.userRecipesRecyclerView.visibility = View.GONE
+                binding.calendarRecyclerView.visibility = View.GONE
+                binding.calendarRecipeRecyclerView.visibility = View.GONE
+                if (recipeAdapter.itemCount == 0) {  // Check if there are no favorite recipes
+                    setNoRecipesMessage("favorites")
+                } else {
+                    binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                }
+            }
+            "user" -> {
+                binding.favoriteRecipeRecyclerView.visibility = View.GONE
+                binding.userRecipesRecyclerView.visibility = View.VISIBLE
+                binding.calendarRecyclerView.visibility = View.GONE
+                binding.calendarRecipeRecyclerView.visibility = View.GONE
+                if (userRecipeAdapter.itemCount == 0) {  // Check if there are no user recipes
+                    setNoRecipesMessage("user")
+                } else {
+                    binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                }
+            }
+            "calendar" -> {
+                binding.favoriteRecipeRecyclerView.visibility = View.GONE
+                binding.userRecipesRecyclerView.visibility = View.GONE
+                binding.calendarRecyclerView.visibility = View.VISIBLE
+                binding.calendarRecipeRecyclerView.visibility = View.VISIBLE
+                if (calendarRecipeCardAdapter.itemCount == 0) {  // Check if there are no calendar recipes
+                    setNoRecipesMessage("calendar")
+                } else {
+                    binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                }
+            }
+        }
     }
+
+    private fun setNoRecipesMessage(category: String) {
+        val recipeListTextView = binding.recipeListTextView
+
+        when (category) {
+            "calendar" -> {
+                recipeListTextView.text = "No recipes for this day"
+            }
+            "favorite" -> {
+                recipeListTextView.text = "No favorite recipes found"
+            }
+            "user" -> {
+                recipeListTextView.text = "No user recipes found"
+            }
+        }
+        recipeListTextView.visibility = View.VISIBLE
+    }
+
 
     private fun setInitialState() {
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
@@ -270,17 +312,13 @@ class MyRecipesFragment : Fragment() {
         calendarRecipeCardAdapter.submitList(newRecipeList)  // Use submitList to update the data
         Log.d("CalendarRecipeCardAdapter", "Submitted ${newRecipeList.size} recipes")
 
-        if (recipesForToday.isEmpty()) {
-            // If no recipes are available for the selected date, show a message and hide the RecyclerView
+
+        if (calendarEntriesForToday.isEmpty()) {
             recipeRecyclerView.visibility = View.GONE
-            recipeListTextView.visibility = View.VISIBLE
-            recipeListTextView.text = "No recipes for $formattedDayString"
-            Log.d("MY RECIPES FRAGMENT", "No recipes for $selectedDate, $formattedDayString")
+            setNoRecipesMessage("calendar")  // Call this for calendar
         } else {
-            // Show the RecyclerView and hide the "No recipes" message
             recipeRecyclerView.visibility = View.VISIBLE
             recipeListTextView.visibility = View.GONE
-            Log.d("MY RECIPES FRAGMENT", "Submitting list of recipes to adapter for $selectedDate")
         }
     }
 
@@ -290,14 +328,11 @@ class MyRecipesFragment : Fragment() {
 
         val year = currentYear.toString()
 
-        // Set the TextView that shows the month and year
-        binding.monthTextView.text = "$monthName $year"  // Assuming this is the TextView for month/year display
+        binding.monthTextView.text = "$monthName $year"
 
-        // Update the grid (i.e., the calendar days) after updating the month display
         updateCalendar()  // Update the calendar grid with the new month and year
 
-        // Re-fetch the calendar recipes for the new month
-        myRecipesViewModel.fetchAndDisplayCalendarRecipes() // Make sure this method is correctly triggering data reload
+        myRecipesViewModel.fetchAndDisplayCalendarRecipes()
     }
 
 
@@ -447,22 +482,32 @@ class MyRecipesFragment : Fragment() {
 
 
     private fun observeViewModel() {
+
         myRecipesViewModel.favoriteRecipes.observe(viewLifecycleOwner) { recipes ->
-            if (recipes != null) {
-                recipeAdapter.submitList(recipes)
+            if (recipes.isNullOrEmpty()) {
+                setNoRecipesMessage("favorites")  // Call this for favorites
+                Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
+                binding.favoriteRecipeRecyclerView.visibility = View.GONE
             } else {
-                Toast.makeText(requireContext(), "No favorite recipes found.", Toast.LENGTH_SHORT)
-                    .show()
+                recipeAdapter.submitList(recipes)
+                binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
             }
         }
 
-        myRecipesViewModel.userRecipes.observe(viewLifecycleOwner) { userrecipes ->
-            if (userrecipes != null) {
-                userRecipeAdapter.submitList(userrecipes)
-            } else {
+        // Observing user recipes
+        myRecipesViewModel.userRecipes.observe(viewLifecycleOwner) { userRecipes ->
+            if (userRecipes.isNullOrEmpty()) {
+                setNoRecipesMessage("user")  // Call this for user recipes
                 Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
+                binding.userRecipesRecyclerView.visibility = View.GONE
+            } else {
+                userRecipeAdapter.submitList(userRecipes)
+                binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                binding.userRecipesRecyclerView.visibility = View.VISIBLE
             }
         }
+
 
         myRecipesViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -474,11 +519,11 @@ class MyRecipesFragment : Fragment() {
             }
         }
 
+        // Inside your observeViewModel method for calendar recipes
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->
             calendarRecipes?.let { recipes ->
                 val days = mutableListOf<String>()
-                val recipesByDay =
-                    mutableMapOf<String, MutableList<CalendarEntry>>() // Use CalendarEntry instead of String
+                val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>() // Use CalendarEntry instead of String
 
                 recipes.forEach { calendar ->
                     val day = calendar.savedCalendarDate
@@ -499,9 +544,21 @@ class MyRecipesFragment : Fragment() {
                     recipesByDay[dayOfMonth] = recipeList
                 }
 
+                // Update the adapter with the days and recipes for each day
                 calendarAdapter.updateCalendarData(days, recipesByDay)
+
+                // Now check if there are no recipes for the selected day, and display message accordingly
+                val selectedDate = "$currentYear-${currentMonth.toString().padStart(2, '0')}-${selectedDay.padStart(2, '0')}"
+                val recipesForSelectedDay = recipesByDay[selectedDay] ?: emptyList()
+
+                if (isCalendarCategoryActive && recipesForSelectedDay.isEmpty()) {
+                    setNoRecipesMessage("calendar") // Show "No recipes for this day" if no recipes are found
+                } else {
+                    binding.recipeListTextView.visibility = View.GONE // Hide the message when there are recipes
+                }
             }
         }
+
 
     }
 }
