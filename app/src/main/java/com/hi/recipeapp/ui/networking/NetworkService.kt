@@ -182,7 +182,7 @@ interface NetworkService {
     suspend fun saveRecipeToCalendar(
         @Query("userId") userId: Int,
         @Query("recipeId") recipeId: Int?,
-        @Query("userRecipeId") userRecipeId: Int?,
+        @Query("userRecipeId") userRecipeId: Int? = null,
         @Query("date") date: String
     ): Response<CalendarEntry>  // Wrapping saved Calendar in Response
 

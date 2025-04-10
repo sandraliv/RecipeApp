@@ -39,6 +39,8 @@ object CalendarUtils {
         return date.format(formatter)
     }
 
+
+
     // Format a LocalTime to a string (e.g., 10:30 AM)
     fun formattedTime(time: LocalTime): String {
         val formatter = DateTimeFormatter.ofPattern("hh:mm a")

@@ -26,7 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month
 import org.threeten.bp.YearMonth
-import org.threeten.bp.format.TextStyle
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
@@ -55,6 +55,7 @@ class MyRecipesFragment : Fragment() {
     private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
     private var currentMonth: Int = LocalDate.now().monthValue
     private var currentYear: Int = LocalDate.now().year
+    private var formattedSelectedDate: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -104,16 +105,117 @@ class MyRecipesFragment : Fragment() {
             }
         )
 
-        calendarRecipeCardAdapter = CalendarRecipeCardAdapter { clickedRecipe ->
-            val recipeId = clickedRecipe.id
-            val action = if (clickedRecipe.isUserRecipe) {
-                MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
-            } else {
-                MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
-            }
-            findNavController().navigate(action)
-        }
+        calendarRecipeCardAdapter = CalendarRecipeCardAdapter(
+            onRecipeClick = { clickedRecipe ->
+                val recipeId = clickedRecipe.id
+                val action = if (clickedRecipe.isUserRecipe) {
+                    MyRecipesFragmentDirections.actionMyRecipesFragmentToUserFullRecipeFragment(recipeId)
+                } else {
+                    MyRecipesFragmentDirections.actionMyRecipesFragmentToFullRecipeFragment(recipeId)
+                }
+                findNavController().navigate(action)
+            },
+            onRemoveFromCalendarClick = onRemoveFromCalendarClick@{ clickedRecipe ->
+                // Log when the remove button is clicked
+                Log.d("CalendarRecipeCardAdapter", "Remove button clicked for recipe: ${clickedRecipe.id}")
 
+                // Assuming you're passing the data to your ViewModel or API request function
+                val recipeId = clickedRecipe.id
+                val userRecipeId = clickedRecipe.id  // Same ID, but we'll decide which to use based on `isUserRecipe`
+
+                // Check if it's a user recipe or a regular recipe
+                val isUserRecipe = clickedRecipe.isUserRecipe
+                val userId = sessionManager.getUserId()  // Get user ID
+
+                // Find the calendar entry associated with this recipe
+                val calendarEntry = findCalendarEntryForRecipe(clickedRecipe)
+                val date = calendarEntry?.savedCalendarDate
+
+                if (date.isNullOrEmpty()) {
+                    Log.e("MyRecipesFragment", "Recipe date is missing!")
+                    return@onRemoveFromCalendarClick
+                }
+
+                // Determine which ID to use for removal based on `isUserRecipe`
+                val requestId = if (isUserRecipe) userRecipeId else recipeId
+
+                // Make the API call to remove the recipe from the calendar using the ViewModel
+                myRecipesViewModel.removeRecipeFromCalendar(userId, requestId, date)
+
+                // Log that removal has been initiated
+                Log.d("CalendarRecipeCardAdapter", "Recipe removal initiated for Recipe ID: $recipeId on date: $date")
+
+                // Update the adapter list
+                val updatedList = calendarRecipeCardAdapter.currentList.toMutableList()
+                updatedList.remove(clickedRecipe)
+                calendarRecipeCardAdapter.submitList(updatedList)
+
+                // Log the updated list size
+                Log.d("CalendarRecipeCardAdapter", "Updated list size after removal: ${updatedList.size}")
+
+                // Format the date for display in Snackbar
+                val formattedDate = try {
+                    val dateParsed = LocalDate.parse(date)  // Parse to LocalDate
+                    CalendarUtils.formattedDate(dateParsed)  // Use formattedDate function for consistency
+                } catch (e: Exception) {
+                    Log.e("CalendarRecipeCardAdapter", "Error formatting date: $e")
+                    date  // Fallback to original date if parsing fails
+                }
+
+                // Show a Snackbar with the success message
+                Snackbar.make(
+                    binding.root,
+                    "Recipe removed from $formattedDate",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+
+                // Check if the list is empty and update UI accordingly
+                if (updatedList.isEmpty()) {
+                    Log.d("CalendarRecipeCardAdapter", "No recipes left for this day after removal.")
+                    binding.recipeListTextView.text = "No recipes for this day"
+                    binding.recipeListTextView.visibility = View.VISIBLE
+                    binding.calendarRecipeRecyclerView.visibility = View.GONE
+                } else {
+                    Log.d("CalendarRecipeCardAdapter", "There are still recipes left after removal.")
+                }
+
+                // Forcefully re-fetch calendar data from the database
+                myRecipesViewModel.fetchAndDisplayCalendarRecipes()
+
+                // Ensure the calendar adapter is updated with the new data
+                myRecipesViewModel.mappedCalendarRecipes.observe(viewLifecycleOwner) { (daysList, recipesByDay) ->
+                    val recipesByDayMap = mutableMapOf<String, MutableList<CalendarEntry>>()
+
+                    daysList.forEach { day ->
+                        val recipes = recipesByDay[day] ?: listOf()
+                        if (recipes.isNotEmpty()) {
+                            val calendarEntries = recipes.mapNotNull { calendarEntry ->
+                                val calendarRecipeCard = calendarEntry.recipe ?: calendarEntry.userRecipe
+                                calendarRecipeCard?.let {
+                                    CalendarEntry(
+                                        id = it.id,
+                                        userId = sessionManager.getUserId(),
+                                        recipe = it,
+                                        userRecipe = it,
+                                        savedCalendarDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-${day}"
+                                    )
+                                }
+                            }
+                            recipesByDayMap[day] = calendarEntries.toMutableList()
+                        }
+                    }
+                    val fullCalendarRecipes = mutableMapOf<String, List<CalendarEntry>>()
+
+                    daysList.forEach { day ->
+                        val recipesForDay = recipesByDayMap[day] ?: listOf()
+                        fullCalendarRecipes[day] = recipesForDay
+                    }
+
+                    // Update the calendar adapter's data
+                    calendarAdapter.updateCalendarData(daysList, fullCalendarRecipes)
+                }
+            }
+        )
 
         setupRecyclerView()
         setupButtonListeners()
@@ -137,6 +239,12 @@ class MyRecipesFragment : Fragment() {
         return binding.root
     }
 
+    private fun findCalendarEntryForRecipe(recipe: CalendarRecipeCard): CalendarEntry? {
+        Log.d("CalendarRecipeCardAdapter", "Searching for calendar entry for recipe: ${recipe.id}")
+        // Assuming you have a method in the ViewModel that fetches the calendar entries
+        val calendarEntries = myRecipesViewModel.mappedCalendarRecipes.value?.second
+        return calendarEntries?.values?.flatten()?.find { it.recipe?.id == recipe.id || it.userRecipe?.id == recipe.id }
+    }
     private fun setupRecyclerView() {
 
         // Set up RecyclerView for the calendar recipe list
@@ -182,7 +290,6 @@ class MyRecipesFragment : Fragment() {
         }
 
         binding.calendarButton.setOnClickListener {
-            hasInitializedToday = false
             setActiveButton(binding.calendarButton)
             toggleVisibility("calendar")
             isCalendarCategoryActive = true
@@ -193,23 +300,23 @@ class MyRecipesFragment : Fragment() {
         binding.previousMonthButton.setOnClickListener {
             currentMonth = if (currentMonth == 1) {
                 currentMonth = 12
-                currentYear -= 1  // Go to the previous year if it's January
+                currentYear -= 1
                 12
             } else {
                 currentMonth - 1
             }
-            updateCalendarWithCurrentMonth()  // Update month and year display
+            updateCalendarWithCurrentMonth()
         }
 
         binding.nextMonthButton.setOnClickListener {
             currentMonth = if (currentMonth == 12) {
                 currentMonth = 1
-                currentYear += 1  // Go to the next year if it's December
+                currentYear += 1
                 1
             } else {
                 currentMonth + 1
             }
-            updateCalendarWithCurrentMonth()  // Update month and year display
+            updateCalendarWithCurrentMonth()
         }
 
     }
@@ -260,7 +367,7 @@ class MyRecipesFragment : Fragment() {
 
         when (category) {
             "calendar" -> {
-                recipeListTextView.text = "No recipes for this day"
+                recipeListTextView.text = "No recipes for ${formattedSelectedDate}"
             }
             "favorite" -> {
                 recipeListTextView.text = "No favorite recipes found"
@@ -293,7 +400,9 @@ class MyRecipesFragment : Fragment() {
 
         // Convert formattedDay to LocalDate and format it to a human-readable string (e.g., "01 January")
         val dayOfMonth = LocalDate.of(currentYear, currentMonth, formattedDay.toInt())
-        val formattedDayString = CalendarUtils.formattedDate(dayOfMonth)
+        // Format it for display as "01 January 2021"
+        formattedSelectedDate = dayOfMonth.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+
 
         // Format the selected day to include the full date (Year-Month-Day)
         val selectedDate = LocalDate.of(currentYear, currentMonth, formattedDay.toInt()).toString()  // "2025-04-01"
@@ -307,14 +416,13 @@ class MyRecipesFragment : Fragment() {
         // Convert CalendarEntry to CalendarRecipeCard
         val recipesForToday: List<CalendarRecipeCard> =
             calendarEntriesForToday.mapNotNull { calendarEntry ->
-                // Assuming each CalendarEntry contains either a recipe or a userRecipe that is a CalendarRecipeCard
                 calendarEntry.recipe ?: calendarEntry.userRecipe
             }
         Log.d("MY RECIPES FRAGMENT", "Mapped recipes to CalendarRecipeCard for $selectedDate: ${recipesForToday.size}")
 
         // Now submit the new list to the adapter
-        val newRecipeList: List<CalendarRecipeCard> = recipesForToday // Get your new list of recipes
-        calendarRecipeCardAdapter.submitList(newRecipeList)  // Use submitList to update the data
+        val newRecipeList: List<CalendarRecipeCard> = recipesForToday
+        calendarRecipeCardAdapter.submitList(newRecipeList)
         Log.d("CalendarRecipeCardAdapter", "Submitted ${newRecipeList.size} recipes")
 
 
@@ -330,13 +438,10 @@ class MyRecipesFragment : Fragment() {
     private fun updateCalendarWithCurrentMonth() {
         val monthName =
             Month.of(currentMonth).name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
-
         val year = currentYear.toString()
 
         binding.monthTextView.text = "$monthName $year"
-
-        updateCalendar()  // Update the calendar grid with the new month and year
-
+        updateCalendar()
         myRecipesViewModel.fetchAndDisplayCalendarRecipes()
     }
 
@@ -426,37 +531,29 @@ class MyRecipesFragment : Fragment() {
                 val recipesForDay = recipesByDayMap[day] ?: listOf()
                 fullCalendarRecipes[day] = recipesForDay
             }
-
-            // Once the data is updated, make sure the adapter is also updated
             calendarAdapter.updateCalendarData(daysList, fullCalendarRecipes)
         }
     }
 
     private fun initializeCalendarForCurrentMonth() {
-
         // Get days of the current month and format them
         val newDays = CalendarUtils.daysInMonthArray(LocalDate.of(currentYear, currentMonth, 1))
             .map { it?.dayOfMonth?.toString()?.padStart(2, '0') ?: " " }
 
-        // Observe calendar recipes from ViewModel
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->
             val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>()
 
-            // Loop through the calendar recipes and add them to recipesByDay
             calendarRecipes?.forEach { calendar ->
                 val fullDate = calendar.savedCalendarDate
 
-                // Create a list of CalendarEntry objects
                 val calendarEntries = mutableListOf<CalendarEntry>()
 
-                // Add the recipe to the list if available
                 calendar.recipe?.let { recipe ->
-                    calendarEntries.add(calendar)  // Add the current calendar entry
+                    calendarEntries.add(calendar)
                 }
 
-                // Add the user-created recipe if available
                 calendar.userRecipe?.let { userRecipe ->
-                    calendarEntries.add(calendar)  // Add the user recipe
+                    calendarEntries.add(calendar)
                 }
 
                 // Store recipes by full date key (the fullDate here is the "yyyy-MM-dd" format)
@@ -467,33 +564,29 @@ class MyRecipesFragment : Fragment() {
             val updatedRecipesByDay = newDays.associateWith { day ->
                 val fullDate = "${currentYear}-${currentMonth.toString().padStart(2, '0')}-$day"  // Example: "2025-04-01"
 
-
                 // If the day is null or doesn't have a recipe, return an empty list
                 if (day == " " || recipesByDay[fullDate].isNullOrEmpty()) {
-                    emptyList()  // Return an empty list if no recipes are found or the date is null
+                    emptyList()
                 } else {
-                    recipesByDay[fullDate] ?: emptyList()  // Return an empty list if no recipes are found
+                    recipesByDay[fullDate] ?: emptyList()
                 }
             }
 
-            // Update the adapter with the new days and associated recipes
             calendarAdapter.updateCalendarData(newDays, updatedRecipesByDay)
         }
 
-        // Ensure you update the calendar view with the current month
         updateCalendarWithCurrentMonth()
     }
 
     private fun observeViewModel() {
-
         myRecipesViewModel.favoriteRecipes.observe(viewLifecycleOwner) { recipes ->
             if (recipes.isNullOrEmpty()) {
-                setNoRecipesMessage("favorites")  // Call this for favorites
+                setNoRecipesMessage("favorites")
                 Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
                 binding.favoriteRecipeRecyclerView.visibility = View.GONE
             } else {
                 recipeAdapter.submitList(recipes)
-                binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                binding.recipeListTextView.visibility = View.GONE
                 binding.favoriteRecipeRecyclerView.visibility = View.VISIBLE
             }
         }
@@ -501,16 +594,15 @@ class MyRecipesFragment : Fragment() {
         // Observing user recipes
         myRecipesViewModel.userRecipes.observe(viewLifecycleOwner) { userRecipes ->
             if (userRecipes.isNullOrEmpty()) {
-                setNoRecipesMessage("user")  // Call this for user recipes
+                setNoRecipesMessage("user")
                 Toast.makeText(requireContext(), "No recipes found.", Toast.LENGTH_SHORT).show()
                 binding.userRecipesRecyclerView.visibility = View.GONE
             } else {
                 userRecipeAdapter.submitList(userRecipes)
-                binding.recipeListTextView.visibility = View.GONE  // Hide message if data exists
+                binding.recipeListTextView.visibility = View.GONE
                 binding.userRecipesRecyclerView.visibility = View.VISIBLE
             }
         }
-
 
         myRecipesViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE

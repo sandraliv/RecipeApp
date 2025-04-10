@@ -27,8 +27,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{recipeCard.title}"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black"
+                android:gravity="start"
+                android:textSize="16sp" />
+
+            <!-- Button for removing from calendar -->
+            <ImageButton
+                android:id="@+id/removeFromCalendarButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/remove_recipe_from_calendar"
+                android:src="@drawable/delete_13550284" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

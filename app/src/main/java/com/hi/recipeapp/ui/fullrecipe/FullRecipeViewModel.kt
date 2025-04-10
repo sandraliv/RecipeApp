@@ -39,6 +39,9 @@ class FullRecipeViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _calendarSaveStatus = MutableLiveData<String>()
+    val calendarSaveStatus: LiveData<String> get() = _calendarSaveStatus
+
 
     fun fetchRecipeById(id: Int) {
         val userId = sessionManager.getUserId()
@@ -169,6 +172,18 @@ class FullRecipeViewModel @Inject constructor(
                 .joinToString("\n\n")
 
             _formattedInstructions.postValue(instructions)
+        }
+    }
+
+    fun saveRecipeToCalendar(userId: Int, recipeId: Int, date: String) {
+        viewModelScope.launch {
+
+            val result = recipeService.saveRecipeToCalendar(userId, recipeId, date)
+            result.onSuccess {
+                _calendarSaveStatus.value = "Recipe saved to calendar on $date"
+            }.onFailure {
+                _calendarSaveStatus.value = "Error saving recipe: ${it.message}"
+            }
         }
     }
 }

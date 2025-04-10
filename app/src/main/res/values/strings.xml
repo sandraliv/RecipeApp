@@ -69,4 +69,6 @@
     <string name="registered_users">Below is a list of all registered users.</string>
     <string name="u003c_u003c"><![CDATA[<<]]></string>
     <string name="u003e_u003e"><![CDATA[>>]]></string>
+    <string name="add_to_calendar">add to calendar</string>
+    <string name="remove_recipe_from_calendar">Remove recipe from calendar</string>
 </resources>
