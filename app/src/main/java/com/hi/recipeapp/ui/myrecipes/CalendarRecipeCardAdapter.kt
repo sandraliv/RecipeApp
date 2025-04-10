@@ -31,7 +31,7 @@ class CalendarRecipeCardAdapter(
         val recipeCard = getItem(position)
         holder.bind(recipeCard)
         // Set up click listener for the remove button (or however you remove from the calendar)
-        holder.itemView.findViewById<AppCompatImageButton>(R.id.removeFromCalendarButton).setOnClickListener {
+        holder.itemView.findViewById<AppCompatImageButton>(R.id.remove_from_calendar_button).setOnClickListener {
             onRemoveFromCalendarClick(recipeCard)  // This is how you trigger the lambda when the remove button is clicked
         }
     }
