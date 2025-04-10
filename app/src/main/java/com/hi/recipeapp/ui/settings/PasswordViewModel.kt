@@ -20,6 +20,10 @@ class PasswordViewModel @Inject constructor(
     private val _passwordChangeState = MutableLiveData<Result<String>>()
     val passwordChangeState: LiveData<Result<String>> = _passwordChangeState
 
+    /**
+     * Calls userService with the password, and the confirmation of new password.
+     * Users current password is fetched from SessionManager.
+     */
     fun updatePassword(newPassword: String, againNewPassword: String){
         viewModelScope.launch {
             val result = userService.changePassword(

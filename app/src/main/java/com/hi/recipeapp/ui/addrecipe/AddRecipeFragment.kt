@@ -66,6 +66,10 @@ class AddRecipeFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * A method to show the photo dialog where user can choose to take a photo,
+     * choose a photo from library og to cancel
+     */
     private fun showPhotoDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(requireContext())
@@ -80,6 +84,13 @@ class AddRecipeFragment : Fragment() {
             .show()
     }
 
+    /**
+     * A method for opening the camera. The camera is given a photoUri to add the photo.
+     * The function creates a content URI (photoUri) for where the image will be saved.
+     *
+     * That URI is passed into the takePhotoLauncher.launch(photoUri) to tell the camera
+     * where to save the photo after it’s taken.
+     */
     private fun openCamera() {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, "recipe_${System.currentTimeMillis()}.jpg")
@@ -94,6 +105,10 @@ class AddRecipeFragment : Fragment() {
         galleryLauncher.launch("image/*")
     }
 
+    /**
+     * When user pressed "add ingredient" button in the view, this method runs and dynamically adds a row
+     *
+     */
     private fun addIngredientRow() {
         val tableRow = TableRow(requireContext())
         val ingredientName = EditText(requireContext()).apply {
@@ -112,6 +127,9 @@ class AddRecipeFragment : Fragment() {
         ingredientCount++
     }
 
+    /**
+     * When user pressed "add instruction" button in the view, this method runs and dynamically adds a row
+     */
     private fun addInstructionRow() {
         val tableRow = TableRow(requireContext())
         val numberView = TextView(requireContext()).apply {
@@ -128,6 +146,9 @@ class AddRecipeFragment : Fragment() {
         instructionCount++
     }
 
+    /**
+     * This method runs when an admin presses a button to add his recipe to the database.
+     */
     private fun submitRecipe() {
         val title = binding.recipeTitleEditText.text.toString().trim()
         val description = binding.recipeDescriptionEditText.text.toString().trim()

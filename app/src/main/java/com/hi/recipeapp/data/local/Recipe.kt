@@ -4,6 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.hi.recipeapp.classes.Category
 
+/**
+ * An entity type for a recipe for Room Database.
+ */
 @Entity("user_recipes")
 data class Recipe(
     @PrimaryKey val id: Int,

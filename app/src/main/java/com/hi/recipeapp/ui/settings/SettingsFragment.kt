@@ -76,19 +76,27 @@ class SettingsFragment : Fragment() {
             navigateToPasswordChange()
         }
 
+        /**
+         * Observer for errors while uploading a new profile pic
+         * @returns message and makes a toast if there was a message
+         */
         settingsViewModel.uploadPPErrorMessage.observe(viewLifecycleOwner) { message ->
             if (!message.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Photo dialog when you click on profile pic
+        /**
+         * Photo dialog when you click on profile pic
+         */
         binding.profilePic.setOnClickListener {
             showPhotoDialog()
         }
 
 
-        // Observe and update profile picture
+        /**
+         * Observe and update profile picture (fetch url)
+         */
         settingsViewModel.profilePic.observe(viewLifecycleOwner) { profilePicUrl ->
             if (!profilePicUrl.isNullOrEmpty()) {
                 binding.profilePicHint.visibility = View.GONE
@@ -100,7 +108,10 @@ class SettingsFragment : Fragment() {
             }
         }
 
-
+        /**
+         * If admin is present, he will see a "User Management" button on his profile where he
+         * can delete users.
+         */
         settingsViewModel.isAdmin.observe(viewLifecycleOwner) { isAdmin ->
             if (isAdmin) {
                 binding.deleteUsers.visibility = View.VISIBLE
@@ -114,8 +125,12 @@ class SettingsFragment : Fragment() {
 
     }
 
+    /**
+     * Gets an InputStrem from the Uri, reads it into a ByteArray and sends it along.
+     * @param photoUri Uri for where a photo is placed
+     */
     private fun uploadPhoto(photoUri: Uri) {
-        // Get an InputStream from the Uri
+
         val contentResolver = requireContext().contentResolver
         val inputStream = contentResolver.openInputStream(photoUri) ?: return
 
@@ -127,7 +142,9 @@ class SettingsFragment : Fragment() {
 
     }
 
-    // Photo dialog with three options
+    /**
+     * A photo dialog with three options.
+     */
     private fun showPhotoDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(requireContext())
@@ -164,15 +181,13 @@ class SettingsFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-
     private fun navigateToLogin() {
         val intent = Intent(requireContext(), WelcomePageActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
-    // _binding is set to null in onDestroyView() to prevent memory leak
-    //If an Android Fragment, memory leaks can occur if the fragments holds references to UI elemnts (like TextView, Buttons, etc) AFTER the view is destroyed.
-    override fun onDestroyView() {
+
+     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }

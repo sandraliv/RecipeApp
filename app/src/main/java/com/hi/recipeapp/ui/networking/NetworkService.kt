@@ -2,12 +2,9 @@ package com.hi.recipeapp.ui.networking
 
 
 import com.hi.recipeapp.classes.CalendarEntry
-import com.hi.recipeapp.classes.Category
-import com.hi.recipeapp.classes.FavoriteRecipesDTO
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.LoginRequest
 import com.hi.recipeapp.classes.RecipeCard
-import com.hi.recipeapp.classes.RecipeTag
 import com.hi.recipeapp.classes.User
 import com.hi.recipeapp.classes.UserCreateDTO
 import com.hi.recipeapp.classes.UserDTO
@@ -19,8 +16,6 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -28,7 +23,6 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-// Define API calls inside NetworkService (No ApiService.kt needed)
 interface NetworkService {
 
     @PATCH("users/{id}/updatePassword")
@@ -64,9 +58,9 @@ interface NetworkService {
 
     @GET("recipes/all")
     fun getAllRecipes(
-        @Query("page") page: Int,       // The page number to fetch
-        @Query("size") size: Int,       // The number of items per page
-        @Query("sort") sort: String     // The sorting criteria, either "rating" or "date"
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String
     ): Call<List<RecipeCard>>
 
     @Multipart
@@ -78,11 +72,11 @@ interface NetworkService {
 
     @GET("/recipes/byCategory")
     fun getRecipesByCategory(
-        @Query("categories") categories: Set<String>,   // Using String to represent enum names
-        @Query("sort") sort: String,                     // The sorting criteria, either "rating" or "date"
-        @Query("page") page: Int,                       // The page number to fetch
-        @Query("size") size: Int                        // The number of items per page
-    ): Call<List<RecipeCard>>  // Return Call for asynchronous processing
+        @Query("categories") categories: Set<String>,
+        @Query("sort") sort: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<List<RecipeCard>>
 
     @POST("recipes/{id}/addRating")
     suspend fun addRatingToRecipe(
@@ -93,18 +87,6 @@ interface NetworkService {
 
     @GET("recipes/{id}")
     fun getRecipeById(@Path("id") id: Int): Call<FullRecipe>
-
-    @GET("recipes/byDate")
-    fun getRecipesSortedByDate(
-        @Query("page") page: Int,
-        @Query("size") size: Int
-    ): Call<List<RecipeCard>>
-
-    @GET("recipes/highestRated")
-    fun getRecipesSortedByRating(
-        @Query("page") page: Int,
-        @Query("size") size: Int
-    ): Call<List<RecipeCard>>
 
     @GET("users/{id}/getUserFav")
     suspend fun getUserFavorites(@Path("id") userId: Int): Response<List<RecipeCard>>
@@ -134,7 +116,6 @@ interface NetworkService {
         @Query("userId") userId: Int
     ): Response<UserFullRecipe>
 
-
     @GET("users/1")
     fun getRoot(): Call<UserDTO>
 
@@ -142,8 +123,7 @@ interface NetworkService {
     suspend fun login(@Body loginRequest: LoginRequest): Response<UserDTO>
 
     @POST("users/Register")
-    fun signup(@Body signupRequest: UserCreateDTO): Call<String> // ✅ Call<String> í stað Call<UserDTO>
-
+    fun signup(@Body signupRequest: UserCreateDTO): Call<String>
     @POST("user-recipes/{userId}/upload")
     suspend fun uploadRecipe(
         @Path("userId") userId: Int,
@@ -156,27 +136,15 @@ interface NetworkService {
         @Body recipe: UserFullRecipe
     ): Response<String>
 
-
     @GET("/{id}")
     suspend fun getUserProfileById(
         @Path("id") userId: Int
     ): Response<User>
 
-
-    interface ImageUploadService {
-        @Multipart
-        @POST("recipes/{recipeId}/upload")  // API Endpoint úr bakenda
-        suspend fun uploadImageToRecipe(
-            @Path("recipeId") recipeId: Int,
-            @Part file: MultipartBody.Part
-        ): Response<String>
-    }
-
-
     @GET("/calendar/user/{userId}")
     suspend fun getUserSavedToCalendarRecipes(
         @Path("userId") userId: Int
-    ): Response<List<CalendarEntry>>  // Wrapping in Response to handle errors and status codes
+    ): Response<List<CalendarEntry>>
 
     @POST("/calendar/saveToDate")
     suspend fun saveRecipeToCalendar(
@@ -184,7 +152,7 @@ interface NetworkService {
         @Query("recipeId") recipeId: Int?,
         @Query("userRecipeId") userRecipeId: Int? = null,
         @Query("date") date: String
-    ): Response<CalendarEntry>  // Wrapping saved Calendar in Response
+    ): Response<CalendarEntry>
 
     @DELETE("/calendar/removeRecipeFromCalendar")
     suspend fun removeRecipeFromCalendar(
@@ -192,7 +160,7 @@ interface NetworkService {
         @Query("recipeId") recipeId: Int?,
         @Query("userRecipeId") userRecipeId: Int?,
         @Query("dateEntry") date: String
-    ): Response<String>  // Wrapping status message in Response<String>
+    ): Response<String>
 
 }
 

@@ -82,12 +82,18 @@ class PasswordFragment : Fragment() {
         }
     }
 
+    /**
+     * Clear fields after password change or attempt
+     */
     private fun clearPasswordFields(){
         binding.newPw.setText("")
         binding.againNewPw.setText("")
         binding.currentPw.setText("")
     }
 
+    /**
+     * When all fields are filled out, the "Change" button is available
+     */
     private fun checkFieldsAndEnableButton() {
         val currentPassword = binding.currentPw.text.toString()
         val newPassword = binding.newPw.text.toString()

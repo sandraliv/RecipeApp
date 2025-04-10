@@ -22,44 +22,57 @@ import com.hi.recipeapp.data.local.RecipeDao
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    /**
+     * Provides an instance of the NetworkService class.
+     */
     @Provides
     @Singleton
     fun provideNetworkService(retrofit: Retrofit): NetworkService {
         return retrofit.create(NetworkService::class.java)
     }
 
+    /**
+     * Provides an instance of the RecipeService class
+     */
     @Provides
     @Singleton
     fun provideRecipeService(
         networkService: NetworkService,
-        sessionManager: SessionManager // Add sessionManager as a parameter here
+        sessionManager: SessionManager
     ): RecipeService {
-        return RecipeService(networkService, sessionManager) // Pass sessionManager to the RecipeService constructor
+        return RecipeService(networkService, sessionManager)
     }
 
+    /**
+     * Provides the client
+     */
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit {
         val gson = GsonBuilder()
-            .setLenient()  // Optional, in case your API has lenient JSON
-            .create()  // Create a Gson instance with default settings (you can add customizations here)
-
+            .setLenient()
+            .create()
         return Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(gson)) // Add the customized Gson instance here
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
-    // Add a provider for SessionManager
+    /**
+     * Provide SessionManager singleton instance
+     */
     @Provides
     @Singleton
     fun provideSessionManager(application: Application, recipeDao: RecipeDao): SessionManager {
-        return SessionManager(application,recipeDao) // Provide SessionManager instance
+        return SessionManager(application,recipeDao)
     }
 
 
+    /**
+     * Provides Room Database singleton instance
+     */
     @Provides
     @Singleton
     fun provideDatabase(application: Application): RecipeDatabase {
@@ -71,6 +84,10 @@ object AppModule {
             .build()
     }
 
+    /**
+     * Provides the DAO (Data Access Object) for accessing recipe-related database operations.
+     *
+     */
     @Provides
     @Singleton
     fun provideRecipeDao(database: RecipeDatabase): RecipeDao {

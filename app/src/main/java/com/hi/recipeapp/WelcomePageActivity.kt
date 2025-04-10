@@ -16,7 +16,6 @@ import javax.inject.Inject
 class WelcomePageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWelcomePageBinding
-    //I need to have the session manager here for checking if a user is logged in, so that I can redirect him from the login page.
     @Inject
     lateinit var sessionManager: SessionManager
 

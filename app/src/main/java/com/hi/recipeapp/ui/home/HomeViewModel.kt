@@ -42,7 +42,6 @@ class HomeViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    // Add this to your ViewModel
     private val _noMoreRecipes = MutableLiveData<Boolean>(false)
     val noMoreRecipes: LiveData<Boolean> = _noMoreRecipes
 
@@ -52,8 +51,8 @@ class HomeViewModel @Inject constructor(
     private val _editableRecipe = MutableLiveData<FullRecipe>()
     val editableRecipe: LiveData<FullRecipe> = _editableRecipe
 
-    private var pageNumber = 0  // Track the page number for pagination
-    private val pageSize = 20    // Define how many items to load per page
+    private var pageNumber = 0
+    private val pageSize = 20
 
 
     init {
@@ -65,6 +64,9 @@ class HomeViewModel @Inject constructor(
         _isAdmin.value = sessionManager.isAdmin();
     }
 
+    /**
+     * A method for fetching recipes based on sort (date added or rating)
+     */
     fun fetchRecipesSortedBy(sortType: SortType) {
         val userId = sessionManager.getUserId()
         _isLoading.value = true
@@ -81,19 +83,16 @@ class HomeViewModel @Inject constructor(
                 _errorMessage.value = error
                 _isLoading.value = false
             } else {
-                // Assign the "isFavoritedByUser" status from SessionManager (local data)
+
                 if (userId != -1) {
                     recipes?.forEach { recipe ->
-                        // Set the favorited status from SessionManager
                         recipe.isFavoritedByUser = sessionManager.getFavoritedStatus(userId, recipe.id)
                     }
                 } else {
                     recipes?.forEach { recipe ->
-                        recipe.isFavoritedByUser = false // Default to false if not logged in
+                        recipe.isFavoritedByUser = false
                     }
                 }
-
-                // Update the LiveData with the recipes
                 _recipes.value = recipes
                 _isLoading.value = false
             }
@@ -101,8 +100,11 @@ class HomeViewModel @Inject constructor(
     }
 
 
-
-
+    /**
+     * A method for updating favourite status when a user clicks the "heart" on a RecipeCard
+     * @param recipe A RecipeCard object
+     * @param isFavorited: A Boolean value representing if the recipe is the users favourite or not.
+     */
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
@@ -145,22 +147,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Loads more recipes when recyclerView needs more recipes.
+     * @param sortType A SortType object which holds the sorting of recipes being fetched
+     */
     fun loadMoreRecipes(sortType: SortType) {
-        // Prevent multiple load requests if no more recipes are available
         if (_noMoreRecipes.value == true || _isLoadingMore.value == true) {
-            return // Exit early if there are no more recipes or it's already loading
+            return
         }
 
         pageNumber++
-        _isLoadingMore.value = true  // Set isLoadingMore to true when loading more recipes
-        _isLoading.value =
-            false    // Set isLoading to false since we're loading more, not initial recipes
-
-        // Use the passed-in sortType directly rather than fetching it from sessionManager
-        val sortString =
-            sortType.name.lowercase()  // Convert SortType enum to string (e.g., "rating", "date")
-
-        // Fetch recipes based on current sort type
+        _isLoadingMore.value = true
+        _isLoading.value = false
+        val sortString = sortType.name.lowercase()
         recipeService.fetchRecipes(
             page = pageNumber,
             size = pageSize,
@@ -169,7 +168,7 @@ class HomeViewModel @Inject constructor(
 
             if (error != null) {
                 _errorMessage.value = error
-                _isLoadingMore.value = false  // Reset loading more state
+                _isLoadingMore.value = false
             } else {
                 val userId = sessionManager.getUserId()
 
@@ -182,32 +181,31 @@ class HomeViewModel @Inject constructor(
                             val isFavorited = sessionManager.getFavoritedStatus(userId, recipe.id)
                             recipe.isFavoritedByUser = isFavorited
                         } else {
-                            // If not logged in, mark the recipe as not favorited
                             recipe.isFavoritedByUser = false
                         }
                     }
 
-                    // Combine the current list of recipes with the new ones
                     val updatedRecipes = _recipes.value?.toMutableList() ?: mutableListOf()
                     updatedRecipes.addAll(newRecipes)
-
-                    // Update the recipes list
                     _recipes.value = updatedRecipes
                 }
 
-                // Check if there are no more recipes to load
                 if (newRecipes.isNullOrEmpty()) {
-                    _noMoreRecipes.value = true // No more recipes to load
-                    _isLoadingMore.value = false // Stop loading
-                    return@fetchRecipes // Exit the function early
+                    _noMoreRecipes.value = true
+                    _isLoadingMore.value = false
+                    return@fetchRecipes
                 }
 
-                _isLoadingMore.value =
-                    false // Reset the isLoadingMore flag after loading is complete
+                _isLoadingMore.value = false
             }
         }
     }
 
+    /**
+     *
+     * Calls recipe service to handle networking for recipe posting.
+     * @param recipeId: A integer representing the recipe unique id.
+     */
     fun deleteRecipe(recipeId: Int) {
         viewModelScope.launch {
             val result = recipeService.deleteRecipe(recipeId)
@@ -223,15 +221,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Fetch recipes when sort variable changes
+     */
     fun updateSortType(newSortType: SortType) {
-        // Optional: Check if the sort type has already been set to avoid unnecessary fetches
         if (_recipes.value != null) {
             fetchRecipesSortedBy(newSortType)
         } else {
-            // If no recipes are currently loaded, fetch with the new sort type
         }
     }
 
+    /**
+     * Recipe Service is called to fetch the recipe that is gonna be edited
+     * @param recipeId An integer representing the recipes unique id.
+     */
     fun editRecipe(recipeId: Int) {
         recipeService.fetchRecipeById(recipeId) { result, _ ->
             result?.let {

@@ -22,6 +22,9 @@ class UsersViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
 
+    /**
+     * All users are fetched
+     */
     fun fetchUsers() {
         viewModelScope.launch {
                 val result = userService.getAllUsers()
@@ -32,6 +35,10 @@ class UsersViewModel @Inject constructor(
         }
     }
 
+    /**
+     * A function that calls a function to remove a user with its id.
+     * @param userId An int representing a user
+     */
     fun deleteUser(userId: Int) {
         viewModelScope.launch {
             val result = userService.deleteUser(userId)
