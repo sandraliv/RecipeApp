@@ -61,6 +61,9 @@ class MyRecipesViewModel @Inject constructor(
     private val _favoriteActionMessage = MutableLiveData<String?>()
     val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
+    private val _removeRecipeResult = MutableLiveData<Result<String>>()
+    val removeRecipeResult: LiveData<Result<String>> = _removeRecipeResult
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -315,6 +318,38 @@ class MyRecipesViewModel @Inject constructor(
         }
     }
 
+    fun removeRecipeFromCalendar(recipeId: Int?, userRecipeId: Int?, date: String) {
+        // Set loading state to true while processing
+        _isLoading.value = true
 
+        // Get userId from sessionManager
+        val userId = sessionManager.getUserId()
 
+        // Only proceed if the user is logged in
+        if (userId != -1) {
+            viewModelScope.launch {
+                try {
+                    // Call the recipe service function to remove the recipe
+                    val result = recipeService.removeRecipeFromCalendar(userId, recipeId, userRecipeId, date)
+
+                    // Handle the result of the network call
+                    result.onSuccess { message ->
+                        _removeRecipeResult.value = Result.success(message)
+                    }.onFailure { exception ->
+                        _removeRecipeResult.value = Result.failure(exception)
+                    }
+                } catch (e: Exception) {
+                    // Handle any exceptions (e.g., network error)
+                    _removeRecipeResult.value = Result.failure(e)
+                } finally {
+                    // Reset the loading state after the operation is complete
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            // If user is not logged in, show error message
+            _errorMessage.value = "User not logged in"
+            _isLoading.value = false
+        }
+    }
 }

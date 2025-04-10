@@ -252,6 +252,29 @@ class RecipeService @Inject constructor(
             Result.failure(e)
         }
     }
+    suspend fun removeRecipeFromCalendar(userId: Int, recipeId: Int?, userRecipeId: Int?, date: String): Result<String> {
+        return try {
+            val queryParam = userRecipeId ?: recipeId
+
+            if (queryParam == null) {
+                return Result.failure(Exception("Both recipeId and userRecipeId are missing"))
+            }
+
+            // Make the network request
+            val response = networkService.removeRecipeFromCalendar(userId, queryParam, null, date)
+
+            if (response.isSuccessful) {
+                // If successful, return the response body (which contains a success message)
+                Result.success(response.body() ?: "Recipe removed successfully")
+            } else {
+                // If the response was not successful, return an error with the message
+                Result.failure(Exception("Error removing recipe: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            // In case of network failure or unexpected errors
+            Result.failure(e)
+        }
+    }
 
 }
 
