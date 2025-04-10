@@ -144,7 +144,13 @@
         android:id="@+id/AddRecipeFragment"
         android:name="com.hi.recipeapp.ui.addrecipe.AddRecipeFragment"
         android:label="Add Recipe"
-        tools:layout="@layout/fragment_add_recipe"/>
+        tools:layout="@layout/fragment_add_recipe">
+
+        <action
+            android:id="@+id/action_addRecipeFragment_to_navigation_myrecipes"
+            app:destination="@id/navigation_myrecipes" />
+    </fragment>
+
 
 
     <!-- Account Navigation -->
