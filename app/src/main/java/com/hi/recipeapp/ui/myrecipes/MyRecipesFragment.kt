@@ -33,7 +33,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MyRecipesFragment : Fragment() {
 
-    private lateinit var binding: FragmentMyRecipesBinding
+    private var _binding: FragmentMyRecipesBinding? = null
+    private val binding get() = _binding!!
+
+
     private val myRecipesViewModel: MyRecipesViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var userRecipeAdapter: UserRecipeAdapter
@@ -43,6 +46,7 @@ class MyRecipesFragment : Fragment() {
     @Inject
     lateinit var sessionManager: SessionManager
 
+    private var hasInitializedToday = false
     private val starSize = 30
     private val spaceBetweenStars = 3
     private val gridColumnCount = 2
@@ -56,7 +60,7 @@ class MyRecipesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
+        _binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
 
         // Initialize the adapters
         recipeAdapter = RecipeAdapter(
@@ -178,6 +182,7 @@ class MyRecipesFragment : Fragment() {
         }
 
         binding.calendarButton.setOnClickListener {
+            hasInitializedToday = false
             setActiveButton(binding.calendarButton)
             toggleVisibility("calendar")
             isCalendarCategoryActive = true
@@ -278,7 +283,6 @@ class MyRecipesFragment : Fragment() {
 
         setActiveButton(binding.favoritesButton)
         myRecipesViewModel.fetchFavoriteRecipes()
-        updateRecipeListForDay(today)
         selectedDay = today
     }
 
@@ -522,7 +526,7 @@ class MyRecipesFragment : Fragment() {
         myRecipesViewModel.calendarRecipes.observe(viewLifecycleOwner) { calendarRecipes ->
             calendarRecipes?.let { recipes ->
                 val days = mutableListOf<String>()
-                val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>() // Use CalendarEntry instead of String
+                val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>()
 
                 recipes.forEach { calendar ->
                     val day = calendar.savedCalendarDate
@@ -532,34 +536,46 @@ class MyRecipesFragment : Fragment() {
                         days.add(dayOfMonth)
                     }
 
-                    // Initialize the recipe list for the specific day
                     val recipeList = recipesByDay[dayOfMonth] ?: mutableListOf()
 
-                    // Add recipe and user recipe if available
                     calendar.recipe?.let { recipeList.add(calendar) }
                     calendar.userRecipe?.let { recipeList.add(calendar) }
 
-                    // Update the map with the list of CalendarEntry objects for that day
                     recipesByDay[dayOfMonth] = recipeList
                 }
 
-                // Update the adapter with the days and recipes for each day
                 calendarAdapter.updateCalendarData(days, recipesByDay)
 
-                // Now check if there are no recipes for the selected day, and display message accordingly
                 val selectedDate = "$currentYear-${currentMonth.toString().padStart(2, '0')}-${selectedDay.padStart(2, '0')}"
                 val recipesForSelectedDay = recipesByDay[selectedDay] ?: emptyList()
 
                 if (isCalendarCategoryActive && recipesForSelectedDay.isEmpty()) {
-                    setNoRecipesMessage("calendar") // Show "No recipes for this day" if no recipes are found
+                    setNoRecipesMessage("calendar")
                 } else {
-                    binding.recipeListTextView.visibility = View.GONE // Hide the message when there are recipes
+                    binding.recipeListTextView.visibility = View.GONE
+                }
+
+                // ✅ Auto-load today’s recipes once
+                if (!hasInitializedToday && isCalendarCategoryActive) {
+                    updateRecipeListForDay(selectedDay)
+                    hasInitializedToday = true
                 }
             }
         }
 
 
     }
+
+    override fun onPause() {
+        super.onPause()
+        _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
 }
 
 

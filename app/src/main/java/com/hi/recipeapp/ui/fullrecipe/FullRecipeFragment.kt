@@ -37,9 +37,9 @@ import java.util.Locale
 class FullRecipeFragment : Fragment() {
 
     private val fullRecipeViewModel: FullRecipeViewModel by viewModels() // Get ViewModel instance
-    private lateinit var binding: FragmentFullRecipeBinding
+    private var _binding: FragmentFullRecipeBinding? = null
+    private val binding get() = _binding!!
 
-    // Safe Args: Retrieve arguments passed to the fragment
     private val args: FullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
 
@@ -50,7 +50,7 @@ class FullRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
+        _binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
 
         // Initial visibility settings
         binding.nestedScrollView.visibility = View.GONE
@@ -407,10 +407,8 @@ class FullRecipeFragment : Fragment() {
     private fun submitRating() {
         // Code to handle rating submission (e.g., network call or saving to a database)
         fullRecipeViewModel.rateRecipe(recipeId, selectedRating)
-
         // Optionally, hide the submit button after the rating is submitted
         binding.rateRecipeButton.isEnabled = false
-
         // Show a message to the user
         Toast.makeText(requireContext(), "You rated this recipe $selectedRating stars", Toast.LENGTH_SHORT).show()
     }
@@ -418,6 +416,11 @@ class FullRecipeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fullRecipeViewModel.fetchRecipeById(recipeId)
-
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }
