@@ -1,11 +1,14 @@
 package com.hi.recipeapp.ui.fullrecipe
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
+import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
@@ -18,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentUserFullRecipeBinding
@@ -34,12 +38,14 @@ class UserFullRecipeFragment : Fragment() {
     private val args: UserFullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
 
+    private var currentIndex = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentUserFullRecipeBinding.inflate(inflater, container, false)
-
+        setupGestureDetector()
         userFullRecipeViewModel.fetchUserRecipeById(recipeId)
 
         // Observe the full recipe data
@@ -62,19 +68,50 @@ class UserFullRecipeFragment : Fragment() {
 
         return binding.root
     }
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupGestureDetector() {
+        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.OnGestureListener {
+            override fun onDown(e: MotionEvent): Boolean = true
+
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                val SWIPE_THRESHOLD = 100
+                val SWIPE_VELOCITY_THRESHOLD = 100
+
+                if (e1 != null) {
+                    if (Math.abs(e1.y - e2.y) < SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (e1.x - e2.x > SWIPE_THRESHOLD) {
+                            showNextImage()
+                        } else if (e2.x - e1.x > SWIPE_THRESHOLD) {
+                            showPreviousImage()
+                        }
+                    }
+                }
+                return true
+            }
+
+            override fun onLongPress(e: MotionEvent) {}
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = true
+            override fun onShowPress(e: MotionEvent) {}
+            override fun onSingleTapUp(e: MotionEvent): Boolean = true
+        })
+
+        binding.imageSwitcher.setOnTouchListener { v, event ->
+            v.performClick()
+            gestureDetector.onTouchEvent(event)
+        }
+    }
 
     private fun bindRecipeData(recipe: UserFullRecipe) {
         // Bind the recipe data to the UI
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
 
-        // Handle the main image (first image in the list of image URLs)
-        val mainImageUrl = recipe.imageUrls?.firstOrNull() // First image
-        Glide.with(binding.root.context)
-            .load(mainImageUrl)
-            .placeholder(R.drawable.placeholder)
-            .error(R.drawable.error_image)
-            .into(binding.userRecipeImage)
+        loadImagesIntoImageSwitcher(recipe.imageUrls)
 
         recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
             val formattedIngredientName = ingredientName.replace("_", " ") // Replace underscores with spaces
@@ -133,32 +170,39 @@ class UserFullRecipeFragment : Fragment() {
         }
 
         binding.instructionsTextView.text = formattedInstructions.toString()
-        // Handle additional images inside the HorizontalScrollView
-        loadImagesIntoHorizontalScrollView(recipe.imageUrls?.drop(1)) // All images except the first one
-
     }
 
-    private fun loadImagesIntoHorizontalScrollView(imageUrls: List<String>?) {
-        val imageLayout = binding.imageLayout  // LinearLayout inside HorizontalScrollView
-        imageLayout.removeAllViews()  // Clear any existing images
-
-        // If imageUrls is not null or empty, load images
-        imageUrls?.forEach { url ->
-            val imageView = ImageView(binding.root.context)
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-            imageView.layoutParams = layoutParams
-
-            Glide.with(binding.root.context)
-                .load(url)
-                .placeholder(R.drawable.placeholder)  // Optional placeholder
-                .error(R.drawable.error_image)  // Optional error image
-                .into(imageView)
-
-            imageLayout.addView(imageView)  // Add the ImageView to the layout
+    private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
+        if (!imageUrls.isNullOrEmpty()) {
+            currentIndex = 0
+            loadImage(imageUrls[currentIndex])
         }
     }
 
+    private fun loadImage(imageUrl: String) {
+        Glide.with(requireContext())
+            .load(imageUrl)
+            .transform(CenterCrop())
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.error_image)
+            .into(binding.imageSwitcher.currentView as ImageView)
+    }
+
+    private fun showNextImage() {
+        val imageUrls = userFullRecipeViewModel.userrecipe.value?.imageUrls ?: return
+        if (imageUrls.isNotEmpty()) {
+            currentIndex = (currentIndex + 1) % imageUrls.size
+            loadImage(imageUrls[currentIndex])
+        }
+    }
+
+    private fun showPreviousImage() {
+        val imageUrls = userFullRecipeViewModel.userrecipe.value?.imageUrls ?: return
+        if (imageUrls.isNotEmpty()) {
+            currentIndex = if (currentIndex - 1 < 0) imageUrls.size - 1 else currentIndex - 1
+            loadImage(imageUrls[currentIndex])
+        }
+    }
 }
+
+

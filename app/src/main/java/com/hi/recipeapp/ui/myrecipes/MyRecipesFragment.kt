@@ -138,9 +138,9 @@ class MyRecipesFragment : Fragment() {
         // Set up RecyclerView for the calendar recipe list
         binding.calendarRecipeRecyclerView.apply {
             layoutManager =
-                LinearLayoutManager(context) // Use LinearLayoutManager for displaying the recipes for a day
+                LinearLayoutManager(context)
             adapter =
-                calendarRecipeCardAdapter // This is the adapter for displaying the recipes of the selected day
+                calendarRecipeCardAdapter
         }
 
         // Ensure RecyclerView uses this adapter
@@ -148,7 +148,7 @@ class MyRecipesFragment : Fragment() {
             layoutManager = GridLayoutManager(
                 context,
                 calendarGridColumnCount
-            )  // Use calendarGridColumnCount for 7 columns
+            )
             adapter = calendarAdapter
         }
 

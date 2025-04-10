@@ -12,38 +12,32 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/user_recipe_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Recipe image" />
-
-        <!-- Horizontal ScrollView for additional images -->
-        <android.widget.HorizontalScrollView
-            android:id="@+id/horizontalScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
-
-            <!-- LinearLayout to hold all the images horizontally -->
-            <LinearLayout
-                android:id="@+id/imageLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <!-- Dynamically loaded images will appear here -->
-            </LinearLayout>
-        </android.widget.HorizontalScrollView>
-
         <TextView
             android:id="@+id/titleTextView"
+            style="@style/Header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:textStyle="bold"
             android:paddingTop="8dp"/>
+
+        <ImageSwitcher
+            android:id="@+id/imageSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:elevation="8dp"
+            android:inAnimation="@android:anim/fade_in"
+            android:outAnimation="@android:anim/fade_out">
+
+            <ImageView
+                android:id="@+id/switcherImageView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:contentDescription="User Recipe Image"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder" />
+        </ImageSwitcher>
 
         <TextView
             android:id="@+id/descriptionTextView"

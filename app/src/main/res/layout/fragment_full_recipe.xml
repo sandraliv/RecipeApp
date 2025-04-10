@@ -112,34 +112,34 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
+            <!-- description text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:fontFamily="@font/playfair_display_semibold"
+                android:paddingBottom="8dp"
+                android:text="@string/description"
+                android:textSize="18sp" />
+
+            <!-- Description TextView -->
+            <TextView
+                android:id="@+id/descriptionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="16sp" />
+
             <!-- New LinearLayout around description, ingredients, and instructions -->
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
+                android:background="@color/rosybrown_100"
                 android:elevation="8dp">
-
-                <!-- description text -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
-                    android:fontFamily="@font/playfair_display_semibold"
-                    android:paddingBottom="8dp"
-                    android:text="Description"
-                    android:textSize="18dp" />
-
-                <!-- Description TextView -->
-                <TextView
-                    android:id="@+id/descriptionTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:textSize="16sp" />
 
                 <!-- ingredients text -->
                 <TextView
