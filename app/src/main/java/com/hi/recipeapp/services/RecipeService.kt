@@ -239,6 +239,20 @@ class RecipeService @Inject constructor(
     suspend fun deleteUserRecipe(recipeId: Int, userId: Int): Response<Unit> {
         return networkService.deleteUserRecipe(recipeId, userId)
     }
+
+    suspend fun saveRecipeToCalendar(userId: Int, recipeId: Int, date: String): Result<Unit> {
+        return try {
+            val response = networkService.saveRecipeToCalendar(userId, recipeId, null, date)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to save recipe: ${response.errorBody()?.string()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
 
 

@@ -1,6 +1,7 @@
 package com.hi.recipeapp.ui.fullrecipe
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.graphics.Paint
 import android.os.Bundle
 import android.text.TextUtils
@@ -27,17 +28,21 @@ import com.google.android.material.snackbar.Snackbar
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.FullRecipe
 import com.hi.recipeapp.classes.RecipeTag
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.databinding.FragmentFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FullRecipeFragment : Fragment() {
 
     private val fullRecipeViewModel: FullRecipeViewModel by viewModels() // Get ViewModel instance
     private lateinit var binding: FragmentFullRecipeBinding
+    @Inject
+    lateinit var sessionManager: SessionManager
 
     // Safe Args: Retrieve arguments passed to the fragment
     private val args: FullRecipeFragmentArgs by navArgs()
@@ -59,6 +64,8 @@ class FullRecipeFragment : Fragment() {
 
         // Setup gesture detector for image swipe
         setupGestureDetector()
+
+
 
         fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
@@ -85,6 +92,15 @@ class FullRecipeFragment : Fragment() {
             }
         }
 
+        fullRecipeViewModel.calendarSaveStatus.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        }
+
+        binding.saveToCalendarButton.setOnClickListener {
+            showDatePickerAndSave()
+        }
+
+
         // Handle rate recipe button click
         binding.rateRecipeButton.setOnClickListener {
             showRatingStars()
@@ -92,6 +108,27 @@ class FullRecipeFragment : Fragment() {
 
         return binding.root
     }
+
+    private fun showDatePickerAndSave() {
+        val today = org.threeten.bp.LocalDate.now()
+        val year = today.year
+        val month = today.monthValue - 1
+        val day = today.dayOfMonth
+
+        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+            val selectedDate = org.threeten.bp.LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
+            val formattedDate = selectedDate.toString() // "YYYY-MM-DD"
+
+            val userId = sessionManager.getUserId()
+            val recipeId = this.recipeId
+
+            fullRecipeViewModel.saveRecipeToCalendar(userId, recipeId, formattedDate)
+        }, year, month, day)
+
+        datePickerDialog.show()
+    }
+
+
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestureDetector() {

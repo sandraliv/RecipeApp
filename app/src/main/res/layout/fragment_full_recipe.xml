@@ -35,37 +35,66 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- Heart Buttons: Empty heart and Filled heart -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="top">
 
-                <ImageButton
-                    android:id="@+id/emptyHeartButton"
-                    android:layout_width="48dp"
+                <!-- Add to Calendar Button (Aligned to the start) -->
+                <Button
+                    android:id="@+id/saveToCalendarButton"
+                    android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Add to Favorites"
-                    android:src="@drawable/ic_heart_empty" />
+                    android:background="@android:color/transparent"
+                    android:drawableLeft="@drawable/calendar_14302143"
+                    android:text="@string/add_to_calendar"
+                    android:textAllCaps="false"
+                    android:layout_gravity="start|top"/>
 
-                <ImageButton
-                    android:id="@+id/filledHeartButton"
-                    android:layout_width="48dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                <!-- Spacer to push heart buttons to the end -->
+                <Space
+                    android:layout_width="0dp"
                     android:layout_height="48dp"
-                    android:contentDescription="Remove from Favorites"
-                    android:src="@drawable/ic_heart_filled" />
+                    android:layout_weight="1" />
+
+                <!-- Heart Buttons: Empty Heart and Filled Heart (Aligned to the end) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="end|top">
+
+                    <!-- Empty Heart Button (Add to Favorites) -->
+                    <ImageButton
+                        android:id="@+id/emptyHeartButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Add to Favorites"
+                        android:elevation="2dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_heart_empty" />
+
+                    <!-- Filled Heart Button (Remove from Favorites) -->
+                    <ImageButton
+                        android:id="@+id/filledHeartButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Remove from Favorites"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_heart_filled" />
+                </LinearLayout>
+
             </LinearLayout>
-
             <!-- Title of the Recipe -->
             <TextView
                 android:id="@+id/titleTextView"
                 style="@style/Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recipe Name" />
+                android:text="@string/recipe_name" />
 
             <ImageSwitcher
                 android:id="@+id/imageSwitcher"
