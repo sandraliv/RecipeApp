@@ -16,8 +16,12 @@ Bakendi: Java Spring Boot sem við smíðuðum í hugbúnaðarverkefni 1 og er h
 Við keyrðum verkefnið í Android Studio og því mælum við með því
 Til að keyra bakendann samhliða þá er hægt að clone-a [hugb1 bakendann](http://github.com/sandraliv/verkefni) og þar er allt til alls (api lyklar og fl) klárt til keyrslu.
 
-<img src="app/src/main/res/drawable/screenshot1.png" alt="Skjáskot1" style="width:20%;"/>
-<img src="app/src/main/res/drawable/scrernshot7.png" alt="Skjáskot1" style="width:20%;"/>
+<span style="display:inline-block; margin:5px;">
+  <img src="app/src/main/res/drawable/screenshot1.png" alt="Skjáskot1" style="width:20%;" />
+</span>
+<span style="display:inline-block; margin:5px;">
+  <img src="app/src/main/res/drawable/scrernshot7.png" alt="Skjáskot1" style="width:20%;"/>
+  </span>
 <img src="app/src/main/res/drawable/screenshot9.png" alt="Skjáskot1" style="width:20%;"/>
 <img src="app/src/main/res/drawable/screenshot10.png" alt="Skjáskot1" style="width:20%;"/>
 <img src="app/src/main/res/drawable/screenshot5.png" alt="Skjáskot1" style="width:20%;"/>
