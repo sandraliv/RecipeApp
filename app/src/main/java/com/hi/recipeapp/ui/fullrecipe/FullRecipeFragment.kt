@@ -65,8 +65,6 @@ class FullRecipeFragment : Fragment() {
         // Setup gesture detector for image swipe
         setupGestureDetector()
 
-
-
         fullRecipeViewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $recipe")
             recipe?.let {

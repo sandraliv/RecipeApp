@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.data.local.Recipe
 import com.hi.recipeapp.data.local.RecipeDao
+import com.hi.recipeapp.services.RecipeService
 import com.hi.recipeapp.services.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserFullRecipeViewModel @Inject constructor(
     private val userService: UserService,
+    private val recipeService: RecipeService,
     private val recipeDao: RecipeDao
 ) : ViewModel() {
 
@@ -23,6 +25,10 @@ class UserFullRecipeViewModel @Inject constructor(
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
+
+    private val _calendarSaveStatus = MutableLiveData<String>()
+    val calendarSaveStatus: LiveData<String> get() = _calendarSaveStatus
+
 
     fun fetchUserRecipeById(id: Int) {
         viewModelScope.launch {
@@ -35,6 +41,18 @@ class UserFullRecipeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching recipe: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    fun saveRecipeToCalendar(userId: Int, recipeId: Int, date: String) {
+        viewModelScope.launch {
+
+            val result = recipeService.saveRecipeToCalendar(userId, recipeId, date)
+            result.onSuccess {
+                _calendarSaveStatus.value = "Recipe saved to calendar on $date"
+            }.onFailure {
+                _calendarSaveStatus.value = "Error saving recipe: ${it.message}"
             }
         }
     }

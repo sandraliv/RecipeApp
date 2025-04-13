@@ -167,7 +167,6 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:background="@color/rosybrown_100"
                 android:elevation="8dp">
 
                 <!-- ingredients text -->

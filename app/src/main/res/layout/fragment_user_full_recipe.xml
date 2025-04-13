@@ -4,6 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="80dp"
+    android:paddingBottom="20dp"
     tools:context=".ui.fullrecipe.UserFullRecipeFragment">
 
     <LinearLayout
@@ -11,6 +13,18 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
+
+        <!-- Add to Calendar Button (Aligned to the start) -->
+        <Button
+            android:id="@+id/saveToCalendarButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/calendar_14302143"
+            android:text="@string/add_to_calendar"
+            android:textAllCaps="false"
+            android:layout_gravity="start|top"/>
+
 
         <TextView
             android:id="@+id/titleTextView"
@@ -27,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:elevation="8dp"
+            android:layout_marginTop="10dp"
             android:inAnimation="@android:anim/fade_in"
             android:outAnimation="@android:anim/fade_out">
 
@@ -39,6 +54,16 @@
                 android:src="@drawable/placeholder" />
         </ImageSwitcher>
 
+        <!-- description text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:fontFamily="@font/playfair_display_semibold"
+            android:paddingBottom="8dp"
+            android:text="@string/description"
+            android:textSize="18sp" />
+
         <TextView
             android:id="@+id/descriptionTextView"
             android:layout_width="wrap_content"
@@ -46,16 +71,35 @@
             android:textSize="16sp"
             android:paddingTop="8dp" />
 
+        <!-- ingredients text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="Ingredients"
+            android:fontFamily="@font/playfair_display_semibold"
+            android:paddingBottom="8dp"
+            android:textSize="18sp" />
+
         <TableLayout
             android:id="@+id/ingredientsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
             android:stretchColumns="1"
-            android:paddingBottom="16dp"
-            android:background="@color/rosybrown_100">
+            android:paddingBottom="16dp">
 
         </TableLayout>
+
+        <!-- instructions text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:fontFamily="@font/playfair_display_semibold"
+            android:paddingBottom="8dp"
+            android:text="Instructions"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/instructionsTextView"

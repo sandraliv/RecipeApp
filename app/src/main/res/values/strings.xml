@@ -71,4 +71,6 @@
     <string name="u003e_u003e"><![CDATA[>>]]></string>
     <string name="add_to_calendar">add to calendar</string>
     <string name="remove_recipe_from_calendar">Remove recipe from calendar</string>
+    <string name="category">Category</string>
+    <string name="recipes">Recipes</string>
 </resources>

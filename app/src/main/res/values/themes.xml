@@ -8,8 +8,8 @@
         <item name="colorOnPrimary">@color/Dark_gray</item><!--color for when you press on , and text on. -->
 
         <!-- Secondary brand color -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/rosybrown</item>
+        <item name="colorSecondaryVariant">@color/rosybrown_dark</item>
         <item name="colorOnSecondary">@color/black</item>
 
         <!-- Status bar color -->
@@ -179,6 +179,13 @@
     <style name="DayToNightTextStyle">
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <style name="CustomDatePickerDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimary">@color/rosybrown</item>
+        <item name="colorAccent">@color/rosybrown_dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+
 
 
 </resources>

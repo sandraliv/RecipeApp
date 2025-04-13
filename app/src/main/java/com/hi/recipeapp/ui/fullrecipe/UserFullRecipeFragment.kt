@@ -1,6 +1,7 @@
 package com.hi.recipeapp.ui.fullrecipe
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
@@ -23,17 +24,20 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.hi.recipeapp.R
+import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentUserFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class UserFullRecipeFragment : Fragment() {
 
     private val userFullRecipeViewModel: UserFullRecipeViewModel by viewModels() // Get ViewModel instance
     private lateinit var binding: FragmentUserFullRecipeBinding
-
+    @Inject
+    lateinit var sessionManager: SessionManager
 
     private val args: UserFullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
@@ -66,8 +70,38 @@ class UserFullRecipeFragment : Fragment() {
             }
         }
 
+        userFullRecipeViewModel.calendarSaveStatus.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        }
+
+        binding.saveToCalendarButton.setOnClickListener {
+            showDatePickerAndSave()
+        }
+
+
+
         return binding.root
     }
+
+    private fun showDatePickerAndSave() {
+        val today = org.threeten.bp.LocalDate.now()
+        val year = today.year
+        val month = today.monthValue - 1
+        val day = today.dayOfMonth
+
+        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+            val selectedDate = org.threeten.bp.LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
+            val formattedDate = selectedDate.toString() // "YYYY-MM-DD"
+
+            val userId = sessionManager.getUserId()
+            val recipeId = this.recipeId
+
+            userFullRecipeViewModel.saveRecipeToCalendar(userId, recipeId, formattedDate)
+        }, year, month, day)
+
+        datePickerDialog.show()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestureDetector() {
         val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.OnGestureListener {
