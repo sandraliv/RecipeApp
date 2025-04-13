@@ -22,11 +22,20 @@ Til að keyra bakendann samhliða þá er hægt að clone-a [hugb1 bakendann](ht
 <span style="display:inline-block; margin:5px;">
   <img src="app/src/main/res/drawable/scrernshot7.png" alt="Skjáskot1" style="width:20%;"/>
   </span>
+  <span style="display:inline-block; margin:5px;">
 <img src="app/src/main/res/drawable/screenshot9.png" alt="Skjáskot1" style="width:20%;"/>
+      </span>
+  <span style="display:inline-block; margin:5px;">
 <img src="app/src/main/res/drawable/screenshot10.png" alt="Skjáskot1" style="width:20%;"/>
+      </span>
+  <span style="display:inline-block; margin:5px;">
 <img src="app/src/main/res/drawable/screenshot5.png" alt="Skjáskot1" style="width:20%;"/>
+      </span>
+  <span style="display:inline-block; margin:5px;">
 <img src="app/src/main/res/drawable/screenshot3.png" alt="Skjáskot1" style="width:20%;"/>
+      </span>
+  <span style="display:inline-block; margin:5px;">
 <img src="app/src/main/res/drawable/screenshot2.png" alt="Skjáskot1" style="width:20%;"/>
-
+      </span>
 
 
