@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.UserFullRecipe
 import com.hi.recipeapp.databinding.FragmentAddRecipeBinding
@@ -181,6 +182,8 @@ class AddRecipeFragment : Fragment() {
         )
         viewModel.uploadRecipe(recipe)
         Toast.makeText(requireContext(), "Recipe sent", Toast.LENGTH_SHORT).show()
+
+        findNavController().navigate(R.id.action_addRecipeFragment_to_navigation_myrecipes)
     }
 
     override fun onDestroyView() {
