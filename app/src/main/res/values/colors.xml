@@ -12,6 +12,7 @@
     <color name="rosybrown_200">#ebdddd</color>
     <color name="rosybrown_50">#f8f4f4</color>
     <color name="rosybrown_400">#d7bcbc</color>
+    <color name="very_dark_brow">#392723</color>
     <color name="selectedChipBackground">#dbaaaa</color>
     <color name="unselectedChipBackground">#808080</color>
     <color name="green">#8A9A5B</color>
@@ -24,28 +25,23 @@
     <color name="descriptionCard">#AAAAAA</color>
     <color name="rosybrown_dark">#A07272</color>
 
-
-
-    <!-- In res/values/colors.xml -->
-    <color name="button_selected_tint">#f2e9e9</color> <!-- Example color for selected state -->
+    <!-- finna fyrir hvað -->
+    <color name="button_selected_tint">#f2e9e9</color>
     <color name="button_pressed_tint">#f2e9e9</color>
-    <color name="button_default_tint">#f8f4f4</color> <!-- Example color for default state -->
+    <color name="button_default_tint">#f8f4f4</color>
 
+    <!-- Night Mode: Colors for selected and today in calendar-->
+    <color name="selected_night_text_color">#FFFFFFFF</color> <!-- Black text -->
+    <color name="selected_night_background_color">#373539</color> <!-- Rosybrown 200 background -->
 
-    <!-- Day Mode: Colors for selected and today -->
-    <color name="selected_night_text_color">#000000</color> <!-- Black text -->
-    <color name="selected_night_background_color">#ebdddd</color> <!-- Rosybrown 200 background -->
-
-    <color name="selected_today_night_text_color">#d7bcbc</color> <!-- Rosybrown 400 text color -->
-    <color name="selected_today_night_background_color">#d7bcbc</color> <!-- Rosybrown 400 background -->
+    <color name="selected_today_night_text_color">#000000</color> <!-- Rosybrown 400 text color -->
+    <color name="selected_today_night_background_color">#392723</color> <!-- Rosybrown 400 background -->
 
     <!-- Default text and background colors for regular days -->
-    <color name="night_text_color">#000000</color> <!-- Black text -->
+    <color name="night_text_color">#FFFFFFFF</color> <!-- White text -->
     <color name="night_background_color">#00000000</color> <!-- Transparent background -->
 
-
-
-    <!-- Day Mode: Colors for selected and today -->
+    <!-- Day Mode: Colors for selected and today in calendar-->
     <color name="selected_day_text_color">#000000</color> <!-- Black text -->
     <color name="selected_day_background_color">#ebdddd</color> <!-- Rosybrown 200 background -->
 
@@ -55,8 +51,21 @@
     <!-- Default text and background colors for regular days -->
     <color name="day_text_color">#000000</color> <!-- Black text -->
     <color name="day_background_color">#00000000</color> <!-- Transparent background -->
-
     <color name="transparent">#00000000</color> <!-- Transparent background -->
 
+
+    <!-- Day Mode: Colors for favorites calendar and my recipes buttons in calendar-->
+    <color name="selected_m_button_text_color">#000000</color> <!-- Black text -->
+    <color name="selected_m_button_background_color">#ebdddd</color> <!-- Rosybrown 200 background -->
+
+    <color name="default_m_button_text_color">#bc8f8f</color> <!-- Rosybrown 400 text color -->
+    <color name="default_m_button_background_color">@color/rosybrown_50</color> <!-- Rosybrown 50 background -->
+
+    <!-- Night Mode: Colors for favorites calendar and my recipes buttons in calendar-->
+    <color name="selected_button_text_color_night">#000000</color> <!-- White text -->
+    <color name="selected_m_button_background_color_night">#252427</color> <!-- Rosybrown 200 background -->
+
+    <color name="default_m_button_text_color_night">#CBCBCB</color> <!-- Rosybrown 400 text color -->
+    <color name="default_m_button_background_color_night">#373539</color> <!-- Rosybrown 400 background -->
 
 </resources>

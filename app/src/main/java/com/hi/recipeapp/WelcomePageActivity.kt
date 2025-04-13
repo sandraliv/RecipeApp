@@ -3,9 +3,12 @@ package com.hi.recipeapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.databinding.ActivityWelcomePageBinding
@@ -16,6 +19,7 @@ import javax.inject.Inject
 class WelcomePageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWelcomePageBinding
+    private lateinit var navController: NavController
     //I need to have the session manager here for checking if a user is logged in, so that I can redirect him from the login page.
     @Inject
     lateinit var sessionManager: SessionManager
@@ -43,9 +47,23 @@ class WelcomePageActivity : AppCompatActivity() {
         // Set up navigation
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
-        // Set up ActionBar with Navigation Controller
-        setupActionBarWithNavController(navController)
+        // ✅ Define top-level destination(s)
+        val appBarConfiguration = AppBarConfiguration(setOf(R.id.loginFragment))
+
+        // ✅ Link toolbar with navigation
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
+        // ✅ Optional: Hide toolbar on login screen
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            toolbar.visibility =
+                if (destination.id == R.id.loginFragment) View.GONE else View.VISIBLE
+        }
+
+    }
+    // ✅ Handle back arrow click
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

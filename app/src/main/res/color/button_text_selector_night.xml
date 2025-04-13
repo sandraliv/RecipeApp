@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When the button is selected -->
+    <item android:color="@color/selected_button_text_color_night" android:state_selected="true"/>
+    <!-- Default state -->
+    <item android:color="@color/default_m_button_text_color_night"/>
+</selector>

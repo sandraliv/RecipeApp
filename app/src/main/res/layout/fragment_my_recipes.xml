@@ -25,13 +25,9 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="2dp"
             android:layout_weight="1"
-            android:elevation="0dp"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="@string/button_name_favorites"
-            android:textAllCaps="false"
-            android:textColor="@color/button_text_selector"
-            android:textSize="14sp" />
+            style="@style/MyRecipesMainButtons"
+            android:elevation="1dp"
+            android:text="@string/button_name_favorites"/>
 
         <!-- Vertical Line -->
         <View
@@ -39,7 +35,7 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="4dp"
             android:layout_weight="0"
-            android:background="@color/rosybrown" />
+            style="@style/VerticalAndHorizontalLineStyle" />
 
         <!-- Calendar Button -->
         <Button
@@ -50,9 +46,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
+            style="@style/MyRecipesMainButtons"
             android:text="@string/calendar"
             android:textAllCaps="false"
-            android:textColor="@color/button_text_selector"
             android:textSize="14sp" />
 
         <!-- Vertical Line -->
@@ -61,7 +57,7 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="4dp"
             android:layout_weight="0"
-            android:background="@color/rosybrown" />
+            style="@style/VerticalAndHorizontalLineStyle" />
 
         <!-- My Recipes Button -->
         <Button
@@ -71,11 +67,11 @@
             android:layout_marginHorizontal="2dp"
             android:layout_weight="1"
             android:elevation="0dp"
+            style="@style/MyRecipesMainButtons"
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/button_name_my_recipes"
             android:textAllCaps="false"
-            android:textColor="@color/button_text_selector"
             android:textSize="14sp" />
 
     </LinearLayout>
@@ -85,7 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="16dp"
-        android:background="@color/rosybrown" />
+        style="@style/VerticalAndHorizontalLineStyle" />
 
     <!-- Calendar Navigation (Previous, Current Month, Next) -->
     <LinearLayout
@@ -170,13 +166,13 @@
         android:visibility="gone" />
 
 
-    <!-- New TextView for displaying list of recipes for the selected day -->
+    <!-- Text view for displaying no recipes -->
     <TextView
         android:id="@+id/recipeListTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/DayToNightTextStyle"
         android:textSize="14sp"
-        android:textColor="@color/black"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:visibility="gone"

@@ -28,6 +28,8 @@ import org.threeten.bp.Month
 import org.threeten.bp.YearMonth
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.Locale
+import android.content.res.Configuration
+
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -441,41 +443,57 @@ class MyRecipesFragment : Fragment() {
     }
 
     private fun setActiveButton(button: Button) {
-        val selectedTint =
-            ContextCompat.getColorStateList(requireContext(), R.color.button_selected_tint)
-        val defaultTint =
-            ContextCompat.getColorStateList(requireContext(), R.color.button_default_tint)
+        // Check if the app is in night mode
+        val isNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
+        // Select the correct ColorStateList based on night mode
+        val textColorSelector = if (isNightMode) {
+            ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector_night)
+        } else {
+            ContextCompat.getColorStateList(requireContext(), R.color.button_text_selector)
+        }
+
+        val backgroundTintSelector = if (isNightMode) {
+            ContextCompat.getColorStateList(requireContext(), R.color.button_background_selector_night)
+        } else {
+            ContextCompat.getColorStateList(requireContext(), R.color.button_background_selector)
+        }
+
+        // Apply background selector just once
+        binding.favoritesButton.backgroundTintList = backgroundTintSelector
+        binding.myRecipesButton.backgroundTintList = backgroundTintSelector
+        binding.calendarButton.backgroundTintList = backgroundTintSelector
+
+        // Update selection states
         binding.favoritesButton.isSelected = button == binding.favoritesButton
         binding.myRecipesButton.isSelected = button == binding.myRecipesButton
         binding.calendarButton.isSelected = button == binding.calendarButton
 
-        binding.favoritesButton.backgroundTintList =
-            if (button == binding.favoritesButton) selectedTint else defaultTint
-        binding.myRecipesButton.backgroundTintList =
-            if (button == binding.myRecipesButton) selectedTint else defaultTint
-        binding.calendarButton.backgroundTintList =
-            if (button == binding.calendarButton) selectedTint else defaultTint
 
-        binding.favoritesButton.setTextColor(
-            ContextCompat.getColorStateList(
-                requireContext(),
-                R.color.button_text_selector
-            )
-        )
-        binding.myRecipesButton.setTextColor(
-            ContextCompat.getColorStateList(
-                requireContext(),
-                R.color.button_text_selector
-            )
-        )
-        binding.calendarButton.setTextColor(
-            ContextCompat.getColorStateList(
-                requireContext(),
-                R.color.button_text_selector
-            )
-        )
+        // Apply text color based on the correct selector
+        binding.favoritesButton.setTextColor(textColorSelector)
+        binding.myRecipesButton.setTextColor(textColorSelector)
+        binding.calendarButton.setTextColor(textColorSelector)
+
+        // Add elevation if button is selected
+        val selectedElevation = 8f // You can adjust this value as needed
+
+        // Reset elevation for all buttons
+        binding.favoritesButton.elevation = 0f
+        binding.myRecipesButton.elevation = 0f
+        binding.calendarButton.elevation = 0f
+
+        // Add elevation to the selected button
+        if (button == binding.favoritesButton) {
+            binding.favoritesButton.elevation = selectedElevation
+        } else if (button == binding.myRecipesButton) {
+            binding.myRecipesButton.elevation = selectedElevation
+        } else if (button == binding.calendarButton) {
+            binding.calendarButton.elevation = selectedElevation
+        }
     }
+
+
 
     private fun updateCalendar() {
         val firstDayOfMonth = YearMonth.of(currentYear, currentMonth).atDay(1).dayOfWeek.value
