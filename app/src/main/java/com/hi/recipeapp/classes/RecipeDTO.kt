@@ -137,19 +137,5 @@ data class CalendarRecipeCard( // For both Recipe and UserRecipe
 )
 
 
-sealed class CalendarRecipeItem {
-    data class Recipe(val recipe: Recipe) : CalendarRecipeItem()
-    data class UserRecipe(val userRecipe: UserRecipe) : CalendarRecipeItem()
 
-    // Custom constructor that enforces at least one of the items is not null
-    companion object {
-        fun create(recipe: Recipe?, userRecipe: UserRecipe?): CalendarRecipeItem {
-            return when {
-                recipe != null -> Recipe(recipe)
-                userRecipe != null -> UserRecipe(userRecipe)
-                else -> throw IllegalArgumentException("At least one of Recipe or UserRecipe must be non-null")
-            }
-        }
-    }
-}
 

@@ -31,12 +31,10 @@ class CategoryFragment : Fragment() {
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var binding: FragmentBycategoryBinding
 
-    // Safe Args: Retrieve arguments passed to the fragment
     private val args: CategoryFragmentArgs by navArgs()
      private val categoryName: String get() = args.categoryName
     private var currentSortType: SortType = SortType.RATING
 
-    // Define star size and space between stars
     private val starSize = 30
     private val spaceBetweenStars = 3
 
@@ -49,11 +47,8 @@ class CategoryFragment : Fragment() {
         val category = Category.valueOf(categoryName)
 
         binding.textCategoryName.text = category.getDisplayName()
-
-        // Fetch recipes based on category (only once)
         categoryViewModel.getRecipesByCategory(category)
 
-        // Initialize the adapter for displaying recipes
         recipeAdapter =
             RecipeAdapter(
                 onClick = { recipe ->
@@ -71,8 +66,6 @@ class CategoryFragment : Fragment() {
                 onEditClick = {}
             )
 
-
-        // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
@@ -93,14 +86,12 @@ class CategoryFragment : Fragment() {
             }
         }
 
-        // Observe error messages
         categoryViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Observe loading state and show progress bar while loading
         categoryViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
                 binding.progressBar.visibility = View.VISIBLE
@@ -109,15 +100,12 @@ class CategoryFragment : Fragment() {
             }
         }
 
-        // Observe the favorite action message LiveData
         categoryViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }
 
-
-        // Detect if the user has scrolled to the bottom of the RecyclerView
         binding.recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -126,8 +114,7 @@ class CategoryFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-                // If the user has scrolled to the bottom, load more recipes
-                if (totalItemCount <= lastVisibleItemPosition + 2) {  // 2 is just an offset to trigger early
+                if (totalItemCount <= lastVisibleItemPosition + 2) {
                     if (!categoryViewModel.isLoading.value!!) {
                         categoryViewModel.loadMoreRecipes(Category.valueOf(categoryName))
                     }
@@ -138,37 +125,33 @@ class CategoryFragment : Fragment() {
         return binding.root
     }
 
-    // Setup Sort Button functionality
+    /**
+     * Sets up the functionality for the Sort button.
+     * Opens a BottomSheet for selecting the sort type, and updates the category recipes based on the selected sort type.
+     */
     private fun setupSortButton() {
         val sortButton = binding.sortByButton
         sortButton.setOnClickListener {
             val bottomSheetFragment = SortBottomSheetFragment()
-
-            // Pass the current sort type to the bottom sheet
             bottomSheetFragment.setCurrentSortType(currentSortType)
-
-            // Pass the callback to handle the sorting selection
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
                 currentSortType = sortType
                 val category = Category.valueOf(categoryName)
-
-                // Update the sort type in the view model along with the current category
                 categoryViewModel.updateSortType(category, currentSortType.name)
             }
-
-            // Show the Bottom Sheet
             bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
         }
     }
 
 
-    // Setup Category Button functionality
+    /**
+     * Sets up the functionality for the Category button.
+     * Opens a BottomSheet to allow the user to select a new category.
+     */
     private fun setupCategoryButton() {
         val categoryButton = binding.categoryButton
         categoryButton.setOnClickListener {
             val bottomSheetFragment = CategoryBottomSheetFragment()
-
-            // Pass the callback to handle the category selection
             bottomSheetFragment.setOnCategorySelectedListener { category ->
                 navigateToCategoryFragment(category)
             }
@@ -177,7 +160,11 @@ class CategoryFragment : Fragment() {
         }
     }
 
-    // Navigate to CategoryFragment with the selected category
+    /**
+     * Navigates to the CategoryFragment with the selected category.
+     *
+     * @param category The selected category to navigate to.
+     */
     private fun navigateToCategoryFragment(category: Category) {
         val action = CategoryFragmentDirections.actionCategoryFragmentToCategoryFragment(category.name)
         findNavController().navigate(action)

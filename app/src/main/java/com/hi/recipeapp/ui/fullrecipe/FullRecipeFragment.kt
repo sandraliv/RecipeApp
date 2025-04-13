@@ -106,7 +106,9 @@ class FullRecipeFragment : Fragment() {
 
         return binding.root
     }
-
+    /**
+     * Opens a DatePicker dialog to save the recipe to the user's calendar.
+     */
     private fun showDatePickerAndSave() {
         val today = org.threeten.bp.LocalDate.now()
         val year = today.year
@@ -115,7 +117,7 @@ class FullRecipeFragment : Fragment() {
 
         val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
             val selectedDate = org.threeten.bp.LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
-            val formattedDate = selectedDate.toString() // "YYYY-MM-DD"
+            val formattedDate = selectedDate.toString()
 
             val userId = sessionManager.getUserId()
             val recipeId = this.recipeId
@@ -126,18 +128,17 @@ class FullRecipeFragment : Fragment() {
         datePickerDialog.show()
     }
 
-
-
+    /**
+     * Initializes the GestureDetector for swipe gestures to change images.
+     */
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestureDetector() {
         val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.OnGestureListener {
 
-            // onDown is required for gesture detection, even if you don't use it
             override fun onDown(e: MotionEvent): Boolean {
                 return true
             }
 
-            // onFling should now work properly with this method signature
             override fun onFling(
                 e1: MotionEvent?,
                 e2: MotionEvent,
@@ -147,7 +148,6 @@ class FullRecipeFragment : Fragment() {
                 val SWIPE_THRESHOLD = 100
                 val SWIPE_VELOCITY_THRESHOLD = 100
 
-                // Detecting horizontal swipe (left/right)
                 if (e1 != null) {
                     if (Math.abs(e1.y - e2.y) < SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (e1.x - e2.x > SWIPE_THRESHOLD) { // Swiped left
@@ -160,7 +160,6 @@ class FullRecipeFragment : Fragment() {
                 return true
             }
 
-            // Implement other required methods from the interface, even if you don't use them
             override fun onLongPress(e: MotionEvent) {}
             override fun onScroll(
                 e1: MotionEvent?,
@@ -176,13 +175,17 @@ class FullRecipeFragment : Fragment() {
             }
         })
 
-        // Set the GestureDetector to the ImageSwitcher
         binding.imageSwitcher.setOnTouchListener { v, event ->
-            v.performClick()  // Ensure accessibility by triggering performClick
-            gestureDetector.onTouchEvent(event)  // Handle the gesture event
+            v.performClick()
+            gestureDetector.onTouchEvent(event)
         }
     }
 
+    /**
+     * Binds the recipe data to the UI elements.
+     *
+     * @param recipe The recipe to be displayed.
+     */
     private fun bindRecipeData(recipe: FullRecipe) {
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
@@ -203,9 +206,9 @@ class FullRecipeFragment : Fragment() {
             fullRecipeViewModel.updateFavoriteStatus(recipe.id, false)
         }
 
-        // Move long operations out of the UI thread
+
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(40) // Let the layout breathe before heavy UI updates
+            delay(40)
 
             binding.ingredientsLayout.removeAllViews()
 

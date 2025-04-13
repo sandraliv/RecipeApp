@@ -15,12 +15,12 @@ class SortBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var onSortSelected: (SortType) -> Unit
     private var currentSortType: SortType? = null
 
-    // Set the callback to handle the sort selection
+
     fun setOnSortSelectedListener(callback: (SortType) -> Unit) {
         this.onSortSelected = callback
     }
 
-    // Set the initial sort type to be passed from HomeFragment
+
     fun setCurrentSortType(sortType: SortType) {
         currentSortType = sortType
     }
@@ -35,27 +35,20 @@ class SortBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Fetch the ImageViews for each sort icon
+
         val iconSortByRating = view.findViewById<ImageView>(R.id.iconSortByRating)
         val iconSortByDate = view.findViewById<ImageView>(R.id.iconSortByDate)
 
-        // Set up button click listeners
         view.findViewById<Button>(R.id.sortByRating).setOnClickListener {
             currentSortType = SortType.RATING
-
-            // Show the corresponding icon for the active sort
             iconSortByRating.visibility = View.VISIBLE
             iconSortByDate.visibility = View.INVISIBLE
-
-            // Pass the selected sort type back via the listener
             onSortSelected(SortType.RATING)
             dismiss()
         }
 
         view.findViewById<Button>(R.id.sortByDate).setOnClickListener {
             currentSortType = SortType.DATE
-
-            // Show the corresponding icon for the active sort
             iconSortByRating.visibility = View.INVISIBLE
             iconSortByDate.visibility = View.VISIBLE
 

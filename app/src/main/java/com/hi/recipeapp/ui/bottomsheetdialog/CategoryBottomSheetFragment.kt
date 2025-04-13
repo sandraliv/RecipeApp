@@ -37,10 +37,10 @@ class CategoryBottomSheetFragment : BottomSheetDialogFragment() {
         val checkmarkDessert = view.findViewById<ImageView>(R.id.iconDessert)
         val checkmarkBaking = view.findViewById<ImageView>(R.id.iconBaking)
 
-        // Set up button click listeners and control checkmark visibility
+
         view.findViewById<Button>(R.id.categoryBreakfast).setOnClickListener {
             onCategorySelected(Category.BREAKFAST)
-            // Show the checkmark for Breakfast and hide others
+
             checkmarkBreakfast.visibility = View.VISIBLE
             checkmarkAppetizer.visibility = View.INVISIBLE
             checkmarkMainCourse.visibility = View.INVISIBLE
@@ -52,7 +52,6 @@ class CategoryBottomSheetFragment : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.categoryAppetizer).setOnClickListener {
             onCategorySelected(Category.APPETIZER)
-            // Show the checkmark for Appetizer and hide others
             checkmarkAppetizer.visibility = View.VISIBLE
             checkmarkBreakfast.visibility = View.INVISIBLE
             checkmarkMainCourse.visibility = View.INVISIBLE
@@ -64,7 +63,7 @@ class CategoryBottomSheetFragment : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.categoryMainCourse).setOnClickListener {
             onCategorySelected(Category.MAIN_COURSE)
-            // Show the checkmark for MainCourse and hide others
+
             checkmarkMainCourse.visibility = View.VISIBLE
             checkmarkBreakfast.visibility = View.INVISIBLE
             checkmarkAppetizer.visibility = View.INVISIBLE
@@ -76,7 +75,7 @@ class CategoryBottomSheetFragment : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.categorySnack).setOnClickListener {
             onCategorySelected(Category.SNACK)
-            // Show the checkmark for Snack and hide others
+
             checkmarkSnack.visibility = View.VISIBLE
             checkmarkBreakfast.visibility = View.INVISIBLE
             checkmarkAppetizer.visibility = View.INVISIBLE
@@ -88,7 +87,7 @@ class CategoryBottomSheetFragment : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.categoryDessert).setOnClickListener {
             onCategorySelected(Category.DESSERT)
-            // Show the checkmark for Dessert and hide others
+
             checkmarkDessert.visibility = View.VISIBLE
             checkmarkBreakfast.visibility = View.INVISIBLE
             checkmarkAppetizer.visibility = View.INVISIBLE
@@ -100,7 +99,6 @@ class CategoryBottomSheetFragment : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.categoryBaking).setOnClickListener {
             onCategorySelected(Category.BAKING)
-            // Show the checkmark for Baking and hide others
             checkmarkBaking.visibility = View.VISIBLE
             checkmarkBreakfast.visibility = View.INVISIBLE
             checkmarkAppetizer.visibility = View.INVISIBLE
