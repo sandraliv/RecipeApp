@@ -42,7 +42,11 @@ class FullRecipeViewModel @Inject constructor(
     private val _calendarSaveStatus = MutableLiveData<String>()
     val calendarSaveStatus: LiveData<String> get() = _calendarSaveStatus
 
-
+    /**
+     * Fetches a recipe by its ID. First checks the local database, then falls back to fetching from the server.
+     *
+     * @param id The ID of the recipe to fetch.
+     */
     fun fetchRecipeById(id: Int) {
         val userId = sessionManager.getUserId()
         _isLoading.value = true
@@ -79,7 +83,6 @@ class FullRecipeViewModel @Inject constructor(
                                 _recipe.value = result
                             }
                         } else {
-                            // If the user is not logged in, assume the recipe is not favorited
                             result.isFavoritedByUser = false
                             _recipe.value = result
                         }
@@ -99,6 +102,11 @@ class FullRecipeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Converts a local Recipe object into a FullRecipe object.
+     *
+     * @return A FullRecipe object representing the local recipe.
+     */
     private fun Recipe.toFullRecipe(): FullRecipe {
         return FullRecipe(
             id = this.id,
@@ -115,7 +123,12 @@ class FullRecipeViewModel @Inject constructor(
     }
 
 
-
+    /**
+     * Updates the favorite status of a recipe for the logged-in user.
+     *
+     * @param recipeId The ID of the recipe to update.
+     * @param isFavorited The new favorite status of the recipe.
+     */
     fun updateFavoriteStatus(recipeId: Int, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
@@ -138,6 +151,13 @@ class FullRecipeViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Rates a recipe with the given rating value.
+     *
+     * @param recipeId The ID of the recipe to rate.
+     * @param rating The rating value (1 to 5) for the recipe.
+     */
     fun rateRecipe(recipeId: Int, rating: Int) {
         viewModelScope.launch {
             try {
@@ -164,6 +184,11 @@ class FullRecipeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Prepares the recipe instructions by formatting them into a readable list.
+     *
+     * @param raw The raw instructions string, with each step separated by a period.
+     */
     fun prepareInstructions(raw: String) {
         viewModelScope.launch {
             val instructions = raw.split(".")
@@ -175,6 +200,13 @@ class FullRecipeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Saves the recipe to the user's calendar for a specific date.
+     *
+     * @param userId The ID of the user saving the recipe.
+     * @param recipeId The ID of the recipe to save.
+     * @param date The date to save the recipe for.
+     */
     fun saveRecipeToCalendar(userId: Int, recipeId: Int, date: String) {
         viewModelScope.launch {
 

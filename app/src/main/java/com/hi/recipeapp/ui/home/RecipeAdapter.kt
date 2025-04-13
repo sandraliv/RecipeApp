@@ -42,6 +42,13 @@ class RecipeAdapter(
     inner class RecipeViewHolder(private val binding: ItemRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
         private var currentIndex = 0  // Keep track of the current image index
 
+        /**
+         * Binds the recipe data to the UI components.
+         *
+         * @param recipe The recipe card data to bind to the views.
+         * @param starSize The size of the stars used to display the rating.
+         * @param spaceBetweenStars The space between the stars used to display the rating.
+         */
         fun bind(recipe: RecipeCard, starSize: Int, spaceBetweenStars: Int) {
             if(isAdmin) {
                 binding.deleteRecipe.visibility = View.VISIBLE
@@ -131,6 +138,12 @@ class RecipeAdapter(
             loadImagesIntoImageSwitcher(recipe.imageUrls) // Load the images into ImageSwitcher
         }
 
+
+        /**
+         * Loads images into the ImageSwitcher with swipe functionality.
+         *
+         * @param imageUrls List of image URLs to be displayed in the ImageSwitcher.
+         */
         @SuppressLint("ClickableViewAccessibility")
         private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
 
@@ -183,6 +196,12 @@ class RecipeAdapter(
             }
         }
 
+
+        /**
+         * Loads an image into the ImageSwitcher.
+         *
+         * @param imageUrl The URL of the image to load.
+         */
         private fun loadImage(imageUrl: String?) {
             // Check if the imageUrl is null or empty
             if (imageUrl.isNullOrEmpty()) {
@@ -202,12 +221,21 @@ class RecipeAdapter(
             }
         }
 
-
+        /**
+         * Displays the next image in the list of images.
+         *
+         * @param imageUrls The list of image URLs.
+         */
         private fun showNextImage(imageUrls: List<String>) {
             currentIndex = (currentIndex + 1) % imageUrls.size
             loadImage(imageUrls[currentIndex])
         }
 
+        /**
+         * Displays the previous image in the list of images.
+         *
+         * @param imageUrls The list of image URLs.
+         */
         private fun showPreviousImage(imageUrls: List<String>) {
             currentIndex = if (currentIndex - 1 < 0) {
                 imageUrls.size - 1
@@ -217,6 +245,11 @@ class RecipeAdapter(
             loadImage(imageUrls[currentIndex])
         }
 
+        /**
+         * Updates the visibility of the heart buttons based on the favorite status of the recipe.
+         *
+         * @param recipe The recipe for which the heart button visibility needs to be updated.
+         */
         private fun updateHeartButtonVisibility(recipe: RecipeCard) {
             if (recipe.isFavoritedByUser) {
                 binding.filledHeartButton.visibility = View.VISIBLE
@@ -228,11 +261,27 @@ class RecipeAdapter(
         }
     }
 
+    /**
+     * A DiffUtil callback used for efficiently comparing and updating a list of RecipeCards.
+     */
     class RecipeDiffCallback : DiffUtil.ItemCallback<RecipeCard>() {
+        /**
+         * Checks if two items are the same.
+         *
+         * @param oldItem The old recipe item.
+         * @param newItem The new recipe item.
+         * @return True if the items are the same, false otherwise.
+         */
         override fun areItemsTheSame(oldItem: RecipeCard, newItem: RecipeCard): Boolean {
             return oldItem.id == newItem.id
         }
-
+        /**
+         * Checks if the contents of two items are the same.
+         *
+         * @param oldItem The old recipe item.
+         * @param newItem The new recipe item.
+         * @return True if the contents of the items are the same, false otherwise.
+         */
         override fun areContentsTheSame(oldItem: RecipeCard, newItem: RecipeCard): Boolean {
             return oldItem == newItem
         }

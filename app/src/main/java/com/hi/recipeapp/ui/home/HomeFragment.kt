@@ -45,10 +45,8 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        // Access the toolbar from the activity
         toolbar = requireActivity().findViewById(R.id.toolbar)
 
-        // Find the custom TextView inside the Toolbar
         titleTextView = toolbar.findViewById(R.id.titleTextView)
 
         recipeAdapter = homeViewModel.isAdmin.value?.let {
@@ -76,15 +74,15 @@ class HomeFragment : Fragment() {
 
         homeViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             if (isLoading) {
-                binding.progressBar.visibility = View.VISIBLE // Show progress bar
+                binding.progressBar.visibility = View.VISIBLE
                 binding.recipeRecyclerView.visibility = View.GONE
             } else {
-                binding.progressBar.visibility = View.GONE // Hide progress bar
+                binding.progressBar.visibility = View.GONE
                 binding.recipeRecyclerView.visibility = View.VISIBLE
                }
         })
 
-        // Set up GridLayoutManager with 2 columns (you can adjust the number of columns)
+
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
         binding.recipeRecyclerView.layoutManager = gridLayoutManager
         binding.recipeRecyclerView.adapter = recipeAdapter
@@ -110,46 +108,43 @@ class HomeFragment : Fragment() {
 
         homeViewModel.noMoreRecipes.observe(viewLifecycleOwner) { noMoreRecipes ->
             if (noMoreRecipes) {
-                // Prevent further load attempts until the page is refreshed
+
                 binding.textNoRecipeResults.text = getString(R.string.no_more_recipes_available)
                 binding.textNoRecipeResults.visibility = View.VISIBLE
             } else {
-                // Reset the message and hide the bottom container
+
                 binding.textNoRecipeResults.visibility = View.GONE
 
             }
         }
 
-        // Observe the error message LiveData
         homeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
 
-
-        // Observe the favorite action message LiveData
         homeViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
             }
         }
 
-
-        // Add scroll listener
         addScrollListenerToRecyclerView()
         return binding.root
     }
 
+    /**
+     * Adds a scroll listener to the RecyclerView to handle pagination, hiding and showing UI components
+     * based on the scroll direction, and animating UI changes.
+     */
     private fun addScrollListenerToRecyclerView() {
         binding.recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (isAnimationInProgress) return // Prevent triggering animations if they're already in progress
-                // If already loading or no more recipes, do nothing
+                if (isAnimationInProgress) return
                 if (isLoadingMore || homeViewModel.noMoreRecipes.value == true) return
-
 
                 // Handle the header visibility based on scroll direction
                 if (dy > 0) {
@@ -253,44 +248,40 @@ class HomeFragment : Fragment() {
             }
         })
     }
+
+    /**
+     * Loads more recipes when the user reaches the bottom of the list.
+     */
     private fun loadMoreRecipes() {
         // Prevent multiple load requests if already loading or no more recipes
         if (isLoadingMore || homeViewModel.noMoreRecipes.value == true) return
 
-        // Mark as loading more recipes
         isLoadingMore = true
         binding.progressBarBottom.visibility = View.VISIBLE
-
-        // Pass the current sort type to the ViewModel so that it loads recipes accordingly
         homeViewModel.loadMoreRecipes(currentSortType)
-
-        // Observe the loading state (whether we are still loading)
         homeViewModel.isLoadingMore.observe(viewLifecycleOwner, Observer { isLoading ->
             if (!isLoading) {
-                // Once loading is finished, reset isLoadingMore flag
                 isLoadingMore = false
 
-                // Handle the loaded recipes
                 homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
                     recipeAdapter.submitList(recipes)
                 }
 
-                // Hide the progress bar and bottom container after loading
                 binding.progressBarBottom.visibility = View.GONE
                 if (homeViewModel.noMoreRecipes.value == true) {
-                    // If no more recipes are available, show the no more recipes message
                     binding.textNoRecipeResults.text = getString(R.string.no_more_recipes_available)
                     binding.textNoRecipeResults.visibility = View.VISIBLE
                     binding.progressBarBottom.visibility = View.GONE
                 } else {
-                    // If there are more recipes, hide the "no more" message
                     binding.textNoRecipeResults.visibility = View.GONE
                 }
             }
         })
     }
 
-
+    /**
+     * Ensures that the toolbar and views are correctly displayed when returning to the fragment.
+     */
     override fun onResume() {
         super.onResume()
         // Ensure Toolbar and views are correctly displayed when returning to the fragment
@@ -300,6 +291,10 @@ class HomeFragment : Fragment() {
         binding.plass.visibility = View.GONE
         titleTextView.visibility = View.GONE
     }
+
+    /**
+     * Sets up the Sort button to allow the user to choose the sorting method.
+     */
     private fun setupSortButton() {
         val sortButton = binding.sortByButton
         sortButton.setOnClickListener {
@@ -307,21 +302,15 @@ class HomeFragment : Fragment() {
             bottomSheetFragment.setCurrentSortType(currentSortType)
 
             bottomSheetFragment.setOnSortSelectedListener { sortType ->
-                // Set the new sort type
+
                 currentSortType = sortType
-
-                // Update the sort type in the ViewModel
                 homeViewModel.updateSortType(currentSortType)
-
-                // Show loading UI immediately
                 binding.progressBar.visibility = View.VISIBLE
                 binding.recipeRecyclerView.visibility = View.GONE
-                binding.textHome.visibility = View.GONE // Hide "No Recipes" message while loading
+                binding.textHome.visibility = View.GONE
 
-                // Clear the current list of recipes
                 recipeAdapter.submitList(emptyList())
 
-                // Observe the recipes LiveData to ensure data is updated
                 homeViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
                     if (recipes != null) {
                         // Submit the new list of recipes
@@ -348,9 +337,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-
-
+    /**
+     * Sets up the Category button to allow the user to filter recipes by category.
+     */
     // Setup Category Button
     private fun setupCategoryButton() {
 
@@ -366,11 +355,17 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Navigates to the CategoryFragment when a category is selected.
+     */
     private fun navigateToCategoryFragment(category: Category) {
         val action = HomeFragmentDirections.actionHomeFragmentToCategoryFragment(category.name)  // Pass category name
         findNavController().navigate(action)
     }
 
+    /**
+     * Cleans up resources when the fragment's view is destroyed.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

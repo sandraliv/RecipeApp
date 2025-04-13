@@ -12,21 +12,24 @@ import android.content.res.Configuration
 import com.hi.recipeapp.classes.CalendarEntry
 
 class CalendarAdapter(
-    private val weekHeaders: List<String>,  // Weekdays like Mon, Tue, Wed
-    private var days: List<String>,         // Days of the month (1, 2, 3, etc.)
-    private var recipesByDay: Map<String, List<CalendarEntry>>,  // Recipes for each day
-    private val currentMonth: Int,         // Current month for highlighting today's date
-    private val currentYear: Int,          // Current year for checking if it's today's date
-    private val onDayClicked: (String, List<CalendarEntry>) -> Unit // Pass day and recipes to Fragment
+    private val weekHeaders: List<String>,
+    private var days: List<String>,
+    private var recipesByDay: Map<String, List<CalendarEntry>>,
+    private val currentMonth: Int,
+    private val currentYear: Int,
+    private val onDayClicked: (String, List<CalendarEntry>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val dayItemType = 1
     private val headerItemType = 2
-
-    // Variable to store the selected day, initialize to today's date
     private var selectedDay: String = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
 
-
+    /**
+     * Updates the calendar data with new days and recipes for each day.
+     *
+     * @param newDays A list of new days to update the calendar.
+     * @param newRecipesByDay A map of recipes associated with each day.
+     */
     fun updateCalendarData(newDays: List<String>, newRecipesByDay: Map<String, List<CalendarEntry>>) {
         val updatedDays = mutableListOf<String>()
         val updatedRecipesByDay = mutableMapOf<String, List<CalendarEntry>>()
@@ -40,11 +43,6 @@ class CalendarAdapter(
             Log.d("CalendarAdapter", "Day: $day, Recipes: ${updatedRecipesByDay[day]}")
         }
 
-        // Log the new days and recipes
-        Log.d("CalendarAdapter", "Updated days: $updatedDays")
-        Log.d("CalendarAdapter", "Updated recipes by day: $updatedRecipesByDay")
-
-        // Mark 'today' and 'selected' day
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')  // Today's date, formatted (e.g., "07")
         Log.d("CalendarAdapter", "Today's Date: $today")
 
@@ -56,11 +54,15 @@ class CalendarAdapter(
         notifyDataSetChanged()  // Ensure the adapter is notified about the data update
     }
 
-
+    /**
+     * Determines the view type for the current item (header or day).
+     */
     override fun getItemViewType(position: Int): Int {
         return if (position < weekHeaders.size) headerItemType else dayItemType
     }
-
+    /**
+     * Creates a view holder based on the item view type (either header or day).
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == headerItemType) {
             // Inflate the week header layout
@@ -72,7 +74,9 @@ class CalendarAdapter(
             DayViewHolder(view)
         }
     }
-
+    /**
+     * Binds data to the appropriate view holder (either the week header or day).
+     */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is WeekHeaderViewHolder -> {
@@ -105,21 +109,37 @@ class CalendarAdapter(
     }
 
 
+    /**
+     * Returns the total item count for the calendar (week headers + days).
+     */
     override fun getItemCount(): Int {
         return weekHeaders.size + days.size
     }
 
+    /**
+     * View holder for the week header that displays the weekday names.
+     */
     inner class WeekHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val weekHeaderTextView: TextView = itemView.findViewById(R.id.weekHeaderTextView)
-
+        /**
+         * Binds the weekday name to the header.
+         */
         fun bind(header: String) {
             weekHeaderTextView.text = header
         }
     }
-
+    /**
+     * View holder for the day items that display the days of the month.
+     */
     inner class DayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val dayTextView: TextView = itemView.findViewById(R.id.dayTextView)
-
+        /**
+         * Binds the day and its status (today/selected) to the day view.
+         *
+         * @param day The day number (e.g., "01", "15", etc.).
+         * @param isToday Whether the day is today's date.
+         * @param isSelected Whether the day is selected.
+         */
         fun bind(day: String, isToday: Boolean, isSelected: Boolean) {
             dayTextView.text = day
 
@@ -185,6 +205,12 @@ class CalendarAdapter(
 
     }
 
+    /**
+     * Checks if a given day is today's date.
+     *
+     * @param day The day to check.
+     * @return True if the day is today's date, false otherwise.
+     */
     private fun isToday(day: String): Boolean {
         val currentDate = LocalDate.now()
         return try {

@@ -49,11 +49,21 @@ class SearchViewModel @Inject constructor(
     private var currentQuery: String = ""
     private var currentTags: Set<String>? = null
 
+    /**
+     * Initializes the ViewModel by performing a default search query.
+     */
     init {
         searchByQuery(query = "", tags = null, sort = SortType.RATING)
     }
 
-
+    /**
+     * Searches for recipes based on a query, tags, and sorting type.
+     * Updates the search results and manages the loading state.
+     *
+     * @param query The search query string.
+     * @param tags A set of tags for filtering the recipes.
+     * @param sort The sorting type for the search results.
+     */
     fun searchByQuery(query: String, tags: Set<String>?, sort: SortType) {
         _errorMessage.value = null
         _isLoading.value = true
@@ -93,7 +103,13 @@ class SearchViewModel @Inject constructor(
 
 
 
-
+    /**
+     * Loads more recipes for pagination, based on the current query and tags.
+     * If no more recipes are available, updates the LiveData.
+     *
+     * @param query The search query string.
+     * @param tags A set of tags for filtering the recipes.
+     */
     fun loadMoreRecipes(query: String, tags: Set<String>?) {
         // Prevent multiple load requests if no more recipes are available
         if (_noMoreRecipes.value == true || _isLoadingMore.value == true) {
@@ -139,7 +155,12 @@ class SearchViewModel @Inject constructor(
     }
 
 
-
+    /**
+     * Updates the favorite status of a recipe and reflects the changes in the backend and session.
+     *
+     * @param recipe The recipe to be updated.
+     * @param isFavorited Boolean indicating the new favorite status.
+     */
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
@@ -176,7 +197,11 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
-
+    /**
+     * Updates the sorting type for the recipes and triggers a new search with the updated sort type.
+     *
+     * @param newSortType The new sort type to apply.
+     */
     fun updateSortType(newSortType: SortType) {
         if (newSortType != sortType) {
             sortType = newSortType

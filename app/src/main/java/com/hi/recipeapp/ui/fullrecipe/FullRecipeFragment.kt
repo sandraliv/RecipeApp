@@ -268,15 +268,13 @@ class FullRecipeFragment : Fragment() {
             }
         }
 
-        // Format instructions in ViewModel
         fullRecipeViewModel.prepareInstructions(recipe.instructions)
 
-        // Observe formatted instructions here
+
         fullRecipeViewModel.formattedInstructions.observe(viewLifecycleOwner) {
             binding.instructionsTextView.text = it
         }
 
-        // Format tags & categories
         binding.tagsTextView.text = recipe.tags.mapNotNull {
             try { RecipeTag.valueOf(it).getDisplayName() } catch (e: Exception) { null }
         }.joinToString(", ")
@@ -286,8 +284,11 @@ class FullRecipeFragment : Fragment() {
         loadImagesIntoImageSwitcher(recipe.imageUrls)
     }
 
-
-
+    /**
+     * Loads the images into the ImageSwitcher.
+     *
+     * @param imageUrls List of image URLs to display.
+     */
     private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
         // Reference to the ImageSwitcher
         val imageSwitcher = binding.imageSwitcher
@@ -297,22 +298,28 @@ class FullRecipeFragment : Fragment() {
             currentIndex = 0
             loadImage(imageUrls[currentIndex])
 
-            // Optionally add swipe listener if needed (handled by gesture detector)
+
         }
     }
-
+    /**
+     * Loads an image into the ImageSwitcher.
+     *
+     * @param imageUrl The URL of the image to load.
+     */
     private fun loadImage(imageUrl: String) {
         val context = requireContext()
 
-        // Load the image using Glide
         Glide.with(context)
             .load(imageUrl)
-            .transform(CenterCrop())  // Optional transformation
+            .transform(CenterCrop())
             .placeholder(R.drawable.placeholder)
-            .error(R.drawable.error_image) // Handle error image gracefully
-            .into(binding.imageSwitcher.currentView as ImageView)  // ImageSwitcher is the target view
+            .error(R.drawable.error_image)
+            .into(binding.imageSwitcher.currentView as ImageView)
     }
 
+    /**
+     * Displays the next image in the ImageSwitcher.
+     */
     private fun showNextImage() {
         val imageUrls = fullRecipeViewModel.recipe.value?.imageUrls ?: return
         if (imageUrls.isNotEmpty()) {
@@ -321,6 +328,10 @@ class FullRecipeFragment : Fragment() {
         }
     }
 
+
+    /**
+     * Displays the previous image in the ImageSwitcher.
+     */
     private fun showPreviousImage() {
         val imageUrls = fullRecipeViewModel.recipe.value?.imageUrls ?: return
         if (imageUrls.isNotEmpty()) {
@@ -333,6 +344,11 @@ class FullRecipeFragment : Fragment() {
         }
     }
 
+    /**
+     * Updates the rating stars based on the given average rating.
+     *
+     * @param averageRating The average rating to display as stars.
+     */
     private fun setRatingStars(averageRating: Double) {
         val fullStars = averageRating.toInt()
         val hasHalfStar = averageRating % 1 >= 0.5
@@ -345,6 +361,11 @@ class FullRecipeFragment : Fragment() {
         binding.recipeRatingStars.text = starRating.toString()
     }
 
+    /**
+     * Updates the visibility of the heart button based on whether the recipe is favorited.
+     *
+     * @param recipe The recipe whose favorited status determines the heart button visibility.
+     */
     private fun updateHeartButtonVisibility(recipe: FullRecipe) {
         if (recipe.isFavoritedByUser) {
             binding.filledHeartButton.visibility = View.VISIBLE
@@ -355,26 +376,28 @@ class FullRecipeFragment : Fragment() {
         }
     }
 
+    /**
+     * Displays the rating stars layout and allows the user to rate the recipe.
+     */
     private fun showRatingStars() {
-        // Show the rating stars layout and dynamically add 5 clickable stars
         binding.ratingStarsLayout.visibility = View.VISIBLE
-        binding.ratingTextView.visibility = View.VISIBLE  // Show the rating text as well
+        binding.ratingTextView.visibility = View.VISIBLE
         binding.ratingStarsLayout.removeAllViews()
 
-        binding.ratingTextView.text = "Rate this recipe:"  // Initially just show "Rate this recipe:"
+        binding.ratingTextView.text = "Rate this recipe:"
 
         for (i in 1..5) {
             val star = ImageView(requireContext()).apply {
-                setImageResource(R.drawable.ic_star_empty)  // Initially empty star
+                setImageResource(R.drawable.ic_star_empty)
 
                 setOnClickListener {
-                    selectedRating = i  // When clicked, set selected rating
-                    updateStars()  // Update the filled stars
-                    updateRatingText()  // Update the rating text
-                    showSubmitButton()  // Change the "Rate this recipe" button to "Submit"
+                    selectedRating = i
+                    updateStars()
+                    updateRatingText()
+                    showSubmitButton()
                 }
 
-                // Adding hover-like effect for touch (shows filled stars)
+
                 setOnTouchListener { v, event ->
                     when (event.action) {
                         MotionEvent.ACTION_MOVE -> {
@@ -389,12 +412,11 @@ class FullRecipeFragment : Fragment() {
                             }
                         }
                         MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                            // Reset all stars to their current state when the touch ends
+
                             updateStars()
                         }
                         MotionEvent.ACTION_DOWN -> {
-                            // Perform the click when the user taps down
-                            performClick() // This is important for accessibility
+                            performClick()
                         }
                     }
                     true
@@ -409,48 +431,49 @@ class FullRecipeFragment : Fragment() {
             binding.ratingStarsLayout.addView(star)
         }
 
-        // After showing the rating stars, scroll the ScrollView to the bottom
         binding.nestedScrollView.post {
             binding.nestedScrollView.smoothScrollTo(0, binding.nestedScrollView.height)
         }
     }
 
-    // Helper function to update the stars based on selected rating
+    /**
+     * Updates the stars in the rating layout based on the selected rating.
+     */
     private fun updateStars() {
-        // Iterate through all child views in the ratingStarsLayout
         for (i in 0 until binding.ratingStarsLayout.childCount) {
             val star = binding.ratingStarsLayout.getChildAt(i) as ImageView
             if (i < selectedRating) {
-                star.setImageResource(R.drawable.ic_star_filled) // Set the star as filled
+                star.setImageResource(R.drawable.ic_star_filled)
             } else {
-                star.setImageResource(R.drawable.ic_star_empty) // Set the star as empty
+                star.setImageResource(R.drawable.ic_star_empty)
             }
         }
     }
-
+    /**
+     * Updates the rating text based on the selected rating.
+     */
     private fun updateRatingText() {
-        // Update the rating text with the number of stars selected
         if (selectedRating > 0) {
             binding.ratingTextView.text = "Rate this recipe: $selectedRating stars"
         }
     }
 
+    /**
+     * Displays the submit button for the rating.
+     */
     private fun showSubmitButton() {
-        // Hide the "Rate this recipe" button and show the "Submit" button
         binding.rateRecipeButton.text = "Submit Rating"
         binding.rateRecipeButton.setOnClickListener {
-            submitRating()  // Call the submit function
+            submitRating()
         }
     }
 
+    /**
+     * Submits the rating for the recipe.
+     */
     private fun submitRating() {
-        // Code to handle rating submission (e.g., network call or saving to a database)
         fullRecipeViewModel.rateRecipe(recipeId, selectedRating)
-
-        // Optionally, hide the submit button after the rating is submitted
         binding.rateRecipeButton.isEnabled = false
-
-        // Show a message to the user
         Toast.makeText(requireContext(), "You rated this recipe $selectedRating stars", Toast.LENGTH_SHORT).show()
     }
 

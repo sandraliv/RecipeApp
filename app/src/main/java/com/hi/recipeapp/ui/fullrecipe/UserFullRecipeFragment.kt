@@ -53,20 +53,17 @@ class UserFullRecipeFragment : Fragment() {
         setupGestureDetector()
         userFullRecipeViewModel.fetchUserRecipeById(recipeId)
 
-        // Observe the full recipe data
+
         userFullRecipeViewModel.userrecipe.observe(viewLifecycleOwner) { userrecipe ->
             Log.d("FullRecipeFragment", "Observer triggered, recipe: $userrecipe")
 
             userrecipe?.let {
-                // Bind the full recipe data to the UI
                 bindRecipeData(it)
             }
         }
 
-        // Observe error messages
         userFullRecipeViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
-                // Handle error (show toast, etc.)
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         }
@@ -79,11 +76,12 @@ class UserFullRecipeFragment : Fragment() {
             showDatePickerAndSave()
         }
 
-
-
         return binding.root
     }
 
+    /**
+     * Displays a date picker dialog and saves the recipe to the user's calendar for the selected date.
+     */
     private fun showDatePickerAndSave() {
         val today = org.threeten.bp.LocalDate.now()
         val year = today.year
@@ -103,6 +101,9 @@ class UserFullRecipeFragment : Fragment() {
         datePickerDialog.show()
     }
 
+    /**
+     * Sets up gesture detection to swipe between images.
+     */
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestureDetector() {
         val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.OnGestureListener {
@@ -141,42 +142,45 @@ class UserFullRecipeFragment : Fragment() {
         }
     }
 
+    /**
+     * Binds the recipe data to the UI components.
+     *
+     * @param recipe The UserFullRecipe object containing the recipe data.
+     */
     private fun bindRecipeData(recipe: UserFullRecipe) {
-        // Bind the recipe data to the UI
         binding.titleTextView.text = recipe.title
         binding.descriptionTextView.text = recipe.description
 
         loadImagesIntoImageSwitcher(recipe.imageUrls)
 
         recipe.ingredients.forEach { (ingredientName, ingredientQuantity) ->
-            val formattedIngredientName = ingredientName.replace("_", " ") // Replace underscores with spaces
+            val formattedIngredientName = ingredientName.replace("_", " ")
 
             // Create a TableRow to hold the components for each ingredient
             val tableRow = TableRow(requireContext()).apply {
                 gravity = Gravity.CENTER_VERTICAL
-                setPadding(0, 8, 0, 8) // Optional padding for each row
+                setPadding(0, 8, 0, 8)
             }
 
             // Create the measurement TextView (for displaying the quantity)
             val measurementTextView = TextView(requireContext()).apply {
                 text = ingredientQuantity
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                gravity = Gravity.START  // Align text to the left for the measurements
-                setPadding(16, 0, 16, 0) // Adjust the padding between columns
+                gravity = Gravity.START
+                setPadding(16, 0, 16, 0)
             }
 
             // Create the ingredient name TextView (for displaying the ingredient name)
             val ingredientNameTextView = TextView(requireContext()).apply {
                 text = formattedIngredientName
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                gravity = Gravity.START  // Align text to the left for the ingredient name
-                setPadding(16, 0, 16, 0) // Adjust the padding between columns
+                gravity = Gravity.START
+                setPadding(16, 0, 16, 0)
             }
 
             // Create the CheckBox for the ingredient
             val ingredientCheckBox = CheckBox(requireContext()).apply {
                 setOnCheckedChangeListener { buttonView, isChecked ->
-                    // Apply strike-through effect to the entire row (checkbox, measurement, and name)
                     val strikeThroughFlag = if (isChecked) Paint.STRIKE_THRU_TEXT_FLAG else 0
                     measurementTextView.paintFlags = strikeThroughFlag
                     ingredientNameTextView.paintFlags = strikeThroughFlag
@@ -184,22 +188,20 @@ class UserFullRecipeFragment : Fragment() {
             }
 
             // Add the views to the TableRow
-            tableRow.addView(ingredientCheckBox) // First column (checkbox)
-            tableRow.addView(measurementTextView)  // Second column (measurement only)
-            tableRow.addView(ingredientNameTextView)  // Third column (ingredient name only)
+            tableRow.addView(ingredientCheckBox)
+            tableRow.addView(measurementTextView)
+            tableRow.addView(ingredientNameTextView)
 
             // Add the TableRow to the TableLayout
-            binding.ingredientsLayout.addView(tableRow)  // Add the entire row
+            binding.ingredientsLayout.addView(tableRow)
         }
 
         // Set instructions with numbering
-        val instructions = recipe.instructions.split(".") // Split by periods (.)
+        val instructions = recipe.instructions.split(".")
 
         val formattedInstructions = StringBuilder()
         instructions.forEachIndexed { index, instruction ->
-            // Ignore empty strings caused by trailing periods or extra spaces
             if (instruction.trim().isNotEmpty()) {
-                // Add number and instruction step
                 formattedInstructions.append("${index + 1}. ${instruction.trim()}. \n\n")
             }
         }
@@ -207,6 +209,11 @@ class UserFullRecipeFragment : Fragment() {
         binding.instructionsTextView.text = formattedInstructions.toString()
     }
 
+    /**
+     * Loads images into the ImageSwitcher for swiping between images.
+     *
+     * @param imageUrls The list of image URLs to be displayed.
+     */
     private fun loadImagesIntoImageSwitcher(imageUrls: List<String>?) {
         if (!imageUrls.isNullOrEmpty()) {
             currentIndex = 0
@@ -214,6 +221,11 @@ class UserFullRecipeFragment : Fragment() {
         }
     }
 
+    /**
+     * Loads the image from the URL into the ImageSwitcher.
+     *
+     * @param imageUrl The URL of the image to load.
+     */
     private fun loadImage(imageUrl: String) {
         Glide.with(requireContext())
             .load(imageUrl)
@@ -223,6 +235,9 @@ class UserFullRecipeFragment : Fragment() {
             .into(binding.imageSwitcher.currentView as ImageView)
     }
 
+    /**
+     * Displays the next image in the ImageSwitcher.
+     */
     private fun showNextImage() {
         val imageUrls = userFullRecipeViewModel.userrecipe.value?.imageUrls ?: return
         if (imageUrls.isNotEmpty()) {
@@ -231,6 +246,9 @@ class UserFullRecipeFragment : Fragment() {
         }
     }
 
+    /**
+     * Displays the previous image in the ImageSwitcher.
+     */
     private fun showPreviousImage() {
         val imageUrls = userFullRecipeViewModel.userrecipe.value?.imageUrls ?: return
         if (imageUrls.isNotEmpty()) {

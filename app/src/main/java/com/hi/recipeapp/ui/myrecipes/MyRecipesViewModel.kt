@@ -69,7 +69,12 @@ class MyRecipesViewModel @Inject constructor(
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
-    // Function to load user recipes
+
+    /**
+     * Fetches user recipes from the server and updates the LiveData accordingly.
+     * @param page The page number to fetch (default is 0).
+     * @param size The number of recipes per page (default is 10).
+     */
     fun fetchUserRecipes(page: Int = 0, size: Int = 10) {
         viewModelScope.launch {
             val result = userService.getUserRecipes(page, size)
@@ -81,7 +86,9 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
-
+    /**
+     * Fetches favorite recipes from either the local database or server and updates the LiveData.
+     */
     fun fetchFavoriteRecipes() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -102,7 +109,9 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
-
+    /**
+     * Fetches the most recent favorite recipes from the server.
+     */
     private fun getNewestFavouriteRecipes() {
         viewModelScope.launch {
             try {
@@ -114,6 +123,9 @@ class MyRecipesViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Fetches favorite recipes from the server and updates the LiveData.
+     */
     private fun fetchMyFavoriteRecipes() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -148,7 +160,11 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
-
+    /**
+     * Updates the favorite status of a recipe, either adding or removing it from the user's favorites.
+     * @param recipe The recipe whose favorite status is to be updated.
+     * @param isFavorited The new favorite status.
+     */
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
@@ -173,7 +189,9 @@ class MyRecipesViewModel @Inject constructor(
             }
         }
     }
-
+    /**
+     * Fetches and displays calendar recipes for the current user.
+     */
     fun fetchAndDisplayCalendarRecipes() {
         val userId = sessionManager.getUserId()
 
@@ -213,7 +231,11 @@ class MyRecipesViewModel @Inject constructor(
         }
     }
 
-    // Add this function inside the ViewModel class
+    /**
+     * Processes a list of calendar entries and returns a list of recipe titles.
+     * @param entries A list of calendar entries to process.
+     * @return A list of recipe titles for each calendar entry.
+     */
     fun processCalendarEntries(entries: List<CalendarEntry>): List<String> {
         return entries.map { entry ->
             // Safely access title from recipe or userRecipe
@@ -221,7 +243,10 @@ class MyRecipesViewModel @Inject constructor(
         }
     }
 
-
+    /**
+     * Maps calendar recipes to specific days and updates the LiveData.
+     * It processes the calendar entries by date and creates a mapping of days to recipe entries.
+     */
     private fun mapCalendarRecipesToDays(calendarRecipes: List<CalendarEntry>) {
         val days = mutableListOf<String>()
         val recipesByDay = mutableMapOf<String, MutableList<CalendarEntry>>() // Stores CalendarEntry for each day
@@ -300,7 +325,10 @@ class MyRecipesViewModel @Inject constructor(
             ingredients = ingredients
         )
     }
-
+    /**
+     * Deletes a recipe by its ID and updates the user recipe list.
+     * @param recipeId The ID of the recipe to delete.
+     */
     fun deleteRecipe(recipeId: Int) {
         viewModelScope.launch {
             try {
@@ -317,7 +345,12 @@ class MyRecipesViewModel @Inject constructor(
 
         }
     }
-
+    /**
+     * Removes a recipe from the user's calendar by recipe ID, user recipe ID, and the date.
+     * @param recipeId The ID of the recipe to remove.
+     * @param userRecipeId The ID of the user-created recipe to remove.
+     * @param date The date of the recipe in the calendar.
+     */
     fun removeRecipeFromCalendar(recipeId: Int?, userRecipeId: Int?, date: String) {
         // Set loading state to true while processing
         _isLoading.value = true

@@ -119,7 +119,9 @@ class SearchFragment : Fragment() {
 
         return binding.root
     }
-
+    /**
+     * Sets up the sorting button to show the SortBottomSheetFragment and update the current sort type.
+     */
     private fun setupSortButton() {
         binding.sortByButton.setOnClickListener {
             // Open the Sort BottomSheetDialogFragment
@@ -145,7 +147,9 @@ class SearchFragment : Fragment() {
         }
     }
 
-
+    /**
+     * Sets up the SearchView and handles query submission and text change events.
+     */
     private fun setupSearchView() {
         val searchView: SearchView = binding.searchDashboard
         searchView.isIconified = false
@@ -179,7 +183,9 @@ class SearchFragment : Fragment() {
             }
         })
     }
-
+    /**
+     * Sets up the tag selection chip group, where users can select tags to filter recipes.
+     */
     private fun setupTagSelection() {
         val chipGroup = binding.chipGroupTags
         chipGroup.removeAllViews()
@@ -202,7 +208,9 @@ class SearchFragment : Fragment() {
         }
     }
 
-
+    /**
+     * Sets up the RecyclerView to display the recipes in a grid layout and handles item clicks.
+     */
     private fun setupRecyclerView() {
         recipeAdapter = RecipeAdapter(
             onClick = { recipe ->
@@ -302,7 +310,9 @@ class SearchFragment : Fragment() {
 
     }
 
-
+    /**
+     * Observes the search results and updates the UI accordingly.
+     */
     private fun observeViewModel() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) { results ->
             if (results.isNullOrEmpty()) {
@@ -326,7 +336,9 @@ class SearchFragment : Fragment() {
             }
         }
     }
-
+    /**
+     * Ensures the sort and tags buttons are shown, even if they are hidden due to scrolling.
+     */
     private fun showSortAndTags() {
         // Ensure tags and sort buttons are shown, even when they are hidden due to scrolling
         if (binding.chipGroupTags.visibility != View.VISIBLE) {
@@ -348,13 +360,17 @@ class SearchFragment : Fragment() {
         }
     }
 
-
+    /**
+     * Resets the search state, clearing the query and hiding the search results.
+     */
     fun resetSearchState() {
         binding.textDashboard.text = ""
         binding.searchDashboard.setQuery("", false)
         binding.searchDashboard.clearFocus()
     }
-
+    /**
+     * Cleans up references when the view is destroyed.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

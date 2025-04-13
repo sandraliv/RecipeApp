@@ -241,12 +241,24 @@ class MyRecipesFragment : Fragment() {
         return binding.root
     }
 
+
+    /**
+     * Searches for the calendar entry associated with the given recipe.
+     *
+     * @param recipe The recipe for which the calendar entry is being searched.
+     * @return The corresponding CalendarEntry if found, null otherwise.
+     */
     private fun findCalendarEntryForRecipe(recipe: CalendarRecipeCard): CalendarEntry? {
         Log.d("CalendarRecipeCardAdapter", "Searching for calendar entry for recipe: ${recipe.id}")
         // Assuming you have a method in the ViewModel that fetches the calendar entries
         val calendarEntries = myRecipesViewModel.mappedCalendarRecipes.value?.second
         return calendarEntries?.values?.flatten()?.find { it.recipe?.id == recipe.id || it.userRecipe?.id == recipe.id }
     }
+
+    /**
+     * Sets up all RecyclerViews used in this fragment by initializing them with their respective
+     * layout managers and adapters.
+     */
     private fun setupRecyclerView() {
 
         // Set up RecyclerView for the calendar recipe list
@@ -278,6 +290,11 @@ class MyRecipesFragment : Fragment() {
         }
     }
 
+
+    /**
+     * Sets up click listeners for the category buttons (Favorites, My Recipes, Calendar)
+     * and the navigation buttons for changing months in the calendar.
+     */
     private fun setupButtonListeners() {
         binding.favoritesButton.setOnClickListener {
             setActiveButton(binding.favoritesButton)
@@ -322,7 +339,12 @@ class MyRecipesFragment : Fragment() {
         }
 
     }
-
+    /**
+     * Toggles the visibility of sections of the fragment based on the selected category.
+     * This method will hide all sections and only show the one that matches the given category.
+     *
+     * @param category The category to be displayed. Can be "favorites", "user", or "calendar".
+     */
     private fun toggleVisibility(category: String) {
         when (category) {
             "favorites" -> {
@@ -363,7 +385,12 @@ class MyRecipesFragment : Fragment() {
             }
         }
     }
-
+    /**
+     * Sets the message to display when there are no recipes for the specified category.
+     *
+     * @param category The category for which no recipes were found. It can be one of the following:
+     *                 "calendar", "favorite", or "user".
+     */
     private fun setNoRecipesMessage(category: String) {
         val recipeListTextView = binding.recipeListTextView
 
@@ -380,7 +407,11 @@ class MyRecipesFragment : Fragment() {
         }
         recipeListTextView.visibility = View.VISIBLE
     }
-
+    /**
+     * Sets the initial state of the view when the user first loads the screen.
+     * It prepares the UI elements, shows the favorite recipe list, and fetches
+     * the favorite recipes.
+     */
     private fun setInitialState() {
         val today = LocalDate.now().dayOfMonth.toString().padStart(2, '0')
 
@@ -395,6 +426,13 @@ class MyRecipesFragment : Fragment() {
         selectedDay = today
     }
 
+    /**
+     * Updates the recipe list for the selected day. If there are recipes for the day,
+     * it displays them; otherwise, it shows a message indicating there are no recipes.
+     *
+     * @param day The selected day for which to update the recipe list. The day should
+     *            be a two-digit string (e.g., "01", "02").
+     */
     private fun updateRecipeListForDay(day: String) {
         val recipeRecyclerView = binding.calendarRecipeRecyclerView
         val recipeListTextView = binding.recipeListTextView
@@ -408,25 +446,23 @@ class MyRecipesFragment : Fragment() {
 
         // Format the selected day to include the full date (Year-Month-Day)
         val selectedDate = LocalDate.of(currentYear, currentMonth, formattedDay.toInt()).toString()  // "2025-04-01"
-        Log.d("MY RECIPES FRAGMENT", "Selected Date: $selectedDate")
+
         // Get the recipes for the selected full date from your ViewModel (CalendarEntry list)
         val calendarEntriesForToday: List<CalendarEntry> =
             myRecipesViewModel.mappedCalendarRecipes.value?.second?.get(selectedDate) ?: emptyList()
 
-        Log.d("MY RECIPES FRAGMENT", "Found recipes for $selectedDate: ${calendarEntriesForToday.size}")  // Log the number of recipes found
+
 
         // Convert CalendarEntry to CalendarRecipeCard
         val recipesForToday: List<CalendarRecipeCard> =
             calendarEntriesForToday.mapNotNull { calendarEntry ->
                 calendarEntry.recipe ?: calendarEntry.userRecipe
             }
-        Log.d("MY RECIPES FRAGMENT", "Mapped recipes to CalendarRecipeCard for $selectedDate: ${recipesForToday.size}")
+
 
         // Now submit the new list to the adapter
         val newRecipeList: List<CalendarRecipeCard> = recipesForToday
         calendarRecipeCardAdapter.submitList(newRecipeList)
-        Log.d("CalendarRecipeCardAdapter", "Submitted ${newRecipeList.size} recipes")
-
 
         if (calendarEntriesForToday.isEmpty()) {
             recipeRecyclerView.visibility = View.GONE
@@ -436,7 +472,10 @@ class MyRecipesFragment : Fragment() {
             recipeListTextView.visibility = View.GONE
         }
     }
-
+    /**
+     * Updates the calendar view with the current month and year. The calendar is populated with
+     * the appropriate days and their corresponding recipes for the selected month.
+     */
     private fun updateCalendarWithCurrentMonth() {
         val monthName =
             Month.of(currentMonth).name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
@@ -446,7 +485,13 @@ class MyRecipesFragment : Fragment() {
         updateCalendar()
         myRecipesViewModel.fetchAndDisplayCalendarRecipes()
     }
-
+    /**
+     * Sets the active button style and updates its visual appearance based on night mode
+     * and the button's selected state.
+     *
+     * @param button The button to set as active (selected). It can be either the
+     *               "favoritesButton", "myRecipesButton", or "calendarButton".
+     */
     private fun setActiveButton(button: Button) {
         // Check if the app is in night mode
         val isNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -499,7 +544,11 @@ class MyRecipesFragment : Fragment() {
     }
 
 
-
+    /**
+     * Updates the calendar grid with the appropriate days for the current month.
+     * It calculates the number of days in the month and ensures the grid is filled
+     * correctly by adding empty cells as needed to complete the 7x5 grid.
+     */
     private fun updateCalendar() {
         val firstDayOfMonth = YearMonth.of(currentYear, currentMonth).atDay(1).dayOfWeek.value
         val daysInMonth = YearMonth.of(currentYear, currentMonth).lengthOfMonth()
@@ -552,7 +601,10 @@ class MyRecipesFragment : Fragment() {
             calendarAdapter.updateCalendarData(daysList, fullCalendarRecipes)
         }
     }
-
+    /**
+     * Initializes the calendar by fetching the data for the current month, including
+     * all the recipes scheduled for each day. The calendar will be displayed in a grid layout.
+     */
     private fun initializeCalendarForCurrentMonth() {
         // Get days of the current month and format them
         val newDays = CalendarUtils.daysInMonthArray(LocalDate.of(currentYear, currentMonth, 1))
@@ -595,7 +647,12 @@ class MyRecipesFragment : Fragment() {
 
         updateCalendarWithCurrentMonth()
     }
-
+    /**
+     * Observes the LiveData from the ViewModel and updates the UI accordingly.
+     * This includes observing the favorite recipes, user recipes, loading state,
+     * error messages, and calendar recipes. It updates the respective views based
+     * on the observed data.
+     */
     private fun observeViewModel() {
         myRecipesViewModel.favoriteRecipes.observe(viewLifecycleOwner) { recipes ->
             if (recipes.isNullOrEmpty()) {
@@ -676,11 +733,17 @@ class MyRecipesFragment : Fragment() {
 
     }
 
+    /**
+     * Called when the fragment is paused. It clears the binding reference to prevent memory leaks.
+     */
     override fun onPause() {
         super.onPause()
         _binding = null
     }
 
+    /**
+     * Called when the fragment is destroyed. It clears the binding reference to prevent memory leaks.
+     */
     override fun onDestroy() {
         super.onDestroy()
         _binding = null

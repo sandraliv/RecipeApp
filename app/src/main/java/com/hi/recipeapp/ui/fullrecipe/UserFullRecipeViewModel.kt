@@ -29,7 +29,12 @@ class UserFullRecipeViewModel @Inject constructor(
     private val _calendarSaveStatus = MutableLiveData<String>()
     val calendarSaveStatus: LiveData<String> get() = _calendarSaveStatus
 
-
+    /**
+     * Fetches the user recipe by its ID.
+     * This method performs a network request to get the recipe details and updates the LiveData.
+     *
+     * @param id The ID of the recipe to fetch.
+     */
     fun fetchUserRecipeById(id: Int) {
         viewModelScope.launch {
             try {
@@ -45,6 +50,14 @@ class UserFullRecipeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Saves the recipe to the user's calendar for a specified date.
+     * The result of the save operation is captured and communicated through LiveData.
+     *
+     * @param userId The ID of the user saving the recipe.
+     * @param recipeId The ID of the recipe to be saved.
+     * @param date The date to save the recipe to in the calendar (in "YYYY-MM-DD" format).
+     */
     fun saveRecipeToCalendar(userId: Int, recipeId: Int, date: String) {
         viewModelScope.launch {
 
