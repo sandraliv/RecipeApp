@@ -152,7 +152,7 @@ class EditRecipeFragment : Fragment() {
             binding.saveRecipe.setOnClickListener {
                 val current = homeViewModel.editableRecipe.value ?: return@setOnClickListener
 
-                //Listinn af url-um getur verið tómur
+                // The list of URLs can be empty
                 val safeImageUrls = current.imageUrls?.filter { it.isNotBlank() } ?: emptyList()
 
                     val updatedRecipe = UserFullRecipe(
