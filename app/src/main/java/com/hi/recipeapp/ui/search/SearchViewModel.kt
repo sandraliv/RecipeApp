@@ -40,23 +40,16 @@ class SearchViewModel @Inject constructor(
     private val _favoriteActionMessage = MutableLiveData<String?>()
     val favoriteActionMessage: LiveData<String?> get() = _favoriteActionMessage
 
-    // Add this to handle load more behavior
     private val _noMoreRecipes = MutableLiveData<Boolean>(false)
     val noMoreRecipes: LiveData<Boolean> = _noMoreRecipes
 
-    // Track current page number and page size
     private var pageNumber = 0
     private val pageSize = 10
     private var sortType = SortType.RATING
-
-
-
-    // Define properties to store the current query and tags
     private var currentQuery: String = ""
     private var currentTags: Set<String>? = null
 
     init {
-        // Initialize the search with an empty query and no tags
         searchByQuery(query = "", tags = null, sort = SortType.RATING)
     }
 
@@ -64,9 +57,7 @@ class SearchViewModel @Inject constructor(
     fun searchByQuery(query: String, tags: Set<String>?, sort: SortType) {
         _errorMessage.value = null
         _isLoading.value = true
-        pageNumber = 0  // Reset to the first page
-
-        // Update the current query, tags, and sort type
+        pageNumber = 0
         currentQuery = query
         currentTags = tags
         sortType = sort
@@ -77,9 +68,8 @@ class SearchViewModel @Inject constructor(
             _isLoading.value = false
 
             // Check if recipes are null or empty
-            if (recipes != null && recipes.isNotEmpty()) {
+            if (!recipes.isNullOrEmpty()) {
                 try {
-                    // Get the logged-in user's ID
                     val userId = sessionManager.getUserId()
 
                     // Mark favorited recipes using the stored favorite IDs
@@ -88,16 +78,12 @@ class SearchViewModel @Inject constructor(
                         recipe.isFavoritedByUser = sessionManager.getFavoritedStatus(userId, recipe.id)
                         Log.d("SEARCH_QUERY", "Recipe: ${recipe.id}, Favorited: ${recipe.isFavoritedByUser}")
                     }
-
-                    // Update the LiveData with the updated recipes
                     _searchResults.value = recipes
                 } catch (e: Exception) {
-                    // Handle potential errors while marking recipes
                     _errorMessage.value = "Error while processing favorites: ${e.message}"
                     Log.e("SEARCH_QUERY", "Error processing favorites", e)
                 }
             } else {
-                // Handle no results found or an error from the API
                 _searchResults.value = null
                 _errorMessage.value = error ?: "No results found"
                 Log.e("SEARCH_QUERY", "Error: ${error ?: "No results found"}")

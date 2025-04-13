@@ -349,8 +349,6 @@ class SearchFragment : Fragment() {
     }
 
 
-
-
     fun resetSearchState() {
         binding.textDashboard.text = ""
         binding.searchDashboard.setQuery("", false)

@@ -35,7 +35,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MyRecipesFragment : Fragment() {
 
-    private lateinit var binding: FragmentMyRecipesBinding
+    private var _binding: FragmentMyRecipesBinding? = null
+    private val binding get() = _binding!!
+
+
     private val myRecipesViewModel: MyRecipesViewModel by viewModels()
     private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var userRecipeAdapter: UserRecipeAdapter
@@ -45,6 +48,7 @@ class MyRecipesFragment : Fragment() {
     @Inject
     lateinit var sessionManager: SessionManager
 
+    private var hasInitializedToday = false
     private val starSize = 30
     private val spaceBetweenStars = 3
     private val gridColumnCount = 2
@@ -59,7 +63,7 @@ class MyRecipesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
+        _binding = FragmentMyRecipesBinding.inflate(inflater, container, false)
 
         // Initialize the adapters
         recipeAdapter = RecipeAdapter(
@@ -218,6 +222,7 @@ class MyRecipesFragment : Fragment() {
         setupRecyclerView()
         setupButtonListeners()
         observeViewModel()
+
         setInitialState()
 
         myRecipesViewModel.favoriteActionMessage.observe(viewLifecycleOwner) { message ->
@@ -243,6 +248,7 @@ class MyRecipesFragment : Fragment() {
         return calendarEntries?.values?.flatten()?.find { it.recipe?.id == recipe.id || it.userRecipe?.id == recipe.id }
     }
     private fun setupRecyclerView() {
+
         // Set up RecyclerView for the calendar recipe list
         binding.calendarRecipeRecyclerView.apply {
             layoutManager =
@@ -386,7 +392,6 @@ class MyRecipesFragment : Fragment() {
 
         setActiveButton(binding.favoritesButton)
         myRecipesViewModel.fetchFavoriteRecipes()
-        updateRecipeListForDay(today)
         selectedDay = today
     }
 
@@ -641,7 +646,6 @@ class MyRecipesFragment : Fragment() {
                         days.add(dayOfMonth)
                     }
 
-                    // Initialize the recipe list for the specific day
                     val recipeList = recipesByDay[dayOfMonth] ?: mutableListOf()
 
                     calendar.recipe?.let { recipeList.add(calendar) }
@@ -650,10 +654,8 @@ class MyRecipesFragment : Fragment() {
                     recipesByDay[dayOfMonth] = recipeList
                 }
 
-                // Update the adapter with the days and recipes for each day
                 calendarAdapter.updateCalendarData(days, recipesByDay)
 
-                // Now check if there are no recipes for the selected day, and display message accordingly
                 val selectedDate = "$currentYear-${currentMonth.toString().padStart(2, '0')}-${selectedDay.padStart(2, '0')}"
                 val recipesForSelectedDay = recipesByDay[selectedDay] ?: emptyList()
 
@@ -662,9 +664,28 @@ class MyRecipesFragment : Fragment() {
                 } else {
                     binding.recipeListTextView.visibility = View.GONE
                 }
+
+                // ✅ Auto-load today’s recipes once
+                if (!hasInitializedToday && isCalendarCategoryActive) {
+                    updateRecipeListForDay(selectedDay)
+                    hasInitializedToday = true
+                }
             }
         }
+
+
     }
+
+    override fun onPause() {
+        super.onPause()
+        _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
 }
 
 

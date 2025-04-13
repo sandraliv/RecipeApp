@@ -43,6 +43,10 @@ class EditRecipeFragment : Fragment() {
         _binding = FragmentAdminEditrecipeBinding.inflate(inflater, container, false)
         homeViewModel.editRecipe(recipeId)
 
+        /**
+         * Listener for when an admin presses a "add ingredient" button on his recipe, this
+         * function is called and a new ingredient line in placed in the view.
+         */
         binding.addIngredientButton.setOnClickListener {
             val somth = binding.ingredientsContainer
 
@@ -88,15 +92,17 @@ class EditRecipeFragment : Fragment() {
             somth.addView(rowLayout)
         }
 
-
-
+        /**
+         * This observer observes for when a recipe has been fetched and then the xml file is filled
+         * with the data from the recipe for editing.
+         */
         homeViewModel.editableRecipe.observe(viewLifecycleOwner) { recipe ->
             binding.editTitle.setText(recipe.title)
             binding.editDescription.setText(recipe.description)
             binding.editInstructions.setText(recipe.instructions)
 
             val somth = binding.ingredientsContainer
-            somth.removeAllViews() // Clear any previous dynamic views
+            somth.removeAllViews()
 
             recipe.ingredients.forEach { (ingredient, quantity) ->
                 val rowLayout = LinearLayout(requireContext()).apply {
@@ -137,19 +143,16 @@ class EditRecipeFragment : Fragment() {
                     }
                 }
 
-                // Now add views to the row (order matters)
                 rowLayout.addView(ingredientInput)
                 rowLayout.addView(quantityInput)
                 rowLayout.addView(deleteButton)
-
-                // Finally, add the row to the container
                 somth.addView(rowLayout)
             }
 
             binding.saveRecipe.setOnClickListener {
                 val current = homeViewModel.editableRecipe.value ?: return@setOnClickListener
 
-                //Listinn af url-um getur verið tómur
+                // The list of URLs can be empty
                 val safeImageUrls = current.imageUrls?.filter { it.isNotBlank() } ?: emptyList()
 
                     val updatedRecipe = UserFullRecipe(
@@ -190,7 +193,10 @@ class EditRecipeFragment : Fragment() {
         _binding = null
     }
 
-
+    /**
+     * The ingredients need to be fetched from the view, to finally send over API
+     * @return Map<String, String> of {ingredient: {quantity}}
+     */
     private fun collectIngredientMap(): Map<String, String> {
         val ingredientMap = mutableMapOf<String, String>()
         for (i in 0 until binding.ingredientsContainer.childCount) {

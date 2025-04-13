@@ -26,6 +26,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.hi.recipeapp.R
 import com.hi.recipeapp.classes.SessionManager
 import com.hi.recipeapp.classes.UserFullRecipe
+import com.hi.recipeapp.databinding.FragmentAdminEditrecipeBinding
 import com.hi.recipeapp.databinding.FragmentUserFullRecipeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -33,11 +34,11 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class UserFullRecipeFragment : Fragment() {
-
     private val userFullRecipeViewModel: UserFullRecipeViewModel by viewModels() // Get ViewModel instance
-    private lateinit var binding: FragmentUserFullRecipeBinding
     @Inject
     lateinit var sessionManager: SessionManager
+    private var _binding: FragmentUserFullRecipeBinding? = null
+    private val binding get() = _binding!!
 
     private val args: UserFullRecipeFragmentArgs by navArgs()
     private val recipeId: Int get() = args.recipeId
@@ -48,7 +49,7 @@ class UserFullRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentUserFullRecipeBinding.inflate(inflater, container, false)
+        _binding = FragmentUserFullRecipeBinding.inflate(inflater, container, false)
         setupGestureDetector()
         userFullRecipeViewModel.fetchUserRecipeById(recipeId)
 

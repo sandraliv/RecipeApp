@@ -35,18 +35,15 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Show the back arrow
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         val navView: BottomNavigationView = binding.navView
 
-        // ✅ Get NavController safely
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as? NavHostFragment
         if (navHostFragment != null) {
             navController = navHostFragment.navController
 
-            // ✅ Setup ActionBar with Navigation
             val appBarConfiguration = AppBarConfiguration(
                 setOf(
                     R.id.navigation_home,
@@ -57,21 +54,17 @@ class MainActivity : AppCompatActivity() {
             )
             setupActionBarWithNavController(navController, appBarConfiguration)
 
-            // ✅ Connect BottomNavigationView with NavController
             navView.setupWithNavController(navController)
 
-            // ✅ Handle Bottom Navigation Item Selection
             navView.setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_home -> {
-                        // Check if already on HomeFragment to prevent unnecessary action
                         if (navController.currentDestination?.id != R.id.navigation_home) {
                             navController.navigate(R.id.navigation_home)
                         }
                         true
                     }
                     R.id.navigation_search -> {
-                        // If we are on a different fragment, navigate to Dashboard directly
                         if (navController.currentDestination?.id != R.id.navigation_search) {
                             navController.navigate(R.id.navigation_search)
                         } else {
@@ -82,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
 
-                    R.id.navigation_add_recipe -> { // ✅ Plús takkinn fer í AddRecipeFragment
+                    R.id.navigation_add_recipe -> {
                         if (navController.currentDestination?.id != R.id.AddRecipeFragment) {
                             navController.navigate(R.id.AddRecipeFragment)
                         }
@@ -90,14 +83,12 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.navigation_myrecipes -> {
-                        // Check if already on NotificationsFragment to prevent unnecessary action
                         if (navController.currentDestination?.id != R.id.navigation_myrecipes) {
                             navController.navigate(R.id.navigation_myrecipes)
                         }
                         true
                     }
                     R.id.navigation_settings -> {
-                        // Check if already on SettingsFragment to prevent unnecessary action
                         if (navController.currentDestination?.id != R.id.navigation_settings) {
                             navController.navigate(R.id.navigation_settings)
                         }

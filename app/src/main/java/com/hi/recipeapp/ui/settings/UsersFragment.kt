@@ -28,6 +28,9 @@ class UsersFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * A recyclerView is setup with all users and a button where admin can delete a user.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -42,14 +45,11 @@ class UsersFragment : Fragment() {
             binding.usersRecyclerView.adapter = userAdapter
         }
 
-
-        // Observe error
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
-
         viewModel.fetchUsers()
     }
 

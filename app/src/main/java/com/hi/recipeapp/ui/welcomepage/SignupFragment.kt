@@ -35,6 +35,12 @@ class SignupFragment : Fragment() {
         setupListeners()
     }
 
+    /**
+     * Observes LiveData from the ViewModel:
+     * - If sign up is successful, user navigates to the login screen.
+     * - If error, displays an error message.
+     * - Updates the signup button's enabled state based on loading status.
+     */
     private fun setupObservers() {
         signupViewModel.signupResult.observe(viewLifecycleOwner) { user ->
             if (user != null) {
@@ -58,6 +64,12 @@ class SignupFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets up listeners for user interactions:
+     * - On signup button click, collects input data and calls the ViewModel’s signup method.
+     * - If any field is empty, shows a warning message.
+     * - Navigates to login screen when the "Log in" text is clicked.
+     */
     private fun setupListeners() {
         binding.signupBtn.setOnClickListener {
             val role = "USER"

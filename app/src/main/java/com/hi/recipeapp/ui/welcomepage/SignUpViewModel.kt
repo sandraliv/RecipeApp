@@ -22,6 +22,18 @@ class SignupViewModel @Inject constructor(
     private val _navigateToLogin = MutableLiveData<Boolean>()
     val navigateToLogin: LiveData<Boolean> get() = _navigateToLogin
 
+
+    /**
+     * Attempts to sign up a new user using the user's provided registration details.
+     * On success, updates [signupResult] with the new user data.
+     * On failure,displays error message.
+     *
+     * @param role The role of the user
+     * @param name The full name of the user
+     * @param email The email address of the user
+     * @param password The user’s chosen password
+     * @param username The user’s chosen username
+     */
     fun signup(role: String, name: String, email: String, password: String, username: String) {
         if (role.isBlank() || name.isBlank() || email.isBlank() || password.isBlank() || username.isBlank()) {
             _errorMessage.value = "Please fill in all fields"
@@ -39,6 +51,6 @@ class SignupViewModel @Inject constructor(
         }
     }
     fun onNavigateToLoginComplete() {
-        _navigateToLogin.value = false // Reset event
+        _navigateToLogin.value = false
     }
 }

@@ -24,6 +24,10 @@ class AddRecipeViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    /**
+     * Method for passing the recipe to recipeService for upload to database
+     * @param recipe UserFullRecipe object which holds all information about recipe from admin
+     */
     fun uploadRecipe(recipe: UserFullRecipe) {
         viewModelScope.launch {
             try {

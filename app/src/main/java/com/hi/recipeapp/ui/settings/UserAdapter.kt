@@ -25,6 +25,9 @@ class UserAdapter(private val users: List<User>, private val onDeleteClick: (Int
             userEmail.text = user.email
             userRole.text = user.role
 
+            /**
+             * User gets a dialog to confirm that he wants to delete the user.
+             */
             deleteUser.setOnClickListener {
                 // Show confirmation dialog
                 AlertDialog.Builder(holder.itemView.context)

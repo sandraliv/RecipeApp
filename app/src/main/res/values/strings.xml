@@ -45,7 +45,7 @@
     <string name="dessert">Dessert</string>
     <string name="baking">Baking</string>
     <string name="selected_category">selected category</string>
-    <string name="no_more_recipes_available">No more recipes availible</string>
+    <string name="no_more_recipes_available">No more recipes available</string>
     <string name="load_more">Load More</string>
     <string name="user_management">User Management</string>
     <string name="delete_user">Delete user</string>

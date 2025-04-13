@@ -33,14 +33,16 @@
 
             <!-- Button for removing from calendar -->
             <ImageButton
-                android:id="@+id/removeFromCalendarButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="end"
+                android:id="@+id/remove_from_calendar_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:contentDescription="@string/a_tiny_trash_can_icon"
+                android:src="@drawable/delete"
                 android:background="@null"
                 android:scaleType="fitCenter"
-                android:contentDescription="@string/remove_recipe_from_calendar"
-                android:src="@drawable/delete_13550284" />
+                android:layout_gravity="top|end"
+                android:layout_marginEnd="10dp"
+                />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

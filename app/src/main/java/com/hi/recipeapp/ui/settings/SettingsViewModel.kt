@@ -33,6 +33,9 @@ class SettingsViewModel @Inject constructor(
         checkIfUserIsAdmin()
     }
 
+    /**
+     * Collects the saved profile pic url from SharedPreferences and displays it.
+     */
     private fun loadProfilePic() {
         val pic = sessionManager.getProfilePic()
         _profilePic.value = if (!pic.isNullOrEmpty()) pic else null
@@ -50,10 +53,21 @@ class SettingsViewModel @Inject constructor(
         _isAdmin.value = user == true
     }
 
+    /**
+     *
+     * Calls session manager and saves the url in sharedpreferences
+     * @param uri: URI path variable
+     * @return void
+     *
+     */
     fun addPicToSessionManager(uri: Uri) {
         sessionManager.saveProfilePic(uri.toString())
     }
 
+    /**
+     * Photo is collected from phone, put in a file and sent over API.
+     * @param photoBytes A ByteArray object which holds the bytes retreived from phone.
+     */
     fun uploadPhotoBytes(photoBytes: ByteArray) {
         viewModelScope.launch {
             try {

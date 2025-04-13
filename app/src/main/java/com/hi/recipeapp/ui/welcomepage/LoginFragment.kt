@@ -38,6 +38,12 @@ class LoginFragment : Fragment() {
         setupListeners()
     }
 
+    /**
+     * Observes changes from the ViewModel:
+     * - If login is successful, shows welcome message and navigates to MainActivity.
+     * - If login fails, shows error message.
+     * - Disables login button while loading.
+     */
     private fun setupObservers() {
         LoginViewModel.loginResult.observe(viewLifecycleOwner) { user ->
             if (user != null) {
@@ -66,6 +72,12 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets up listeners for user interactions:
+     * - When the login button is pressed, the app reads the username and password input fields,
+     *   and calls the ViewModel’s login function to attempt logging in.
+     * - When you click on "Sign Up", the user is goes to SignUpFragment.
+     */
     private fun setupListeners() {
         binding.loginBtn.setOnClickListener {
             val username = binding.usernameInput.text.toString().trim()

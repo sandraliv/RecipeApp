@@ -40,7 +40,8 @@ import javax.inject.Inject
 class FullRecipeFragment : Fragment() {
 
     private val fullRecipeViewModel: FullRecipeViewModel by viewModels() // Get ViewModel instance
-    private lateinit var binding: FragmentFullRecipeBinding
+    private var _binding: FragmentFullRecipeBinding? = null
+    private val binding get() = _binding!!
     @Inject
     lateinit var sessionManager: SessionManager
 
@@ -55,7 +56,7 @@ class FullRecipeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
+        _binding = FragmentFullRecipeBinding.inflate(inflater, container, false)
 
         // Initial visibility settings
         binding.nestedScrollView.visibility = View.GONE
@@ -456,6 +457,11 @@ class FullRecipeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fullRecipeViewModel.fetchRecipeById(recipeId)
-
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }
