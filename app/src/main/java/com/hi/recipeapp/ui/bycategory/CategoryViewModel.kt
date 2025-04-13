@@ -41,6 +41,13 @@ class CategoryViewModel @Inject constructor(
 
     private var currentSort = "rating" // Default sort
 
+    /**
+     * Fetches recipes based on the given category and sort type.
+     * Updates the LiveData with the fetched recipes and their favorite status.
+     *
+     * @param category The category for which recipes are being fetched.
+     * @param sort The sort type (e.g., rating, popularity).
+     */
     fun getRecipesByCategory(category: Category, sort: String = "rating") {
         currentSort = sort // Store the current sort type
 
@@ -83,6 +90,14 @@ class CategoryViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Loads more recipes for a given category when scrolling or requesting more.
+     * Appends the new recipes to the existing list and updates the LiveData.
+     *
+     * @param category The category for which more recipes are being fetched.
+     * @param sort The sort type (e.g., rating, popularity).
+     */
     fun loadMoreRecipes(category: Category, sort: String = "rating") {
         pageNumber++ // Increment the page number to load the next page
         _isLoading.value = true
@@ -112,8 +127,12 @@ class CategoryViewModel @Inject constructor(
         }
     }
 
-
-
+    /**
+     * Updates the favorite status of a recipe and reflects the changes in the backend and session.
+     *
+     * @param recipe The recipe to be updated.
+     * @param isFavorited Boolean indicating the new favorite status.
+     */
     fun updateFavoriteStatus(recipe: RecipeCard, isFavorited: Boolean) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()

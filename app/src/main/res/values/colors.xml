@@ -25,7 +25,7 @@
     <color name="descriptionCard">#AAAAAA</color>
     <color name="rosybrown_dark">#A07272</color>
 
-    <!-- finna fyrir hvað -->
+
     <color name="button_selected_tint">#f2e9e9</color>
     <color name="button_pressed_tint">#f2e9e9</color>
     <color name="button_default_tint">#f8f4f4</color>
@@ -62,7 +62,7 @@
     <color name="default_m_button_background_color">@color/rosybrown_50</color> <!-- Rosybrown 50 background -->
 
     <!-- Night Mode: Colors for favorites calendar and my recipes buttons in calendar-->
-    <color name="selected_button_text_color_night">#000000</color> <!-- White text -->
+    <color name="selected_button_text_color_night">#FFFFFFFF</color> <!-- White text -->
     <color name="selected_m_button_background_color_night">#252427</color> <!-- Rosybrown 200 background -->
 
     <color name="default_m_button_text_color_night">#CBCBCB</color> <!-- Rosybrown 400 text color -->
