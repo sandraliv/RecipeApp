@@ -18,7 +18,6 @@ import com.bumptech.glide.Glide
 import com.hi.recipeapp.R
 import com.hi.recipeapp.WelcomePageActivity
 import com.hi.recipeapp.databinding.FragmentSettingsBinding
-import com.hi.recipeapp.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 import java.io.File
