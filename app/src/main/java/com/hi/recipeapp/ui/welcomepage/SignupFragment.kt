@@ -65,7 +65,7 @@ class SignupFragment : Fragment() {
     }
 
     /**
-     * Sets up button click listeners:
+     * Sets up listeners for user interactions:
      * - On signup button click, collects input data and calls the ViewModel’s signup method.
      * - If any field is empty, shows a warning message.
      * - Navigates to login screen when the "Log in" text is clicked.
