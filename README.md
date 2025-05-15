@@ -1,6 +1,6 @@
 # 📦 Recipe App
 
-Verkefni sem við @hildursvava @asdis96 gerðum saman í hugbúnaðarverkefni 2.
+Verkefni sem við @sandraliv @hildursvava og @asdis96 gerðum saman í hugbúnaðarverkefni 2.
 Appið er uppskriftarsíða þar sem notendur geta fundið uppskriftir og einnig geymt/sett inn sínar eigin uppskiftir.
 
 Framendi: 
